@@ -1,0 +1,5 @@
+class Dashboard {
+    static initDashboard() {
+        
+    }
+}
