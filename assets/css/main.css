@@ -5,8 +5,72 @@
     --secondary-color: #38a3a5;
     --tertiary-clor: #184e77;
     --primary-font: "Inter", sans-serif;
+    --navbar-font-color: #83afd1;
 }
 
 body {
     font-family: var(--primary-font) !important;
+}
+
+.ims__body-container {
+    height: 100vh;
+}
+
+.active,
+.active i {
+    color: white !important;
+}
+
+.active::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    width: 0.2rem;
+    height: 2rem;
+    background-color: white;
+}
+
+/** Navbar **/
+.ims__navbar-content {
+    width: 9.5rem;
+    transition: 0.3s ease-in-out;
+    background-color: var(--primary-color);
+}
+
+.ims__collapsible-navbar {
+    width: 3.3rem;
+}
+
+.ims__navbar-content a {
+    font-size: 0.85rem;
+    display: grid;
+}
+
+.ims__navbar-content a,
+.ims__navbar-content i {
+    color: var(--navbar-font-color);
+    transition: color 0.2s ease-in-out;
+}
+
+.ims__navbar-content a:hover,
+.ims__navbar-content a:hover i,
+.ims__navbar-content i:hover {
+    color: white;
+}
+
+.ims__navbar-link-container {
+    width: 8rem;
+}
+
+.ims__navbar-link-container ul {
+    gap: 0.5rem;
+}
+
+.ims__navbar-logo-container {
+    width: 2rem;
+}
+
+.ims__navbar-logo-container .ims__navbar-icon {
+    cursor: pointer;
+    font-size: 1rem;
 }
