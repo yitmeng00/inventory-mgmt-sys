@@ -2,7 +2,6 @@
 <html lang="en">
 
 <?php
-$include_chartjs = true;
 include("includes/header.php");
 ?>
 
@@ -14,7 +13,7 @@ include("includes/header.php");
             <div>
                 <div>
                     <p>
-                        Dashboard page.
+                        Transaction page.
                     </p>
                 </div>
             </div>
