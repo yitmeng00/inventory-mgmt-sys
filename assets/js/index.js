@@ -1,7 +1,3 @@
-document.addEventListener("DOMContentLoaded", function () {
-    Dashboard.initDashboard();
-});
-
 const toggleNavbar = () => {
     const NAVBAR_CONTENT = document.querySelector(".ims__navbar-content");
     const ICON_TOGGLER = document.getElementById("ims__navbar-toggler");
