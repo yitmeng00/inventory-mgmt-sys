@@ -41,12 +41,92 @@ class ElementFactory {
         return div;
     };
 
-    static createParagraph(paragraph) {
+    static createParagraph = (paragraph) => {
         const p = document.createElement("p");
         p.textContent = paragraph;
 
         return p;
-    }
+    };
+
+    static createButton = (value) => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.classList.add("btn");
+        btn.innerHTML = value;
+
+        return btn;
+    };
+
+    static createInput = (
+        labelText,
+        inputType,
+        inputName,
+        inputValue,
+        disabled
+    ) => {
+        const label = document.createElement("label");
+        label.textContent = labelText;
+
+        const input = document.createElement("input");
+        input.type = inputType;
+        input.name = inputName;
+        input.value = inputValue;
+        input.disabled = disabled;
+
+        const wrapper = document.createElement("div");
+        wrapper.appendChild(label);
+        wrapper.appendChild(input);
+
+        return wrapper;
+    };
+
+    static createTable = (id) => {
+        const table = document.createElement("table");
+        table.classList.add("table");
+        table.id = id;
+
+        return table;
+    };
+
+    static createTableHeader = (table, labels) => {
+        const tableHeaderRow = table.createTHead().insertRow();
+
+        labels.forEach((label) => {
+            const th = document.createElement("th");
+            th.textContent = label;
+            tableHeaderRow.appendChild(th);
+        });
+
+        return tableHeaderRow;
+    };
+
+    static createTableBody = (tableType, table, responses) => {
+        const tableBody = table.createTBody();
+
+        responses.forEach((response) => {
+            const row = tableBody.insertRow();
+            for (const key in response) {
+                const cell = row.insertCell();
+                cell.textContent = response[key];
+            }
+
+            const actionCell = row.insertCell();
+
+            const viewDetailButton = this.createButton("View Detail");
+            viewDetailButton.classList.add("btn", "btn-primary");
+            viewDetailButton.setAttribute("data-bs-toggle", "modal");
+            viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
+            if (tableType == "product") {
+                viewDetailButton.addEventListener("click", () => {
+                    this.showModal("Detail", tableType, response);
+                });
+            }
+
+            actionCell.appendChild(viewDetailButton);
+        });
+
+        return tableBody;
+    };
 
     static createIcon = (icon) => {
         const div = document.createElement("div");
