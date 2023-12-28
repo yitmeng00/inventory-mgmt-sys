@@ -39,3 +39,5 @@ $RECYCLE.BIN/
 composer.phar
 /vendor/
 composer.lock
+
+.env
