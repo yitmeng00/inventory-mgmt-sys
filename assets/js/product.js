@@ -12,7 +12,7 @@ class Product {
         const productBtnCol = ElementFactory.createCol();
         const productBtnContainer = ElementFactory.createDiv();
         productBtnContainer.classList.add("text-end");
-        const productBtn = ElementFactory.createButton("Add Product");
+        const productBtn = ElementFactory.createButton("button", "Add Product");
         productBtn.setAttribute("data-bs-toggle", "modal");
         productBtn.setAttribute("data-bs-target", "#ims__modal");
         productBtn.addEventListener("click", () => {
@@ -33,11 +33,10 @@ class Product {
         const productTable = ElementFactory.createTable("ims__product-table");
 
         const headerLabels = [
-            "Product ID",
+            "Product Code",
             "Product Name",
             "Category ID",
             "Supplier ID",
-            "Product Code",
             "Description",
             "Price",
             "Quantity",
