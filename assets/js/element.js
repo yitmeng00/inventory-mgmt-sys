@@ -223,15 +223,21 @@ class ElementFactory {
         const tableBody = table.createTBody();
 
         if (tableType == "product") {
+            let counter = 1;
+
             responses.forEach((response) => {
                 const row = tableBody.insertRow();
+
+                // Insert the counter in the first cell
+                const counterCell = row.insertCell();
+                counterCell.textContent = counter++;
 
                 // Define the order of keys
                 const keysOrder = [
                     "product_code",
                     "product_name",
-                    "category_id",
-                    "supplier_id",
+                    "category_name",
+                    "supplier_name",
                     "description",
                     "price",
                     "quantity",
@@ -368,6 +374,10 @@ class ElementFactory {
     }
 
     static showModal = (actionType, tableType, response) => {
+        console.log("i am here");
+        console.log(actionType);
+        console.log(tableType);
+        console.log(response);
         const modalHeader = document.getElementById("ims__modal-header");
         const modalBody = document.getElementById("ims__modal-body");
 
@@ -377,15 +387,15 @@ class ElementFactory {
         const modalType =
             tableType.charAt(0).toUpperCase() + tableType.slice(1);
         if (actionType == "Add") {
-            this.rendalModalHeader(modalHeader, `${actionType} ${modalType}`);
-        } else {
-            this.rendalModalHeader(modalHeader, `${modalType} ${actionType}`);
+            this.renderModalHeader(modalHeader, `${actionType} ${modalType}`);
+        } else if (actionType == "Detail") {
+            this.renderModalHeader(modalHeader, `${modalType} ${actionType}`);
         }
 
-        this.rendalModalBody(actionType, tableType, response, modalBody);
+        this.renderModalBody(actionType, tableType, response, modalBody);
     };
 
-    static rendalModal = () => {
+    static renderModal = () => {
         var modalContainer = this.createDiv();
         modalContainer.classList.add("modal", "fade");
         modalContainer.id = "ims__modal";
@@ -420,7 +430,7 @@ class ElementFactory {
         document.body.appendChild(modalContainer);
     };
 
-    static rendalModalHeader = (modalHeader, title) => {
+    static renderModalHeader = (modalHeader, title) => {
         const modalTitle = document.createElement("h1");
         modalTitle.classList.add("modal-title", "fs-5");
         modalTitle.textContent = title;
@@ -434,7 +444,7 @@ class ElementFactory {
         modalHeader.appendChild(closeButton);
     };
 
-    static rendalModalBody = (actionType, tableType, response, modalBody) => {
+    static renderModalBody = (actionType, tableType, response, modalBody) => {
         const formContainer = this.createSection();
         const formContainerRow = this.createRow();
         const formContainerCol = this.createCol();
@@ -446,7 +456,7 @@ class ElementFactory {
                     this.renderProductDetailForm(form, response);
                     break;
                 case "Add":
-                    this.renderProductAddForm(form);
+                    this.renderProductAddForm(form, tableType);
                     break;
             }
         }
@@ -477,6 +487,7 @@ class ElementFactory {
                     if (data.product_imgs && data.product_imgs.length > 0) {
                         const productImgSrc = data.product_imgs[0].img_path;
                         const productImgContainer = this.createDiv();
+                        productImgContainer.classList.add("text-center");
                         const productImg = this.createImage(
                             productImgSrc,
                             "Product Image"
@@ -496,6 +507,66 @@ class ElementFactory {
             })
             .catch((error) => {
                 console.error("Error fetching product image: ", error);
+            });
+
+        const categoryPromise = fetch("db/category_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const categories = data.categories;
+                    const selectedCategoryId = response.category_id;
+
+                    const categoryDropdown = ElementFactory.createDropdown(
+                        "Category:",
+                        categories,
+                        "category_id",
+                        "category_name",
+                        true,
+                        selectedCategoryId
+                    );
+
+                    formCol2.appendChild(categoryDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        const supplierPromise = fetch("db/supplier_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const suppliers = data.suppliers;
+                    const selectedSupplierId = response.supplier_id;
+
+                    const supplierDropdown = ElementFactory.createDropdown(
+                        "Supplier:",
+                        suppliers,
+                        "supplier_id",
+                        "supplier_name",
+                        true,
+                        selectedSupplierId
+                    );
+
+                    formCol2.appendChild(supplierDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
             });
 
         const productCodeInput = this.createInput(
@@ -581,66 +652,6 @@ class ElementFactory {
         btnWrapperDiv.appendChild(editButton);
         btnWrapperDiv.appendChild(deleteButton);
 
-        const categoryPromise = fetch("db/category_db.php", {
-            method: "GET",
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    const categories = data.categories;
-                    const selectedCategoryId = response.category_id;
-
-                    const categoryDropdown = ElementFactory.createDropdown(
-                        "Category:",
-                        categories,
-                        "category_id",
-                        "category_name",
-                        true,
-                        selectedCategoryId
-                    );
-
-                    formCol2.appendChild(categoryDropdown);
-                } else {
-                    console.error(
-                        "Error fetching product data: ",
-                        data.error_msg
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching product data: ", error);
-            });
-
-        const supplierPromise = fetch("db/supplier_db.php", {
-            method: "GET",
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    const suppliers = data.suppliers;
-                    const selectedSupplierId = response.supplier_id;
-
-                    const supplierDropdown = ElementFactory.createDropdown(
-                        "Supplier:",
-                        suppliers,
-                        "supplier_id",
-                        "supplier_name",
-                        true,
-                        selectedSupplierId
-                    );
-
-                    formCol2.appendChild(supplierDropdown);
-                } else {
-                    console.error(
-                        "Error fetching product data: ",
-                        data.error_msg
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching product data: ", error);
-            });
-
         Promise.all([imagePromise, categoryPromise, supplierPromise]).then(
             () => {
                 formCol2.appendChild(productCodeInput);
@@ -654,45 +665,7 @@ class ElementFactory {
         );
     };
 
-    static renderProductAddForm = (form) => {
-        const productCodeInput = this.createInput(
-            "Product Code:",
-            "text",
-            "product_code",
-            "",
-            false
-        );
-        const productNameInput = this.createInput(
-            "Product Name:",
-            "text",
-            "product_name",
-            "",
-            false
-        );
-        const descriptionInput = this.createInput(
-            "Description:",
-            "text",
-            "description",
-            "",
-            false
-        );
-        const priceInput = this.createInput(
-            "Price:",
-            "number",
-            "price",
-            "",
-            false
-        );
-
-        const attachmentInput = this.createInput(
-            "Attachment:",
-            "file",
-            "attachment",
-            "",
-            false
-        );
-        attachmentInput.id = "ims__add-product-img-input";
-
+    static renderProductAddForm = (form, tableType) => {
         const categoryPromise = fetch("db/category_db.php", {
             method: "GET",
         })
@@ -751,6 +724,44 @@ class ElementFactory {
                 console.error("Error fetching product data: ", error);
             });
 
+        const productCodeInput = this.createInput(
+            "Product Code:",
+            "text",
+            "product_code",
+            "",
+            false
+        );
+        const productNameInput = this.createInput(
+            "Product Name:",
+            "text",
+            "product_name",
+            "",
+            false
+        );
+        const descriptionInput = this.createInput(
+            "Description:",
+            "text",
+            "description",
+            "",
+            false
+        );
+        const priceInput = this.createInput(
+            "Price:",
+            "number",
+            "price",
+            "",
+            false
+        );
+
+        const attachmentInput = this.createInput(
+            "Attachment:",
+            "file",
+            "attachment",
+            "",
+            false
+        );
+        attachmentInput.id = "ims__add-product-img-input";
+
         const submitButtonContainer = this.createDiv();
         submitButtonContainer.classList.add("text-end");
         const submitButton = this.createButton("submit", "Submit");
@@ -769,7 +780,7 @@ class ElementFactory {
             form.addEventListener("submit", (event) => {
                 event.preventDefault();
 
-                this.handleFormSubmission(form);
+                this.handleFormSubmission(form, tableType);
             });
         });
     };
@@ -810,7 +821,74 @@ class ElementFactory {
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
+                            const productTable = $(
+                                "#ims__product-table"
+                            ).DataTable();
+
+                            // Find the row index based on the product_code
+                            const rowIndex = productTable
+                                .rows()
+                                .eq(0)
+                                .filter((rowIdx) => {
+                                    return (
+                                        productTable.cell(rowIdx, 1).data() ===
+                                        response.product_code
+                                    );
+                                });
+
+                            if (rowIndex.length > 0) {
+                                const rowNode = productTable
+                                    .row(rowIndex)
+                                    .node();
+
+                                const cellUpdates = [
+                                    {
+                                        index: 1,
+                                        value: data.product_data.product_code,
+                                    },
+                                    {
+                                        index: 2,
+                                        value: data.product_data.product_name,
+                                    },
+                                    {
+                                        index: 3,
+                                        value: data.product_data.category_name,
+                                    },
+                                    {
+                                        index: 4,
+                                        value: data.product_data.supplier_name,
+                                    },
+                                    {
+                                        index: 5,
+                                        value: data.product_data.description,
+                                    },
+                                    {
+                                        index: 6,
+                                        value: data.product_data.price,
+                                    },
+                                ];
+
+                                // Update each specified cell in the row
+                                cellUpdates.forEach(({ index, value }) => {
+                                    productTable
+                                        .cell(rowNode, index)
+                                        .data(value);
+                                });
+
+                                productTable.draw();
+                            }
+
                             $("#ims__modal").modal("hide");
+
+                            // Reset to "Edit" mode
+                            editButton.textContent = "Edit";
+
+                            // Disable all input elements in the form
+                            const inputElements =
+                                form.querySelectorAll("input, select");
+                            inputElements.forEach((input) => {
+                                input.disabled = true;
+                            });
                         } else {
                             console.error(
                                 "Error updating product:",
@@ -821,15 +899,6 @@ class ElementFactory {
                     .catch((error) => {
                         console.error("Error updating product:", error);
                     });
-
-                // Reset to "Edit" mode
-                editButton.textContent = "Edit";
-
-                // Disable all input elements in the form
-                const inputElements = form.querySelectorAll("input, select");
-                inputElements.forEach((input) => {
-                    input.disabled = true;
-                });
             }
         }
     };
@@ -841,6 +910,7 @@ class ElementFactory {
 
         if (userConfirmed) {
             const productId = response.product_id;
+            const productCode = response.product_code;
 
             fetch(`db/product_db.php`, {
                 method: "DELETE",
@@ -852,6 +922,25 @@ class ElementFactory {
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.success) {
+                        const productTable = $(
+                            "#ims__product-table"
+                        ).DataTable();
+
+                        // Find the row in DataTable based on the product_code and remove it
+                        const rowIndex = productTable
+                            .rows()
+                            .eq(0)
+                            .filter((rowIdx) => {
+                                return (
+                                    productTable.cell(rowIdx, 1).data() ===
+                                    productCode
+                                );
+                            });
+
+                        if (rowIndex.length > 0) {
+                            productTable.row(rowIndex).remove().draw();
+                        }
+
                         $("#ims__modal").modal("hide");
                     } else {
                         console.error(
@@ -866,7 +955,7 @@ class ElementFactory {
         }
     };
 
-    static handleFormSubmission = (form) => {
+    static handleFormSubmission = (form, tableType) => {
         const fileInput = document.querySelector(
             '#ims__add-product-img-input input[type="file"]'
         );
@@ -881,6 +970,51 @@ class ElementFactory {
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
+                    const productTable = $("#ims__product-table").DataTable();
+
+                    const nextRowNumber = productTable.rows().count() + 1;
+
+                    const viewDetailButton = this.createButton(
+                        "button",
+                        "View Detail"
+                    );
+                    viewDetailButton.classList.add("btn", "btn-info");
+                    viewDetailButton.setAttribute("data-bs-toggle", "modal");
+                    viewDetailButton.setAttribute(
+                        "data-bs-target",
+                        "#ims__modal"
+                    );
+
+                    const viewDetailButtonHTML = viewDetailButton.outerHTML;
+
+                    const productData = data.product_data;
+
+                    // Add new row to the DataTable
+                    productTable.row
+                        .add([
+                            nextRowNumber,
+                            data.product_data.product_code,
+                            data.product_data.product_name,
+                            data.product_data.category_name,
+                            data.product_data.supplier_name,
+                            data.product_data.description,
+                            data.product_data.price,
+                            data.product_data.quantity,
+                            viewDetailButtonHTML,
+                        ])
+                        .draw(false);
+
+                    const lastRowNode = productTable
+                        .row(productTable.rows().count() - 1)
+                        .node();
+
+                    // Attach the event listener to the button in the last added row
+                    const lastRowViewDetailButton =
+                        lastRowNode.querySelector(".btn-info");
+                    lastRowViewDetailButton.addEventListener("click", () => {
+                        this.showModal("Detail", tableType, productData);
+                    });
+
                     $("#ims__modal").modal("hide");
                 } else {
                     console.error("Error adding product:", data.error_msg);

@@ -34,7 +34,7 @@ function retrieveProducts()
     global $conn;
 
     try {
-        $stmt = $conn->prepare("SELECT product_id, product_name, category_id, supplier_id, product_code, `description`, price, quantity FROM product;");
+        $stmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id;");
         $stmt->execute();
         $result = $stmt->get_result();
         $products = $result->fetch_all(MYSQLI_ASSOC);
@@ -83,7 +83,6 @@ function createProduct()
     $productCode = $_POST['product_code'];
     $description = $_POST['description'];
     $price = $_POST['price'];
-    $quantity = $_POST['quantity'];
 
     // Handle file upload
     $uploadFile = $uploadDir . basename($_FILES['attachment']['name']);
@@ -107,9 +106,17 @@ function createProduct()
                 $imgStmt->execute();
 
                 if ($imgStmt->affected_rows > 0) {
+                    // Retrieve the newly added product data
+                    $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
+                    $selectStmt->bind_param("i", $lastInsertedProductId);
+                    $selectStmt->execute();
+                    $result = $selectStmt->get_result();
+                    $productData = $result->fetch_assoc();
+
                     echo json_encode(array(
                         'success' => true,
-                        'message' => 'Product and image created successfully'
+                        'message' => 'Product and image created successfully',
+                        'product_data' => $productData
                     ));
                 } else {
                     echo json_encode(array(
@@ -162,7 +169,6 @@ function updateProduct()
     $productCode = $data['product_code'];
     $description = $data['description'];
     $price = $data['price'];
-    $quantity = $data['quantity'];
 
     try {
         $stmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, price=? WHERE product_id=?;");
@@ -171,9 +177,16 @@ function updateProduct()
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
+            $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
+            $selectStmt->bind_param("i", $productId);
+            $selectStmt->execute();
+            $result = $selectStmt->get_result();
+            $productData = $result->fetch_assoc();
+
             echo json_encode(array(
                 'success' => true,
-                'message' => 'Product updated successfully'
+                'message' => 'Product updated successfully',
+                'product_data' => $productData
             ));
         } else {
             echo json_encode(array(
