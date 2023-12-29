@@ -4,7 +4,7 @@ class Dashboard {
 
         // Overview section
         const overviewSect = ElementFactory.createSection();
-        overviewSect.classList.add("border", "border-black");
+        overviewSect.classList.add("border", "border-black", "mb-3");
         const overviewSectRow = ElementFactory.createRow();
         overviewSectRow.classList.add("p-3");
         const overviewSectCol = ElementFactory.createCol();
@@ -64,6 +64,7 @@ class Dashboard {
 
         // Chart Section
         const chartSect = ElementFactory.createSection();
+        chartSect.classList.add("mb-3");
         const chartSectRow = ElementFactory.createRow();
         const chartSectCol = ElementFactory.createCol();
         chartSect.appendChild(chartSectRow);
