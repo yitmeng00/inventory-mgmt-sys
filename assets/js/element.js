@@ -264,6 +264,48 @@ class ElementFactory {
 
                 actionCell.appendChild(viewDetailButton);
             });
+        } else if (tableType == "transaction") {
+            let counter = 1;
+
+            responses.forEach((response) => {
+                const row = tableBody.insertRow();
+
+                // Insert the counter in the first cell
+                const counterCell = row.insertCell();
+                counterCell.textContent = counter++;
+
+                // Define the order of keys
+                const keysOrder = [
+                    "product_code",
+                    "product_name",
+                    "type_name",
+                    "quantity",
+                    "unit_price",
+                    "created",
+                ];
+
+                keysOrder.forEach((key) => {
+                    const cell = row.insertCell();
+                    cell.textContent = response[key];
+                });
+
+                const actionCell = row.insertCell();
+
+                const viewDetailButton = this.createButton(
+                    "button",
+                    "View Detail"
+                );
+                viewDetailButton.classList.add("btn", "btn-info");
+                viewDetailButton.setAttribute("data-bs-toggle", "modal");
+                viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
+
+                response.no = counter - 1;
+                viewDetailButton.addEventListener("click", () => {
+                    this.showModal("Detail", tableType, response);
+                });
+
+                actionCell.appendChild(viewDetailButton);
+            });
         }
 
         return tableBody;
@@ -374,10 +416,6 @@ class ElementFactory {
     }
 
     static showModal = (actionType, tableType, response) => {
-        console.log("i am here");
-        console.log(actionType);
-        console.log(tableType);
-        console.log(response);
         const modalHeader = document.getElementById("ims__modal-header");
         const modalBody = document.getElementById("ims__modal-body");
 
@@ -459,6 +497,15 @@ class ElementFactory {
                     this.renderProductAddForm(form, tableType);
                     break;
             }
+        } else if (tableType == "transaction") {
+            switch (actionType) {
+                case "Detail":
+                    this.renderTransactionDetailForm(form, response);
+                    break;
+                case "Add":
+                    this.renderTransactionAddForm(form, tableType);
+                    break;
+            }
         }
 
         modalBody.appendChild(formContainer);
@@ -530,13 +577,13 @@ class ElementFactory {
                     formCol2.appendChild(categoryDropdown);
                 } else {
                     console.error(
-                        "Error fetching product data: ",
+                        "Error fetching category data: ",
                         data.error_msg
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching product data: ", error);
+                console.error("Error fetching category data: ", error);
             });
 
         const supplierPromise = fetch("db/supplier_db.php", {
@@ -560,13 +607,13 @@ class ElementFactory {
                     formCol2.appendChild(supplierDropdown);
                 } else {
                     console.error(
-                        "Error fetching product data: ",
+                        "Error fetching supplier data: ",
                         data.error_msg
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching product data: ", error);
+                console.error("Error fetching supplier data: ", error);
             });
 
         const productCodeInput = this.createInput(
@@ -639,13 +686,13 @@ class ElementFactory {
         const editButton = this.createButton("button", "Edit");
         editButton.classList.add("btn-primary");
         editButton.addEventListener("click", () => {
-            this.handleEditButtonClick(editButton, form, response);
+            this.handleProductEditBtnEvent(editButton, form, response);
         });
 
         const deleteButton = this.createButton("button", "Delete");
         deleteButton.classList.add("btn-danger");
         deleteButton.addEventListener("click", () => {
-            this.handleDeleteButtonClick(response);
+            this.handleProductDltBtnEvent(response);
         });
         btnWrapperRow.appendChild(btnWrapperCol);
         btnWrapperCol.appendChild(btnWrapperDiv);
@@ -686,13 +733,13 @@ class ElementFactory {
                     form.appendChild(categoryDropdown);
                 } else {
                     console.error(
-                        "Error fetching product data: ",
+                        "Error fetching category data: ",
                         data.error_msg
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching product data: ", error);
+                console.error("Error fetching category data: ", error);
             });
 
         const supplierPromise = fetch("db/supplier_db.php", {
@@ -715,13 +762,13 @@ class ElementFactory {
                     form.appendChild(supplierDropdown);
                 } else {
                     console.error(
-                        "Error fetching product data: ",
+                        "Error fetching supplier data: ",
                         data.error_msg
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching product data: ", error);
+                console.error("Error fetching supplier data: ", error);
             });
 
         const productCodeInput = this.createInput(
@@ -780,12 +827,12 @@ class ElementFactory {
             form.addEventListener("submit", (event) => {
                 event.preventDefault();
 
-                this.handleFormSubmission(form, tableType);
+                this.handleProductFormEvent(form, tableType);
             });
         });
     };
 
-    static handleEditButtonClick = (editButton, form, response) => {
+    static handleProductEditBtnEvent = (editButton, form, response) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
             editButton.textContent = "Save Changes";
@@ -903,7 +950,7 @@ class ElementFactory {
         }
     };
 
-    static handleDeleteButtonClick = (response) => {
+    static handleProductDltBtnEvent = (response) => {
         const userConfirmed = window.confirm(
             "Are you sure you want to delete this product?"
         );
@@ -955,7 +1002,7 @@ class ElementFactory {
         }
     };
 
-    static handleFormSubmission = (form, tableType) => {
+    static handleProductFormEvent = (form, tableType) => {
         const fileInput = document.querySelector(
             '#ims__add-product-img-input input[type="file"]'
         );
@@ -1022,6 +1069,514 @@ class ElementFactory {
             })
             .catch((error) => {
                 console.error("Error adding product:", error);
+            });
+    };
+
+    static renderTransactionDetailForm = (form, response) => {
+        const typePromise = fetch("db/transaction_type_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const txn_types = data.txn_types;
+
+                    const typeDropdown = ElementFactory.createDropdown(
+                        "Type:",
+                        txn_types,
+                        "type_id",
+                        "type_name",
+                        true,
+                        response.type_id
+                    );
+
+                    form.appendChild(typeDropdown);
+                } else {
+                    console.error(
+                        "Error fetching transaction type data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching transaction type data: ", error);
+            });
+
+        const productPromise = fetch("db/product_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const products = data.products;
+
+                    const productDropdown = ElementFactory.createDropdown(
+                        "Product:",
+                        products,
+                        "product_id",
+                        "product_name",
+                        true,
+                        response.product_id
+                    );
+
+                    form.appendChild(productDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        const quantityInput = this.createInput(
+            "Quantity:",
+            "number",
+            "quantity",
+            response.quantity,
+            true
+        );
+
+        const productCodeInputContainer = this.createDiv();
+        productCodeInputContainer.classList.add("mb-3");
+        const wrapperRow1 = this.createRow();
+        const wrapperCol1 = this.createCol();
+        wrapperCol1.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-3",
+            "col-lg-3",
+            "col-xl-3",
+            "col-xxl-3"
+        );
+        const wrapperCol2 = this.createCol();
+        wrapperCol2.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-9",
+            "col-lg-9",
+            "col-xl-9",
+            "col-xxl-9"
+        );
+        const productCodeInputLabel = this.createLabel("Product Code:");
+        const productCodeInput = this.createParagraph(response.product_code);
+        productCodeInputContainer.appendChild(wrapperRow1);
+        wrapperRow1.appendChild(wrapperCol1);
+        wrapperRow1.appendChild(wrapperCol2);
+        wrapperCol1.appendChild(productCodeInputLabel);
+        wrapperCol2.appendChild(productCodeInput);
+
+        const unitPriceInputContainer = this.createDiv();
+        unitPriceInputContainer.classList.add("mb-3");
+        const wrapperRow2 = this.createRow();
+        const wrapperCol3 = this.createCol();
+        wrapperCol3.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-3",
+            "col-lg-3",
+            "col-xl-3",
+            "col-xxl-3"
+        );
+        const wrapperCol4 = this.createCol();
+        wrapperCol4.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-9",
+            "col-lg-9",
+            "col-xl-9",
+            "col-xxl-9"
+        );
+        const unitPriceInputLabel = this.createLabel("Unit Price:");
+        const unitPriceInput = this.createParagraph(response.unit_price);
+        unitPriceInputContainer.appendChild(wrapperRow2);
+        wrapperRow2.appendChild(wrapperCol3);
+        wrapperRow2.appendChild(wrapperCol4);
+        wrapperCol3.appendChild(unitPriceInputLabel);
+        wrapperCol4.appendChild(unitPriceInput);
+
+        const createdInputContainer = this.createDiv();
+        createdInputContainer.classList.add("mb-3");
+        const wrapperRow3 = this.createRow();
+        const wrapperCol5 = this.createCol();
+        wrapperCol5.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-3",
+            "col-lg-3",
+            "col-xl-3",
+            "col-xxl-3"
+        );
+        const wrapperCol6 = this.createCol();
+        wrapperCol6.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-9",
+            "col-lg-9",
+            "col-xl-9",
+            "col-xxl-9"
+        );
+        const createdInputLabel = this.createLabel("Created:");
+        const createdInput = this.createParagraph(response.created);
+        createdInputContainer.appendChild(wrapperRow3);
+        wrapperRow3.appendChild(wrapperCol5);
+        wrapperRow3.appendChild(wrapperCol6);
+        wrapperCol5.appendChild(createdInputLabel);
+        wrapperCol6.appendChild(createdInput);
+
+        const btnWrapperRow = this.createRow();
+        const btnWrapperCol = this.createCol();
+        const btnWrapperDiv = this.createDiv();
+        btnWrapperDiv.classList.add(
+            "d-flex",
+            "flex-row",
+            "justify-content-end",
+            "gap-2"
+        );
+        const editButton = this.createButton("button", "Edit");
+        editButton.classList.add("btn-primary");
+        editButton.addEventListener("click", () => {
+            this.handleTransactionEditBtnEvent(editButton, form, response);
+        });
+
+        const deleteButton = this.createButton("button", "Delete");
+        deleteButton.classList.add("btn-danger");
+        deleteButton.addEventListener("click", () => {
+            this.handleTransactionDltBtnEvent(response);
+        });
+        btnWrapperRow.appendChild(btnWrapperCol);
+        btnWrapperCol.appendChild(btnWrapperDiv);
+        btnWrapperDiv.appendChild(editButton);
+        btnWrapperDiv.appendChild(deleteButton);
+
+        Promise.all([typePromise, productPromise]).then(() => {
+            form.appendChild(quantityInput);
+            form.appendChild(productCodeInputContainer);
+            form.appendChild(unitPriceInputContainer);
+            form.appendChild(createdInputContainer);
+
+            form.appendChild(btnWrapperRow);
+        });
+    };
+
+    static renderTransactionAddForm = (form, tableType) => {
+        const typePromise = fetch("db/transaction_type_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const txn_types = data.txn_types;
+
+                    const typeDropdown = ElementFactory.createDropdown(
+                        "Type:",
+                        txn_types,
+                        "type_id",
+                        "type_name",
+                        false,
+                        ""
+                    );
+
+                    form.appendChild(typeDropdown);
+                } else {
+                    console.error(
+                        "Error fetching transaction type data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching transaction type data: ", error);
+            });
+
+        const productPromise = fetch("db/product_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const products = data.products;
+
+                    const productDropdown = ElementFactory.createDropdown(
+                        "Product:",
+                        products,
+                        "product_id",
+                        "product_name",
+                        false,
+                        ""
+                    );
+
+                    form.appendChild(productDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        const quantityInput = this.createInput(
+            "Quantity:",
+            "number",
+            "quantity",
+            "",
+            false
+        );
+
+        const submitButtonContainer = this.createDiv();
+        submitButtonContainer.classList.add("text-end");
+        const submitButton = this.createButton("submit", "Submit");
+        submitButton.classList.add("btn-primary");
+        submitButtonContainer.appendChild(submitButton);
+
+        Promise.all([typePromise, productPromise]).then(() => {
+            form.appendChild(quantityInput);
+
+            form.appendChild(submitButtonContainer);
+
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+
+                this.handleTransactionFormEvent(form, tableType);
+            });
+        });
+    };
+
+    static handleTransactionEditBtnEvent = (editButton, form, response) => {
+        if (editButton.textContent === "Edit") {
+            // Toggle to "Save Changes" mode
+            editButton.textContent = "Save Changes";
+
+            // Enable all input elements in the form
+            const inputElements = form.querySelectorAll("input, select");
+            inputElements.forEach((input) => {
+                input.disabled = false;
+            });
+        } else {
+            // Save Changes mode - Prompt user for confirmation
+            const userConfirmed = window.confirm(
+                "Are you sure you want to make the changes for the transaction detail?"
+            );
+
+            if (userConfirmed) {
+                const no = response.no;
+                const number = no.toString();
+
+                const formData = new FormData(form);
+                const jsonData = {};
+
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+
+                jsonData["transaction_id"] = response.transaction_id;
+
+                fetch("db/transaction_db.php", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(jsonData),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            const transactionTable = $(
+                                "#ims__transaction-table"
+                            ).DataTable();
+
+                            // Find the row index based on the no
+                            const rowIndex = transactionTable
+                                .rows()
+                                .eq(0)
+                                .filter((rowIdx) => {
+                                    return (
+                                        transactionTable
+                                            .cell(rowIdx, 0)
+                                            .data() === number
+                                    );
+                                });
+
+                            if (rowIndex.length > 0) {
+                                const rowNode = transactionTable
+                                    .row(rowIndex)
+                                    .node();
+
+                                const cellUpdates = [
+                                    {
+                                        index: 2,
+                                        value: data.transaction_data.product_name,
+                                    },
+                                    {
+                                        index: 3,
+                                        value: data.transaction_data.type_name,
+                                    },
+                                    {
+                                        index: 4,
+                                        value: data.transaction_data.quantity,
+                                    },
+                                ];
+
+                                // Update each specified cell in the row
+                                cellUpdates.forEach(({ index, value }) => {
+                                    transactionTable
+                                        .cell(rowNode, index)
+                                        .data(value);
+                                });
+
+                                transactionTable.draw();
+                            }
+
+                            $("#ims__modal").modal("hide");
+
+                            // Reset to "Edit" mode
+                            editButton.textContent = "Edit";
+
+                            // Disable all input elements in the form
+                            const inputElements =
+                                form.querySelectorAll("input, select");
+                            inputElements.forEach((input) => {
+                                input.disabled = true;
+                            });
+                        } else {
+                            console.error(
+                                "Error updating transaction:",
+                                data.error_msg
+                            );
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error updating transaction:", error);
+                    });
+            }
+        }
+    };
+
+    static handleTransactionDltBtnEvent = (response) => {
+        const userConfirmed = window.confirm(
+            "Are you sure you want to delete this transaction?"
+        );
+
+        if (userConfirmed) {
+            const transactionId = response.transaction_id;
+            const productId = response.product_id;
+            const no = response.no;
+            const number = no.toString();
+
+            fetch(`db/transaction_db.php`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    transaction_id: transactionId,
+                    product_id: productId,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const transactionTable = $(
+                            "#ims__transaction-table"
+                        ).DataTable();
+
+                        // Find the row in DataTable based on the transaction_id and remove it
+                        const rowIndex = transactionTable
+                            .rows()
+                            .eq(0)
+                            .filter((rowIdx) => {
+                                return (
+                                    transactionTable.cell(rowIdx, 0).data() ===
+                                    number
+                                );
+                            });
+
+                        if (rowIndex.length > 0) {
+                            transactionTable.row(rowIndex).remove().draw();
+                        }
+
+                        $("#ims__modal").modal("hide");
+                    } else {
+                        console.error(
+                            "Error deleting transaction:",
+                            data.error_msg
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error deleting transaction:", error);
+                });
+        }
+    };
+
+    static handleTransactionFormEvent = (form, tableType) => {
+        const formData = new FormData(form);
+
+        fetch("db/transaction_db.php", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const transactionTable = $(
+                        "#ims__transaction-table"
+                    ).DataTable();
+
+                    const nextRowNumber = transactionTable.rows().count() + 1;
+
+                    const viewDetailButton = this.createButton(
+                        "button",
+                        "View Detail"
+                    );
+                    viewDetailButton.classList.add("btn", "btn-info");
+                    viewDetailButton.setAttribute("data-bs-toggle", "modal");
+                    viewDetailButton.setAttribute(
+                        "data-bs-target",
+                        "#ims__modal"
+                    );
+
+                    const viewDetailButtonHTML = viewDetailButton.outerHTML;
+
+                    const transactionData = data.transaction_data;
+
+                    // Add new row to the DataTable
+                    transactionTable.row
+                        .add([
+                            nextRowNumber,
+                            data.transaction_data.product_code,
+                            data.transaction_data.product_name,
+                            data.transaction_data.type_name,
+                            data.transaction_data.quantity,
+                            data.transaction_data.unit_price,
+                            data.transaction_data.created,
+                            viewDetailButtonHTML,
+                        ])
+                        .draw(false);
+
+                    const lastRowNode = transactionTable
+                        .row(transactionTable.rows().count() - 1)
+                        .node();
+
+                    // Attach the event listener to the button in the last added row
+                    const lastRowViewDetailButton =
+                        lastRowNode.querySelector(".btn-info");
+                    lastRowViewDetailButton.addEventListener("click", () => {
+                        this.showModal("Detail", tableType, transactionData);
+                    });
+
+                    $("#ims__modal").modal("hide");
+                } else {
+                    console.error("Error adding transaction:", data.error_msg);
+                }
+            })
+            .catch((error) => {
+                console.error("Error adding transaction:", error);
             });
     };
 }

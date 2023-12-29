@@ -13,6 +13,7 @@ $include_chartjs = isset($include_chartjs) ? $include_chartjs : false;
     <script src="assets/js/index.js?v=1.0.0" defer></script>
     <script src="assets/js/dashboard.js?v=1.0.0" defer></script>
     <script src="assets/js/product.js?v=1.0.0" defer></script>
+    <script src="assets/js/transaction.js?v=1.0.0" defer></script>
     <script src="assets/js/element.js?v=1.0.0" defer></script>
 
     <!-- cdn link -->
