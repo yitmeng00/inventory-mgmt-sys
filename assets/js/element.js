@@ -1,7 +1,7 @@
 class ElementFactory {
     static createSection = () => {
         const section = document.createElement("section");
-        section.classList.add("container-fluid", "mb-3");
+        section.classList.add("container-fluid");
 
         return section;
     };
@@ -76,14 +76,101 @@ class ElementFactory {
             input.min = 1;
         }
         if (inputName == "price") {
-            input.setAttribute("step", "any")
+            input.setAttribute("step", "any");
         }
 
         const wrapper = document.createElement("div");
-        wrapper.appendChild(label);
-        wrapper.appendChild(input);
+        wrapper.classList.add("mb-3");
+        const wrapperRow = this.createRow();
+        const wrapperCol1 = this.createCol();
+        wrapperCol1.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-3",
+            "col-lg-3",
+            "col-xl-3",
+            "col-xxl-3"
+        );
+        const wrapperCol2 = this.createCol();
+        wrapperCol2.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-9",
+            "col-lg-9",
+            "col-xl-9",
+            "col-xxl-9"
+        );
+        wrapper.appendChild(wrapperRow);
+        wrapperRow.appendChild(wrapperCol1);
+        wrapperRow.appendChild(wrapperCol2);
+        wrapperCol1.appendChild(label);
+        wrapperCol2.appendChild(input);
 
         return wrapper;
+    };
+
+    static createDropdown = (
+        labelText,
+        options,
+        idPropertyName,
+        namePropertyName,
+        disabled,
+        selectedID
+    ) => {
+        const label = document.createElement("label");
+        label.textContent = labelText;
+
+        const select = document.createElement("select");
+        select.name = idPropertyName;
+        select.disabled = disabled;
+
+        options.forEach((option) => {
+            const optionElement = document.createElement("option");
+            optionElement.value = option[idPropertyName];
+            optionElement.textContent = option[namePropertyName];
+
+            if (option[idPropertyName] === selectedID) {
+                optionElement.selected = true;
+            }
+
+            select.appendChild(optionElement);
+        });
+
+        const wrapper = document.createElement("div");
+        wrapper.classList.add("mb-3");
+        const wrapperRow = this.createRow();
+        const wrapperCol1 = this.createCol();
+        wrapperCol1.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-3",
+            "col-lg-3",
+            "col-xl-3",
+            "col-xxl-3"
+        );
+        const wrapperCol2 = this.createCol();
+        wrapperCol2.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-9",
+            "col-lg-9",
+            "col-xl-9",
+            "col-xxl-9"
+        );
+        wrapper.appendChild(wrapperRow);
+        wrapperRow.appendChild(wrapperCol1);
+        wrapperRow.appendChild(wrapperCol2);
+        wrapperCol1.appendChild(label);
+        wrapperCol2.appendChild(select);
+
+        return wrapper;
+    };
+
+    static createLabel = (value) => {
+        const label = document.createElement("label");
+        label.textContent = value;
+
+        return label;
     };
 
     static createForm = () => {
@@ -93,9 +180,28 @@ class ElementFactory {
         return form;
     };
 
+    static createImage = (src, alt) => {
+        const img = document.createElement("img");
+        img.src = src;
+        img.alt = alt;
+
+        return img;
+    };
+
+    static createIcon = (icon) => {
+        const div = document.createElement("div");
+
+        const iconElement = document.createElement("i");
+        iconElement.classList.add("fa-solid", icon);
+
+        div.appendChild(iconElement);
+
+        return div;
+    };
+
     static createTable = (id) => {
         const table = document.createElement("table");
-        table.classList.add("table");
+        // table.classList.add("table");
         table.id = id;
 
         return table;
@@ -142,7 +248,7 @@ class ElementFactory {
                     "button",
                     "View Detail"
                 );
-                viewDetailButton.classList.add("btn", "btn-primary");
+                viewDetailButton.classList.add("btn", "btn-info");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
                 viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
 
@@ -155,51 +261,6 @@ class ElementFactory {
         }
 
         return tableBody;
-    };
-
-    static createDropdown = (
-        labelText,
-        options,
-        idPropertyName,
-        namePropertyName,
-        disabled,
-        selectedID
-    ) => {
-        const label = document.createElement("label");
-        label.textContent = labelText;
-
-        const select = document.createElement("select");
-        select.name = idPropertyName;
-        select.disabled = disabled;
-
-        options.forEach((option) => {
-            const optionElement = document.createElement("option");
-            optionElement.value = option[idPropertyName];
-            optionElement.textContent = option[namePropertyName];
-
-            if (option[idPropertyName] === selectedID) {
-                optionElement.selected = true;
-            }
-
-            select.appendChild(optionElement);
-        });
-
-        const wrapper = document.createElement("div");
-        wrapper.appendChild(label);
-        wrapper.appendChild(select);
-
-        return wrapper;
-    };
-
-    static createIcon = (icon) => {
-        const div = document.createElement("div");
-
-        const iconElement = document.createElement("i");
-        iconElement.classList.add("fa-solid", icon);
-
-        div.appendChild(iconElement);
-
-        return div;
     };
 
     static createCanvas = (id) => {
@@ -333,6 +394,7 @@ class ElementFactory {
         var modalDialog = this.createDiv();
         modalDialog.classList.add(
             "modal-dialog",
+            "modal-lg",
             "modal-dialog-centered",
             "modal-dialog-scrollable"
         );
@@ -373,399 +435,459 @@ class ElementFactory {
     };
 
     static rendalModalBody = (actionType, tableType, response, modalBody) => {
+        const formContainer = this.createSection();
+        const formContainerRow = this.createRow();
+        const formContainerCol = this.createCol();
         const form = this.createForm();
 
         if (tableType == "product") {
             switch (actionType) {
                 case "Detail":
-                    const productCodeInput = this.createInput(
-                        "Product Code:",
-                        "text",
-                        "product_code",
-                        response.product_code,
-                        true
-                    );
-                    const productNameInput = this.createInput(
-                        "Product Name:",
-                        "text",
-                        "product_name",
-                        response.product_name,
-                        true
-                    );
-                    const descriptionInput = this.createInput(
-                        "Description:",
-                        "text",
-                        "description",
-                        response.description,
-                        true
-                    );
-                    const priceInput = this.createInput(
-                        "Price:",
-                        "number",
-                        "price",
-                        response.price,
-                        true
-                    );
-                    const quantityInput = this.createInput(
-                        "Quantity:",
-                        "number",
-                        "quantity",
-                        response.quantity,
-                        true
-                    );
-
-                    const editButton = this.createButton("button", "Edit");
-                    editButton.addEventListener("click", () => {
-                        if (editButton.textContent === "Edit") {
-                            // Toggle to "Save Changes" mode
-                            editButton.textContent = "Save Changes";
-
-                            // Enable all input elements in the form
-                            const inputElements =
-                                form.querySelectorAll("input, select");
-                            inputElements.forEach((input) => {
-                                input.disabled = false;
-                            });
-                        } else {
-                            // Save Changes mode - Prompt user for confirmation
-                            const userConfirmed = window.confirm(
-                                "Are you sure you want to make the changes for the product detail?"
-                            );
-
-                            if (userConfirmed) {
-                                const formData = new FormData(form);
-                                const jsonData = {};
-
-                                formData.forEach((value, key) => {
-                                    jsonData[key] = value;
-                                });
-                                
-                                jsonData['product_id'] = response.product_id;
-
-                                fetch("db/product_db.php", {
-                                    method: "PUT",
-                                    headers: {
-                                        "Content-Type": "application/json",
-                                    },
-                                    body: JSON.stringify(jsonData),
-                                })
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                        if (data.success) {
-                                            $("#ims__modal").modal("hide");
-                                        } else {
-                                            console.error(
-                                                "Error updating product:",
-                                                data.error_msg
-                                            );
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error(
-                                            "Error updating product:",
-                                            error
-                                        );
-                                    });
-
-                                // Reset to "Edit" mode
-                                editButton.textContent = "Edit";
-
-                                // Disable all input elements in the form
-                                const inputElements =
-                                    form.querySelectorAll("input, select");
-                                inputElements.forEach((input) => {
-                                    input.disabled = true;
-                                });
-                            }
-                        }
-                    });
-
-                    const deleteButton = this.createButton("button", "Delete");
-                    deleteButton.addEventListener("click", () => {
-                        const userConfirmed = window.confirm(
-                            "Are you sure you want to delete this product?"
-                        );
-
-                        if (userConfirmed) {
-                            const productId = response.product_id;
-
-                            fetch(`db/product_db.php`, {
-                                method: "DELETE",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({ product_id: productId }),
-                            })
-                                .then((response) => response.json())
-                                .then((data) => {
-                                    if (data.success) {
-                                        $("#ims__modal").modal("hide");
-                                    } else {
-                                        console.error(
-                                            "Error deleting product:",
-                                            data.error_msg
-                                        );
-                                    }
-                                })
-                                .catch((error) => {
-                                    console.error(
-                                        "Error deleting product:",
-                                        error
-                                    );
-                                });
-                        }
-                    });
-
-                    const categoryPromise = fetch("db/category_db.php", {
-                        method: "GET",
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                const categories = data.categories;
-                                const selectedCategoryId = response.category_id;
-
-                                const categoryDropdown =
-                                    ElementFactory.createDropdown(
-                                        "Category:",
-                                        categories,
-                                        "category_id",
-                                        "category_name",
-                                        true,
-                                        selectedCategoryId
-                                    );
-
-                                form.appendChild(categoryDropdown);
-                            } else {
-                                console.error(
-                                    "Error fetching product data: ",
-                                    data.error_msg
-                                );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(
-                                "Error fetching product data: ",
-                                error
-                            );
-                        });
-
-                    const supplierPromise = fetch("db/supplier_db.php", {
-                        method: "GET",
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                const suppliers = data.suppliers;
-                                const selectedSupplierId = response.supplier_id;
-
-                                const supplierDropdown =
-                                    ElementFactory.createDropdown(
-                                        "Supplier:",
-                                        suppliers,
-                                        "supplier_id",
-                                        "supplier_name",
-                                        true,
-                                        selectedSupplierId
-                                    );
-
-                                form.appendChild(supplierDropdown);
-                            } else {
-                                console.error(
-                                    "Error fetching product data: ",
-                                    data.error_msg
-                                );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(
-                                "Error fetching product data: ",
-                                error
-                            );
-                        });
-
-                    Promise.all([categoryPromise, supplierPromise]).then(() => {
-                        form.appendChild(productCodeInput);
-                        form.appendChild(productNameInput);
-                        form.appendChild(descriptionInput);
-                        form.appendChild(priceInput);
-                        form.appendChild(quantityInput);
-
-                        form.appendChild(editButton);
-                        form.appendChild(deleteButton);
-                    });
+                    this.renderProductDetailForm(form, response);
                     break;
                 case "Add":
-                    const productCodeAddInput = this.createInput(
-                        "Product Code:",
-                        "text",
-                        "product_code",
-                        "",
-                        false
-                    );
-                    const productNameAddInput = this.createInput(
-                        "Product Name:",
-                        "text",
-                        "product_name",
-                        "",
-                        false
-                    );
-                    const descriptionAddInput = this.createInput(
-                        "Description:",
-                        "text",
-                        "description",
-                        "",
-                        false
-                    );
-                    const priceAddInput = this.createInput(
-                        "Price:",
-                        "number",
-                        "price",
-                        "",
-                        false
-                    );
-                    const quantityAddInput = this.createInput(
-                        "Quantity:",
-                        "number",
-                        "quantity",
-                        "",
-                        false
-                    );
-
-                    const attachmentInput = this.createInput(
-                        "Attachment:",
-                        "file",
-                        "attachment",
-                        "",
-                        false
-                    );
-                    attachmentInput.id = "ims__add-product-img-input";
-
-                    const categoryAddPromise = fetch("db/category_db.php", {
-                        method: "GET",
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                const categories = data.categories;
-
-                                const categoryDropdown =
-                                    ElementFactory.createDropdown(
-                                        "Category:",
-                                        categories,
-                                        "category_id",
-                                        "category_name",
-                                        false,
-                                        ""
-                                    );
-
-                                form.appendChild(categoryDropdown);
-                            } else {
-                                console.error(
-                                    "Error fetching product data: ",
-                                    data.error_msg
-                                );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(
-                                "Error fetching product data: ",
-                                error
-                            );
-                        });
-
-                    const supplierAddPromise = fetch("db/supplier_db.php", {
-                        method: "GET",
-                    })
-                        .then((response) => response.json())
-                        .then((data) => {
-                            if (data.success) {
-                                const suppliers = data.suppliers;
-
-                                const supplierDropdown =
-                                    ElementFactory.createDropdown(
-                                        "Supplier:",
-                                        suppliers,
-                                        "supplier_id",
-                                        "supplier_name",
-                                        false,
-                                        ""
-                                    );
-
-                                form.appendChild(supplierDropdown);
-                            } else {
-                                console.error(
-                                    "Error fetching product data: ",
-                                    data.error_msg
-                                );
-                            }
-                        })
-                        .catch((error) => {
-                            console.error(
-                                "Error fetching product data: ",
-                                error
-                            );
-                        });
-
-                    const submitButton = this.createButton("submit", "Submit");
-
-                    Promise.all([categoryAddPromise, supplierAddPromise]).then(
-                        () => {
-                            form.appendChild(productCodeAddInput);
-                            form.appendChild(productNameAddInput);
-                            form.appendChild(descriptionAddInput);
-                            form.appendChild(priceAddInput);
-                            form.appendChild(quantityAddInput);
-                            form.appendChild(attachmentInput);
-
-                            form.appendChild(submitButton);
-
-                            form.addEventListener("submit", (event) => {
-                                event.preventDefault();
-
-                                const fileInput = document.querySelector(
-                                    '#ims__add-product-img-input input[type="file"]'
-                                );
-                                console.log(fileInput.files[0]);
-
-                                const formData = new FormData(form);
-                                formData.append(
-                                    "attachment",
-                                    fileInput.files[0]
-                                );
-
-                                for (const [key, value] of formData.entries()) {
-                                    console.log(`Key: ${key}, Value: ${value}`);
-                                }
-
-                                fetch("db/product_db.php", {
-                                    method: "POST",
-                                    body: formData,
-                                })
-                                    .then((response) => response.json())
-                                    .then((data) => {
-                                        if (data.success) {
-                                            $("#ims__modal").modal("hide");
-                                        } else {
-                                            console.error(
-                                                "Error adding product:",
-                                                data.error_msg
-                                            );
-                                        }
-                                    })
-                                    .catch((error) => {
-                                        console.error(
-                                            "Error adding product:",
-                                            error
-                                        );
-                                    });
-                            });
-                        }
-                    );
+                    this.renderProductAddForm(form);
                     break;
             }
         }
 
-        modalBody.appendChild(form);
+        modalBody.appendChild(formContainer);
+        formContainer.appendChild(formContainerRow);
+        formContainerRow.appendChild(formContainerCol);
+        formContainerCol.appendChild(form);
+    };
+
+    static renderProductDetailForm = (form, response) => {
+        const formRow = this.createRow();
+        const formCol1 = this.createCol();
+        const formCol2 = this.createCol();
+        form.appendChild(formRow);
+        formRow.appendChild(formCol1);
+        formRow.appendChild(formCol2);
+
+        const imagePromise = fetch(
+            `db/product_img_db.php?product_id=${response.product_id}`,
+            {
+                method: "GET",
+            }
+        )
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    if (data.product_imgs && data.product_imgs.length > 0) {
+                        const productImgSrc = data.product_imgs[0].img_path;
+                        const productImgContainer = this.createDiv();
+                        const productImg = this.createImage(
+                            productImgSrc,
+                            "Product Image"
+                        );
+                        productImg.classList.add("ims__product-img");
+                        formCol1.appendChild(productImgContainer);
+                        productImgContainer.appendChild(productImg);
+                    } else {
+                        console.error("No product images found.");
+                    }
+                } else {
+                    console.error(
+                        "Error fetching product image: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product image: ", error);
+            });
+
+        const productCodeInput = this.createInput(
+            "Product Code:",
+            "text",
+            "product_code",
+            response.product_code,
+            true
+        );
+        const productNameInput = this.createInput(
+            "Product Name:",
+            "text",
+            "product_name",
+            response.product_name,
+            true
+        );
+        const descriptionInput = this.createInput(
+            "Description:",
+            "text",
+            "description",
+            response.description,
+            true
+        );
+        const priceInput = this.createInput(
+            "Price:",
+            "number",
+            "price",
+            response.price,
+            true
+        );
+
+        const quantityInputContainer = this.createDiv();
+        quantityInputContainer.classList.add("mb-3");
+        const wrapperRow = this.createRow();
+        const wrapperCol1 = this.createCol();
+        wrapperCol1.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-3",
+            "col-lg-3",
+            "col-xl-3",
+            "col-xxl-3"
+        );
+        const wrapperCol2 = this.createCol();
+        wrapperCol2.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-9",
+            "col-lg-9",
+            "col-xl-9",
+            "col-xxl-9"
+        );
+        const quantityInputLabel = this.createLabel("Quantity:");
+        const quantityInput = this.createParagraph(response.quantity);
+        quantityInputContainer.appendChild(wrapperRow);
+        wrapperRow.appendChild(wrapperCol1);
+        wrapperRow.appendChild(wrapperCol2);
+        wrapperCol1.appendChild(quantityInputLabel);
+        wrapperCol2.appendChild(quantityInput);
+
+        const btnWrapperRow = this.createRow();
+        const btnWrapperCol = this.createCol();
+        const btnWrapperDiv = this.createDiv();
+        btnWrapperDiv.classList.add(
+            "d-flex",
+            "flex-row",
+            "justify-content-end",
+            "gap-2"
+        );
+        const editButton = this.createButton("button", "Edit");
+        editButton.classList.add("btn-primary");
+        editButton.addEventListener("click", () => {
+            this.handleEditButtonClick(editButton, form, response);
+        });
+
+        const deleteButton = this.createButton("button", "Delete");
+        deleteButton.classList.add("btn-danger");
+        deleteButton.addEventListener("click", () => {
+            this.handleDeleteButtonClick(response);
+        });
+        btnWrapperRow.appendChild(btnWrapperCol);
+        btnWrapperCol.appendChild(btnWrapperDiv);
+        btnWrapperDiv.appendChild(editButton);
+        btnWrapperDiv.appendChild(deleteButton);
+
+        const categoryPromise = fetch("db/category_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const categories = data.categories;
+                    const selectedCategoryId = response.category_id;
+
+                    const categoryDropdown = ElementFactory.createDropdown(
+                        "Category:",
+                        categories,
+                        "category_id",
+                        "category_name",
+                        true,
+                        selectedCategoryId
+                    );
+
+                    formCol2.appendChild(categoryDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        const supplierPromise = fetch("db/supplier_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const suppliers = data.suppliers;
+                    const selectedSupplierId = response.supplier_id;
+
+                    const supplierDropdown = ElementFactory.createDropdown(
+                        "Supplier:",
+                        suppliers,
+                        "supplier_id",
+                        "supplier_name",
+                        true,
+                        selectedSupplierId
+                    );
+
+                    formCol2.appendChild(supplierDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        Promise.all([imagePromise, categoryPromise, supplierPromise]).then(
+            () => {
+                formCol2.appendChild(productCodeInput);
+                formCol2.appendChild(productNameInput);
+                formCol2.appendChild(descriptionInput);
+                formCol2.appendChild(priceInput);
+                formCol2.appendChild(quantityInputContainer);
+
+                form.appendChild(btnWrapperRow);
+            }
+        );
+    };
+
+    static renderProductAddForm = (form) => {
+        const productCodeInput = this.createInput(
+            "Product Code:",
+            "text",
+            "product_code",
+            "",
+            false
+        );
+        const productNameInput = this.createInput(
+            "Product Name:",
+            "text",
+            "product_name",
+            "",
+            false
+        );
+        const descriptionInput = this.createInput(
+            "Description:",
+            "text",
+            "description",
+            "",
+            false
+        );
+        const priceInput = this.createInput(
+            "Price:",
+            "number",
+            "price",
+            "",
+            false
+        );
+
+        const attachmentInput = this.createInput(
+            "Attachment:",
+            "file",
+            "attachment",
+            "",
+            false
+        );
+        attachmentInput.id = "ims__add-product-img-input";
+
+        const categoryPromise = fetch("db/category_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const categories = data.categories;
+
+                    const categoryDropdown = ElementFactory.createDropdown(
+                        "Category:",
+                        categories,
+                        "category_id",
+                        "category_name",
+                        false,
+                        ""
+                    );
+
+                    form.appendChild(categoryDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        const supplierPromise = fetch("db/supplier_db.php", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const suppliers = data.suppliers;
+
+                    const supplierDropdown = ElementFactory.createDropdown(
+                        "Supplier:",
+                        suppliers,
+                        "supplier_id",
+                        "supplier_name",
+                        false,
+                        ""
+                    );
+
+                    form.appendChild(supplierDropdown);
+                } else {
+                    console.error(
+                        "Error fetching product data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching product data: ", error);
+            });
+
+        const submitButtonContainer = this.createDiv();
+        submitButtonContainer.classList.add("text-end");
+        const submitButton = this.createButton("submit", "Submit");
+        submitButton.classList.add("btn-primary");
+        submitButtonContainer.appendChild(submitButton);
+
+        Promise.all([categoryPromise, supplierPromise]).then(() => {
+            form.appendChild(productCodeInput);
+            form.appendChild(productNameInput);
+            form.appendChild(descriptionInput);
+            form.appendChild(priceInput);
+            form.appendChild(attachmentInput);
+
+            form.appendChild(submitButtonContainer);
+
+            form.addEventListener("submit", (event) => {
+                event.preventDefault();
+
+                this.handleFormSubmission(form);
+            });
+        });
+    };
+
+    static handleEditButtonClick = (editButton, form, response) => {
+        if (editButton.textContent === "Edit") {
+            // Toggle to "Save Changes" mode
+            editButton.textContent = "Save Changes";
+
+            // Enable all input elements in the form
+            const inputElements = form.querySelectorAll("input, select");
+            inputElements.forEach((input) => {
+                input.disabled = false;
+            });
+        } else {
+            // Save Changes mode - Prompt user for confirmation
+            const userConfirmed = window.confirm(
+                "Are you sure you want to make the changes for the product detail?"
+            );
+
+            if (userConfirmed) {
+                const formData = new FormData(form);
+                const jsonData = {};
+
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+
+                jsonData["product_id"] = response.product_id;
+
+                fetch("db/product_db.php", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(jsonData),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            $("#ims__modal").modal("hide");
+                        } else {
+                            console.error(
+                                "Error updating product:",
+                                data.error_msg
+                            );
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error updating product:", error);
+                    });
+
+                // Reset to "Edit" mode
+                editButton.textContent = "Edit";
+
+                // Disable all input elements in the form
+                const inputElements = form.querySelectorAll("input, select");
+                inputElements.forEach((input) => {
+                    input.disabled = true;
+                });
+            }
+        }
+    };
+
+    static handleDeleteButtonClick = (response) => {
+        const userConfirmed = window.confirm(
+            "Are you sure you want to delete this product?"
+        );
+
+        if (userConfirmed) {
+            const productId = response.product_id;
+
+            fetch(`db/product_db.php`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ product_id: productId }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        $("#ims__modal").modal("hide");
+                    } else {
+                        console.error(
+                            "Error deleting product:",
+                            data.error_msg
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error deleting product:", error);
+                });
+        }
+    };
+
+    static handleFormSubmission = (form) => {
+        const fileInput = document.querySelector(
+            '#ims__add-product-img-input input[type="file"]'
+        );
+
+        const formData = new FormData(form);
+        formData.append("attachment", fileInput.files[0]);
+
+        fetch("db/product_db.php", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    $("#ims__modal").modal("hide");
+                } else {
+                    console.error("Error adding product:", data.error_msg);
+                }
+            })
+            .catch((error) => {
+                console.error("Error adding product:", error);
+            });
     };
 }
