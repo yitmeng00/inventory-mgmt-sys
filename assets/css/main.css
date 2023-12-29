@@ -83,30 +83,35 @@ canvas {
 
 /* Main Content */
 #ims__product-table,
-#ims__transaction-table {
+#ims__transaction-table,
+#ims__supplier-table {
     border: none;
     border-radius: 0.5rem;
     box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
 }
 
 #ims__product-table tbody tr:hover,
-#ims__transaction-table tbody tr:hover {
+#ims__transaction-table tbody tr:hover,
+#ims__supplier-table tbody tr:hover {
     background-color: #f7f6f6;
 }
 
 #ims__product-table th,
-#ims__transaction-table th {
+#ims__transaction-table th,
+#ims__supplier-table th {
     border: none;
     background-color: #dfdede;
 }
 
 #ims__product-table_filter,
-#ims__transaction-table_filter {
+#ims__transaction-table_filter,
+#ims__supplier-table_filter {
     margin-bottom: 1em;
 }
 
 .ims__product-table-container::-webkit-scrollbar,
-.ims__transaction-table-container::-webkit-scrollbar {
+.ims__transaction-table-container::-webkit-scrollbar,
+.ims__supplier-table-container::-webkit-scrollbar {
     display: none;
 }
 
