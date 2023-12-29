@@ -92,8 +92,8 @@ function createProduct()
         // File upload successful, continue with database insertion
         try {
             // Insert product data
-            $stmt = $conn->prepare("INSERT INTO product (product_name, category_id, supplier_id, product_code, `description`, price, quantity) VALUES (?, ?, ?, ?, ?, ?, ?);");
-            $stmt->bind_param("siissdi", $productName, $categoryId, $supplierId, $productCode, $description, $price, $quantity);
+            $stmt = $conn->prepare("INSERT INTO product (product_name, category_id, supplier_id, product_code, `description`, price) VALUES (?, ?, ?, ?, ?, ?);");
+            $stmt->bind_param("siissd", $productName, $categoryId, $supplierId, $productCode, $description, $price);
             $stmt->execute();
 
             $lastInsertedProductId = $conn->insert_id;
@@ -165,8 +165,8 @@ function updateProduct()
     $quantity = $data['quantity'];
 
     try {
-        $stmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, price=?, quantity=? WHERE product_id=?;");
-        $stmt->bind_param("sssssdii", $productName, $categoryId, $supplierId, $productCode, $description, $price, $quantity, $productId);
+        $stmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, price=? WHERE product_id=?;");
+        $stmt->bind_param("sssssdi", $productName, $categoryId, $supplierId, $productCode, $description, $price, $productId);
 
         $stmt->execute();
 
@@ -211,15 +211,21 @@ function deleteProduct()
     $productId = $data['product_id'];
 
     try {
+        // Delete from product_img table
+        $stmtImg = $conn->prepare("DELETE FROM product_img WHERE product_id = ?;");
+        $stmtImg->bind_param("i", $productId);
+        $stmtImg->execute();
+        $stmtImg->close();
+
+        // Delete from product table
         $stmt = $conn->prepare("DELETE FROM product WHERE product_id = ?;");
         $stmt->bind_param("i", $productId);
-
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
             echo json_encode(array(
                 'success' => true,
-                'message' => 'Product deleted successfully'
+                'message' => 'Product and associated images deleted successfully'
             ));
         } else {
             echo json_encode(array(
