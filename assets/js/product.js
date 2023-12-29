@@ -2,19 +2,19 @@ class Product {
     static initProduct() {
         const MAIN_CONTENT = document.getElementById("ims__main-product");
 
-        ElementFactory.rendalModal();
+        ElementFactory.renderModal();
 
         const productSect = ElementFactory.createSection();
         productSect.classList.add("mb-3");
 
-        const productTitleRow = ElementFactory.createTitle("Products", "h2");
+        const productTitleRow = ElementFactory.createTitle("Products", "h3");
 
         const productBtnRow = ElementFactory.createRow();
         const productBtnCol = ElementFactory.createCol();
         const productBtnContainer = ElementFactory.createDiv();
         productBtnContainer.classList.add("text-end");
         const productBtn = ElementFactory.createButton("button", "Add Product");
-        productBtn.classList.add("btn-primary", "mb-5");
+        productBtn.classList.add("btn-primary", "mb-4");
         productBtn.setAttribute("data-bs-toggle", "modal");
         productBtn.setAttribute("data-bs-target", "#ims__modal");
         productBtn.addEventListener("click", () => {
@@ -37,10 +37,11 @@ class Product {
         productTable.classList.add("mb-2", "overflow-hidden");
 
         const headerLabels = [
+            "No",
             "Product Code",
             "Product Name",
-            "Category ID",
-            "Supplier ID",
+            "Category",
+            "Supplier",
             "Description",
             "Price",
             "Quantity",
@@ -62,7 +63,9 @@ class Product {
                         products
                     );
 
-                    $(productTable).DataTable();
+                    $(productTable).DataTable({
+                        order: [[0, "desc"]],
+                    });
                 } else {
                     console.error(
                         "Error fetching product data: ",
