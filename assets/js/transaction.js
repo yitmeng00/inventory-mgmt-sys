@@ -7,13 +7,19 @@ class Transaction {
         const transactionSect = ElementFactory.createSection();
         transactionSect.classList.add("mb-3");
 
-        const transactionTitleRow = ElementFactory.createTitle("Transactions", "h3");
+        const transactionTitleRow = ElementFactory.createTitle(
+            "Transactions",
+            "h3"
+        );
 
         const transactionBtnRow = ElementFactory.createRow();
         const transactionBtnCol = ElementFactory.createCol();
         const transactionBtnContainer = ElementFactory.createDiv();
         transactionBtnContainer.classList.add("text-end");
-        const transactionBtn = ElementFactory.createButton("button", "Add Transaction");
+        const transactionBtn = ElementFactory.createButton(
+            "button",
+            "Add Transaction"
+        );
         transactionBtn.classList.add("btn-primary", "mb-4");
         transactionBtn.setAttribute("data-bs-toggle", "modal");
         transactionBtn.setAttribute("data-bs-target", "#ims__modal");
@@ -33,7 +39,9 @@ class Transaction {
             "overflow-hidden",
             "overflow-x-scroll"
         );
-        const transactionTable = ElementFactory.createTable("ims__transaction-table");
+        const transactionTable = ElementFactory.createTable(
+            "ims__transaction-table"
+        );
         transactionTable.classList.add("mb-2", "overflow-hidden");
 
         const headerLabels = [

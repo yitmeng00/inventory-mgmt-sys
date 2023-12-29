@@ -5,18 +5,11 @@
 include("includes/header.php");
 ?>
 
-<body>
+<body onload="Supplier.initSupplier()">
     <div class="ims__body-container d-flex">
         <?php include("includes/navbar.php"); ?>
 
-        <main class="ims__main-content overflow-y-scroll w-100 p-3">
-            <div>
-                <div>
-                    <p>
-                        Supplier page.
-                    </p>
-                </div>
-            </div>
+        <main id="ims__main-supplier" class="overflow-y-scroll w-100 p-3">
         </main>
     </div>
 </body>

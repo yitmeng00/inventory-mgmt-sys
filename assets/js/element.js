@@ -306,6 +306,47 @@ class ElementFactory {
 
                 actionCell.appendChild(viewDetailButton);
             });
+        } else if (tableType == "supplier") {
+            let counter = 1;
+
+            responses.forEach((response) => {
+                const row = tableBody.insertRow();
+
+                // Insert the counter in the first cell
+                const counterCell = row.insertCell();
+                counterCell.textContent = counter++;
+
+                // Define the order of keys
+                const keysOrder = [
+                    "supplier_name",
+                    "contact_person",
+                    "contact_no",
+                    "email",
+                    "location",
+                ];
+
+                keysOrder.forEach((key) => {
+                    const cell = row.insertCell();
+                    cell.textContent = response[key];
+                });
+
+                const actionCell = row.insertCell();
+
+                const viewDetailButton = this.createButton(
+                    "button",
+                    "View Detail"
+                );
+                viewDetailButton.classList.add("btn", "btn-info");
+                viewDetailButton.setAttribute("data-bs-toggle", "modal");
+                viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
+
+                response.no = counter - 1;
+                viewDetailButton.addEventListener("click", () => {
+                    this.showModal("Detail", tableType, response);
+                });
+
+                actionCell.appendChild(viewDetailButton);
+            });
         }
 
         return tableBody;
@@ -504,6 +545,15 @@ class ElementFactory {
                     break;
                 case "Add":
                     this.renderTransactionAddForm(form, tableType);
+                    break;
+            }
+        } else if (tableType == "supplier") {
+            switch (actionType) {
+                case "Detail":
+                    this.renderSupplierDetailForm(form, response);
+                    break;
+                case "Add":
+                    this.renderSupplierAddForm(form, tableType);
                     break;
             }
         }
@@ -1410,7 +1460,8 @@ class ElementFactory {
                                 const cellUpdates = [
                                     {
                                         index: 2,
-                                        value: data.transaction_data.product_name,
+                                        value: data.transaction_data
+                                            .product_name,
                                     },
                                     {
                                         index: 3,
@@ -1577,6 +1628,377 @@ class ElementFactory {
             })
             .catch((error) => {
                 console.error("Error adding transaction:", error);
+            });
+    };
+
+    static renderSupplierDetailForm = (form, response) => {
+        const supplierNameInput = this.createInput(
+            "Supplier Name:",
+            "text",
+            "supplier_name",
+            response.supplier_name,
+            true
+        );
+
+        const contactPersonInput = this.createInput(
+            "Contact Person:",
+            "text",
+            "contact_person",
+            response.contact_person,
+            true
+        );
+
+        const contactNoInput = this.createInput(
+            "Contact No:",
+            "text",
+            "contact_no",
+            response.contact_no,
+            true
+        );
+
+        const emailInput = this.createInput(
+            "Email:",
+            "text",
+            "email",
+            response.email,
+            true
+        );
+
+        const locationInput = this.createInput(
+            "Location:",
+            "text",
+            "location",
+            response.location,
+            true
+        );
+
+        const btnWrapperRow = this.createRow();
+        const btnWrapperCol = this.createCol();
+        const btnWrapperDiv = this.createDiv();
+        btnWrapperDiv.classList.add(
+            "d-flex",
+            "flex-row",
+            "justify-content-end",
+            "gap-2"
+        );
+        const editButton = this.createButton("button", "Edit");
+        editButton.classList.add("btn-primary");
+        editButton.addEventListener("click", () => {
+            this.handleSupplierEditBtnEvent(editButton, form, response);
+        });
+
+        const deleteButton = this.createButton("button", "Delete");
+        deleteButton.classList.add("btn-danger");
+        deleteButton.addEventListener("click", () => {
+            this.handleSupplierDltBtnEvent(response);
+        });
+        btnWrapperRow.appendChild(btnWrapperCol);
+        btnWrapperCol.appendChild(btnWrapperDiv);
+        btnWrapperDiv.appendChild(editButton);
+        btnWrapperDiv.appendChild(deleteButton);
+
+        form.appendChild(supplierNameInput);
+        form.appendChild(contactPersonInput);
+        form.appendChild(contactNoInput);
+        form.appendChild(emailInput);
+        form.appendChild(locationInput);
+        form.appendChild(btnWrapperRow);
+    };
+
+    static renderSupplierAddForm = (form, tableType) => {
+        const supplierNameInput = this.createInput(
+            "Supplier Name:",
+            "text",
+            "supplier_name",
+            "",
+            false
+        );
+
+        const contactPersonInput = this.createInput(
+            "Contact Person:",
+            "text",
+            "contact_person",
+            "",
+            false
+        );
+
+        const contactNoInput = this.createInput(
+            "Contact No:",
+            "text",
+            "contact_no",
+            "",
+            false
+        );
+
+        const emailInput = this.createInput(
+            "Email:",
+            "text",
+            "email",
+            "",
+            false
+        );
+
+        const locationInput = this.createInput(
+            "Location:",
+            "text",
+            "location",
+            "",
+            false
+        );
+
+        const submitButtonContainer = this.createDiv();
+        submitButtonContainer.classList.add("text-end");
+        const submitButton = this.createButton("submit", "Submit");
+        submitButton.classList.add("btn-primary");
+        submitButtonContainer.appendChild(submitButton);
+
+        form.appendChild(supplierNameInput);
+        form.appendChild(contactPersonInput);
+        form.appendChild(contactNoInput);
+        form.appendChild(emailInput);
+        form.appendChild(locationInput);
+        form.appendChild(submitButtonContainer);
+
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+
+            this.handleSupplierFormEvent(form, tableType);
+        });
+    };
+
+    static handleSupplierEditBtnEvent = (editButton, form, response) => {
+        if (editButton.textContent === "Edit") {
+            // Toggle to "Save Changes" mode
+            editButton.textContent = "Save Changes";
+
+            // Enable all input elements in the form
+            const inputElements = form.querySelectorAll("input, select");
+            inputElements.forEach((input) => {
+                input.disabled = false;
+            });
+        } else {
+            // Save Changes mode - Prompt user for confirmation
+            const userConfirmed = window.confirm(
+                "Are you sure you want to make the changes for the supplier detail?"
+            );
+
+            if (userConfirmed) {
+                const no = response.no;
+                const number = no.toString();
+
+                const formData = new FormData(form);
+                const jsonData = {};
+
+                formData.forEach((value, key) => {
+                    jsonData[key] = value;
+                });
+
+                jsonData["supplier_id"] = response.supplier_id;
+
+                fetch("db/supplier_db.php", {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(jsonData),
+                })
+                    .then((response) => response.json())
+                    .then((data) => {
+                        if (data.success) {
+                            const supplierTable = $(
+                                "#ims__supplier-table"
+                            ).DataTable();
+
+                            // Find the row index based on the no
+                            const rowIndex = supplierTable
+                                .rows()
+                                .eq(0)
+                                .filter((rowIdx) => {
+                                    return (
+                                        supplierTable.cell(rowIdx, 0).data() ===
+                                        number
+                                    );
+                                });
+
+                            if (rowIndex.length > 0) {
+                                const rowNode = supplierTable
+                                    .row(rowIndex)
+                                    .node();
+
+                                const cellUpdates = [
+                                    {
+                                        index: 1,
+                                        value: data.supplier_data.supplier_name,
+                                    },
+                                    {
+                                        index: 2,
+                                        value: data.supplier_data
+                                            .contact_person,
+                                    },
+                                    {
+                                        index: 3,
+                                        value: data.supplier_data.contact_no,
+                                    },
+                                    {
+                                        index: 4,
+                                        value: data.supplier_data.email,
+                                    },
+                                    {
+                                        index: 5,
+                                        value: data.supplier_data.location,
+                                    },
+                                ];
+
+                                // Update each specified cell in the row
+                                cellUpdates.forEach(({ index, value }) => {
+                                    supplierTable
+                                        .cell(rowNode, index)
+                                        .data(value);
+                                });
+
+                                supplierTable.draw();
+                            }
+
+                            $("#ims__modal").modal("hide");
+
+                            // Reset to "Edit" mode
+                            editButton.textContent = "Edit";
+
+                            // Disable all input elements in the form
+                            const inputElements =
+                                form.querySelectorAll("input, select");
+                            inputElements.forEach((input) => {
+                                input.disabled = true;
+                            });
+                        } else {
+                            console.error(
+                                "Error updating supplier:",
+                                data.error_msg
+                            );
+                        }
+                    })
+                    .catch((error) => {
+                        console.error("Error updating supplier:", error);
+                    });
+            }
+        }
+    };
+
+    static handleSupplierDltBtnEvent = (response) => {
+        const userConfirmed = window.confirm(
+            "Are you sure you want to delete this supplier?"
+        );
+
+        if (userConfirmed) {
+            const supplierId = response.supplier_id;
+            const no = response.no;
+            const number = no.toString();
+
+            fetch(`db/supplier_db.php`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    supplier_id: supplierId,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        const supplierTable = $(
+                            "#ims__supplier-table"
+                        ).DataTable();
+
+                        // Find the row in DataTable based on the supplier_id and remove it
+                        const rowIndex = supplierTable
+                            .rows()
+                            .eq(0)
+                            .filter((rowIdx) => {
+                                return (
+                                    supplierTable.cell(rowIdx, 0).data() ===
+                                    number
+                                );
+                            });
+
+                        if (rowIndex.length > 0) {
+                            supplierTable.row(rowIndex).remove().draw();
+                        }
+
+                        $("#ims__modal").modal("hide");
+                    } else {
+                        console.error(
+                            "Error deleting supplier:",
+                            data.error_msg
+                        );
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error deleting supplier:", error);
+                });
+        }
+    };
+
+    static handleSupplierFormEvent = (form, tableType) => {
+        const formData = new FormData(form);
+
+        fetch("db/supplier_db.php", {
+            method: "POST",
+            body: formData,
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const supplierTable = $("#ims__supplier-table").DataTable();
+
+                    const nextRowNumber = supplierTable.rows().count() + 1;
+
+                    const viewDetailButton = this.createButton(
+                        "button",
+                        "View Detail"
+                    );
+                    viewDetailButton.classList.add("btn", "btn-info");
+                    viewDetailButton.setAttribute("data-bs-toggle", "modal");
+                    viewDetailButton.setAttribute(
+                        "data-bs-target",
+                        "#ims__modal"
+                    );
+
+                    const viewDetailButtonHTML = viewDetailButton.outerHTML;
+
+                    const supplierData = data.supplier_data;
+
+                    // Add new row to the DataTable
+                    supplierTable.row
+                        .add([
+                            nextRowNumber,
+                            data.supplier_data.supplier_name,
+                            data.supplier_data.contact_person,
+                            data.supplier_data.contact_no,
+                            data.supplier_data.email,
+                            data.supplier_data.location,
+                            viewDetailButtonHTML,
+                        ])
+                        .draw(false);
+
+                    const lastRowNode = supplierTable
+                        .row(supplierTable.rows().count() - 1)
+                        .node();
+
+                    // Attach the event listener to the button in the last added row
+                    const lastRowViewDetailButton =
+                        lastRowNode.querySelector(".btn-info");
+                    lastRowViewDetailButton.addEventListener("click", () => {
+                        this.showModal("Detail", tableType, supplierData);
+                    });
+
+                    $("#ims__modal").modal("hide");
+                } else {
+                    console.error("Error adding supplier:", data.error_msg);
+                }
+            })
+            .catch((error) => {
+                console.error("Error adding supplier:", error);
             });
     };
 }
