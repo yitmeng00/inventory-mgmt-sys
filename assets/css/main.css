@@ -77,11 +77,32 @@ body {
 
 /* Chart */
 canvas {
-    width: auto !important;
-    height: 20rem !important;
+    width: 100% !important;
+    height: auto !important;
+}
+
+.dashboard__chart-content {
+    border-radius: 0.5rem;
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
 }
 
 /* Main Content */
+#ims__main-dashboard {
+    background-color: #f6f7f8;
+}
+
+.ims__overview-section-container {
+    box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+}
+
+.ims__overview-content-title p {
+    font-size: 0.8rem;
+}
+
+.ims__overview-content-value {
+    font-size: 2.5rem;
+}
+
 #ims__product-table,
 #ims__transaction-table,
 #ims__supplier-table {
