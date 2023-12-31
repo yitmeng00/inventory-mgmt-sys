@@ -34,7 +34,7 @@ function retrieveTransactions()
     global $conn;
 
     try {
-        $stmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM transaction txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id;");
+        $stmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id;");
         $stmt->execute();
         $result = $stmt->get_result();
         $transactions = $result->fetch_all(MYSQLI_ASSOC);
@@ -71,7 +71,7 @@ function createTransaction()
 
     try {
         // Fetch unit price from the product table based on product_id
-        $fetchPriceStmt = $conn->prepare("SELECT price FROM product WHERE product_id = ?;");
+        $fetchPriceStmt = $conn->prepare("SELECT sale_price FROM product WHERE product_id = ?;");
         $fetchPriceStmt->bind_param("i", $productId);
         $fetchPriceStmt->execute();
         $fetchPriceResult = $fetchPriceStmt->get_result();
@@ -79,7 +79,7 @@ function createTransaction()
         // Check if the product_id is valid
         if ($fetchPriceResult->num_rows > 0) {
             $row = $fetchPriceResult->fetch_assoc();
-            $unitPrice = $row['price'];
+            $unitPrice = $row['sale_price'];
 
             // Insert transaction data
             $insertStmt = $conn->prepare("INSERT INTO transaction (product_id, type_id, quantity, unit_price) VALUES (?, ?, ?, ?);");
@@ -105,7 +105,7 @@ function createTransaction()
                 }
 
                 // Retrieve the newly added transaction data
-                $selectStmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM transaction txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
+                $selectStmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
                 $selectStmt->bind_param("i", $lastInsertedTransactionId);
                 $selectStmt->execute();
                 $result = $selectStmt->get_result();
@@ -166,7 +166,7 @@ function updateTransaction()
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            $selectStmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM transaction txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
+            $selectStmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
             $selectStmt->bind_param("i", $transactionId);
             $selectStmt->execute();
             $result = $selectStmt->get_result();
@@ -174,7 +174,7 @@ function updateTransaction()
 
             echo json_encode(array(
                 'success' => true,
-                'message' => 'Product updated successfully',
+                'message' => 'Transaction updated successfully',
                 'transaction_data' => $transactionData
             ));
         } else {
