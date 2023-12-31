@@ -40,6 +40,13 @@ function retrieveProducts()
         $products = $result->fetch_all(MYSQLI_ASSOC);
 
         if ($products) {
+            // Decode HTML special characters for specific fields
+            foreach ($products as &$product) {
+                $product['product_name'] = htmlspecialchars_decode($product['product_name']);
+                $product['product_code'] = htmlspecialchars_decode($product['product_code']);
+                $product['description'] = htmlspecialchars_decode($product['description']);
+            }
+
             echo json_encode(array(
                 'success' => true,
                 'products' => $products
@@ -77,11 +84,11 @@ function createProduct()
         return;
     }
 
-    $productName = $_POST['product_name'];
+    $productName = htmlspecialchars($_POST['product_name'], ENT_QUOTES);
     $categoryId = $_POST['category_id'];
     $supplierId = $_POST['supplier_id'];
-    $productCode = $_POST['product_code'];
-    $description = $_POST['description'];
+    $productCode = htmlspecialchars($_POST['product_code'], ENT_QUOTES);
+    $description = htmlspecialchars($_POST['description'], ENT_QUOTES);
     $price = $_POST['price'];
 
     // Handle file upload
@@ -256,5 +263,3 @@ function deleteProduct()
     $stmt->close();
     $conn->close();
 }
-
-?>
