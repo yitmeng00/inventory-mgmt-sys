@@ -34,7 +34,7 @@ function retrieveProducts()
     global $conn;
 
     try {
-        $stmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id;");
+        $stmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id;");
         $stmt->execute();
         $result = $stmt->get_result();
         $products = $result->fetch_all(MYSQLI_ASSOC);
@@ -89,7 +89,8 @@ function createProduct()
     $supplierId = $_POST['supplier_id'];
     $productCode = htmlspecialchars($_POST['product_code'], ENT_QUOTES);
     $description = htmlspecialchars($_POST['description'], ENT_QUOTES);
-    $price = $_POST['price'];
+    $costPrice = $_POST['cost_price'];
+    $salePrice = $_POST['sale_price'];
 
     // Handle file upload
     $uploadFile = $uploadDir . basename($_FILES['attachment']['name']);
@@ -98,8 +99,8 @@ function createProduct()
         // File upload successful, continue with database insertion
         try {
             // Insert product data
-            $stmt = $conn->prepare("INSERT INTO product (product_name, category_id, supplier_id, product_code, `description`, price) VALUES (?, ?, ?, ?, ?, ?);");
-            $stmt->bind_param("siissd", $productName, $categoryId, $supplierId, $productCode, $description, $price);
+            $stmt = $conn->prepare("INSERT INTO product (product_name, category_id, supplier_id, product_code, `description`, cost_price, sale_price) VALUES (?, ?, ?, ?, ?, ?, ?);");
+            $stmt->bind_param("siissdd", $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice);
             $stmt->execute();
 
             $lastInsertedProductId = $conn->insert_id;
@@ -114,7 +115,7 @@ function createProduct()
 
                 if ($imgStmt->affected_rows > 0) {
                     // Retrieve the newly added product data
-                    $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
+                    $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
                     $selectStmt->bind_param("i", $lastInsertedProductId);
                     $selectStmt->execute();
                     $result = $selectStmt->get_result();
@@ -175,16 +176,17 @@ function updateProduct()
     $supplierId = $data['supplier_id'];
     $productCode = $data['product_code'];
     $description = $data['description'];
-    $price = $data['price'];
+    $costPrice = $data['cost_price'];
+    $salePrice = $data['sale_price'];
 
     try {
-        $stmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, price=? WHERE product_id=?;");
-        $stmt->bind_param("sssssdi", $productName, $categoryId, $supplierId, $productCode, $description, $price, $productId);
+        $stmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, cost_price=?, sale_price=? WHERE product_id=?;");
+        $stmt->bind_param("sssssddi", $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice, $productId);
 
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
+            $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
             $selectStmt->bind_param("i", $productId);
             $selectStmt->execute();
             $result = $selectStmt->get_result();

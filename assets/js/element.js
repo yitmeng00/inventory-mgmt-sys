@@ -239,7 +239,8 @@ class ElementFactory {
                     "category_name",
                     "supplier_name",
                     "description",
-                    "price",
+                    "cost_price",
+                    "sale_price",
                     "quantity",
                 ];
 
@@ -1255,11 +1256,18 @@ class ElementFactory {
             response.description,
             true
         );
-        const priceInput = this.createInput(
-            "Price:",
+        const costPriceInput = this.createInput(
+            "Cost Price:",
             "number",
-            "price",
-            response.price,
+            "cost_price",
+            response.cost_price,
+            true
+        );
+        const salePriceInput = this.createInput(
+            "Sale Price:",
+            "number",
+            "sale_price",
+            response.sale_price,
             true
         );
 
@@ -1322,7 +1330,8 @@ class ElementFactory {
                 formCol2.appendChild(productCodeInput);
                 formCol2.appendChild(productNameInput);
                 formCol2.appendChild(descriptionInput);
-                formCol2.appendChild(priceInput);
+                formCol2.appendChild(costPriceInput);
+                formCol2.appendChild(salePriceInput);
                 formCol2.appendChild(quantityInputContainer);
 
                 form.appendChild(btnWrapperRow);
@@ -1410,14 +1419,20 @@ class ElementFactory {
             "",
             false
         );
-        const priceInput = this.createInput(
-            "Price:",
+        const costPriceInput = this.createInput(
+            "Cost Price:",
             "number",
-            "price",
+            "cost_price",
             "",
             false
         );
-
+        const salePriceInput = this.createInput(
+            "Sale Price:",
+            "number",
+            "sale_price",
+            "",
+            false
+        );
         const attachmentInput = this.createInput(
             "Attachment:",
             "file",
@@ -1437,7 +1452,8 @@ class ElementFactory {
             form.appendChild(productCodeInput);
             form.appendChild(productNameInput);
             form.appendChild(descriptionInput);
-            form.appendChild(priceInput);
+            form.appendChild(costPriceInput);
+            form.appendChild(salePriceInput);
             form.appendChild(attachmentInput);
 
             form.appendChild(submitButtonContainer);
@@ -1529,7 +1545,11 @@ class ElementFactory {
                                     },
                                     {
                                         index: 6,
-                                        value: data.product_data.price,
+                                        value: data.product_data.cost_price,
+                                    },
+                                    {
+                                        index: 7,
+                                        value: data.product_data.sale_price,
                                     },
                                 ];
 
@@ -1663,7 +1683,8 @@ class ElementFactory {
                             data.product_data.category_name,
                             data.product_data.supplier_name,
                             data.product_data.description,
-                            data.product_data.price,
+                            data.product_data.cost_price,
+                            data.product_data.sale_price,
                             data.product_data.quantity,
                             viewDetailButtonHTML,
                         ])

@@ -43,7 +43,8 @@ class Product {
             "Category",
             "Supplier",
             "Description",
-            "Price",
+            "Cost Price",
+            "Sale Price",
             "Quantity",
             "Action",
         ];
