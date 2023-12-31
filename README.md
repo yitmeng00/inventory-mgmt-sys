@@ -37,7 +37,7 @@ This app includes the following features:
 - Issue 2: After adding a new transaction, there will be an issue with the transaction edit and delete functions.
 - Issue 3: After adding a new supplier, there will be an issue with the supplier edit and delete functions.
 - Issue 4: After editing the details of a product, transaction, or supplier, when you click the "View Detail" button, it still shows the old information.
-- Issue 5: When loading the page, the header appears first, and then the table body loads (a loading spinner can be added).
+- Issue 5: When loading the page, the header appears first, and then the table body loads. [Fixed]
 
 ## Technologies Used
 
