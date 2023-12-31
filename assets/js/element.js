@@ -352,6 +352,56 @@ class ElementFactory {
         return tableBody;
     };
 
+    static createOverviewContent = (contents, overviewContentRow) => {
+        contents.forEach((content) => {
+            const overviewContentCol = this.createCol();
+            const overviewContentWrapper = this.createDiv();
+            overviewContentWrapper.classList.add("bg-white", "rounded", "p-3");
+            overviewContentCol.appendChild(overviewContentWrapper);
+
+            const titleRow = this.createTitle(content.title, "p");
+            titleRow.classList.add("ims__overview-content-title");
+
+            const dataRow = this.createRow();
+            const dataCol = this.createCol();
+            dataRow.appendChild(dataCol);
+
+            const valueContainer = this.createDiv();
+            const value = this.createParagraph("0");
+            value.classList.add("ims__overview-content-value", "m-0");
+            dataCol.appendChild(valueContainer);
+            valueContainer.appendChild(value);
+
+            overviewContentWrapper.appendChild(titleRow);
+            overviewContentWrapper.appendChild(dataRow);
+
+            overviewContentRow.appendChild(overviewContentCol);
+
+            this.animateCountingEffect(value, content.value);
+        });
+    };
+
+    static animateCountingEffect = (element, finalValue, duration = 2000) => {
+        const initialValue = 0;
+        const increment = finalValue / (duration / 16); // 16ms is approximately the frame duration for 60fps
+
+        let currentVal = initialValue;
+
+        const updateValue = () => {
+            currentVal += increment;
+            element.textContent = Math.round(currentVal);
+
+            if (currentVal < finalValue) {
+                requestAnimationFrame(updateValue);
+            } else {
+                // Ensure the final value is set
+                element.textContent = finalValue;
+            }
+        };
+
+        updateValue();
+    };
+
     static createCanvas = (id) => {
         const canvas = document.createElement("canvas");
         canvas.id = id;
@@ -359,92 +409,610 @@ class ElementFactory {
         return canvas;
     };
 
-    static createChartSection = (contents, chartSectCol) => {
-        const chartSectRow = this.createRow();
-        chartSectRow.classList.add("mb-3", "gap-3");
+    static createProductChart = (title, id, data) => {
+        const chartContainer = this.createCol();
+        chartContainer.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-12",
+            "col-lg-12",
+            "col-xl-6",
+            "col-xxl-6"
+        );
 
-        contents.forEach((content) => {
-            const chartContainer = this.createCol();
-            chartContainer.classList.add("border", "border-black");
+        const chartContentRow = this.createRow();
+        const chartContentCol = this.createCol();
+        const chartContentContainer = this.createDiv();
+        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        const chartCanvas = this.createCanvas(id);
+        chartContentRow.appendChild(chartContentCol);
+        chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(chartCanvas);
 
-            const chartTitleRow = this.createTitle(content.title, "h5");
+        chartContainer.appendChild(chartContentRow);
 
-            const chartContentRow = this.createRow();
-            const chartContentCol = this.createCol();
-            const chartContentContainer = this.createDiv();
-            const chartCanvas = this.createCanvas(content.id);
-            chartContentRow.appendChild(chartContentCol);
-            chartContentCol.appendChild(chartContentContainer);
-            chartContentContainer.appendChild(chartCanvas);
+        const categories = data.map((entry) => entry.category_name);
+        const values = data.map((entry) => parseFloat(entry.value));
 
-            chartContainer.appendChild(chartTitleRow);
-            chartContainer.appendChild(chartContentRow);
-            chartSectRow.appendChild(chartContainer);
+        const chartData = {
+            labels: categories,
+            datasets: [
+                {
+                    label: "Total products",
+                    data: values,
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 0.5)",
+                        "rgba(54, 162, 235, 0.5)",
+                        "rgba(255, 206, 86, 0.5)",
+                        "rgba(75, 192, 192, 0.5)",
+                        "rgba(153, 102, 255, 0.5)",
+                        "rgba(255, 159, 64, 0.5)",
+                    ],
+                    borderColor: [
+                        "rgba(255, 99, 132, 1)",
+                        "rgba(54, 162, 235, 1)",
+                        "rgba(255, 206, 86, 1)",
+                        "rgba(75, 192, 192, 1)",
+                        "rgba(153, 102, 255, 1)",
+                        "rgba(255, 159, 64, 1)",
+                    ],
+                    borderWidth: 1,
+                },
+            ],
+        };
 
-            const chartData = {
-                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-                datasets: [
-                    {
-                        label: "# of Votes",
-                        data: [12, 19, 3, 5, 2, 3],
-                        borderWidth: 1,
-                    },
-                ],
-            };
-            const chartOptions = {
-                scales: {
-                    y: {
-                        beginAtZero: true,
+        const chartOptions = {
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: "Total product over categories",
+                    font: {
+                        size: 20,
                     },
                 },
-            };
-            this.initializeChart(
-                chartCanvas,
-                chartData,
-                content.type,
-                chartOptions
-            );
-        });
+            },
+        };
 
-        chartSectCol.appendChild(chartSectRow);
+        this.initializeChart(chartCanvas, chartData, "bar", chartOptions);
+
+        return chartContainer;
     };
 
-    static createOverviewContent = (contents, overviewContentRow) => {
-        contents.forEach((content) => {
-            const overviewContentCol = this.createCol();
-            overviewContentCol.classList.add("border", "border-black", "p-2");
+    static createPurchaseChart = (title, id, data) => {
+        const dummyData = [
+            {
+                month: "January",
+                purchase: "85500.75",
+            },
+            {
+                month: "February",
+                purchase: "68250.50",
+            },
+            {
+                month: "March",
+                purchase: "72890.25",
+            },
+            {
+                month: "April",
+                purchase: "99760.80",
+            },
+            {
+                month: "May",
+                purchase: "81567.20",
+            },
+            {
+                month: "June",
+                purchase: "74680.10",
+            },
+            {
+                month: "July",
+                purchase: "87520.45",
+            },
+            {
+                month: "August",
+                purchase: "90430.60",
+            },
+            {
+                month: "September",
+                purchase: "128890.75",
+            },
+            {
+                month: "October",
+                purchase: "80670.30",
+            },
+            {
+                month: "November",
+                purchase: "109500.15",
+            },
+            {
+                month: "December",
+                purchase: "146116.00",
+            },
+        ];
 
-            const titleRow = this.createTitle(content.title, "p");
+        const chartContainer = this.createCol();
+        chartContainer.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-12",
+            "col-lg-12",
+            "col-xl-6",
+            "col-xxl-6"
+        );
 
-            const dataRow = this.createRow();
-            const dataCol = this.createCol();
-            const dataContainer = this.createDiv();
-            dataContainer.classList.add("d-flex", "gap-3");
-            dataCol.appendChild(dataContainer);
-            dataRow.appendChild(dataCol);
+        const chartContentRow = this.createRow();
+        const chartContentCol = this.createCol();
+        const chartContentContainer = this.createDiv();
+        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        const chartCanvas = this.createCanvas(id);
+        chartContentRow.appendChild(chartContentCol);
+        chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(chartCanvas);
 
-            const valueContainer = this.createDiv();
-            const value = this.createParagraph(content.value);
-            dataContainer.appendChild(valueContainer);
-            valueContainer.appendChild(value);
+        chartContainer.appendChild(chartContentRow);
 
-            const percentageContainer = this.createDiv();
-            percentageContainer.classList.add("d-flex", "gap-1");
+        const months = dummyData.map((entry) => entry.month);
+        const purchaseValues = dummyData.map((entry) =>
+            parseFloat(entry.purchase)
+        );
 
-            const iconContainer = this.createIcon(content.icon);
-            const percentageValueContainer = this.createDiv();
-            const percentage = this.createParagraph(content.percentage);
+        const chartData = {
+            labels: months,
+            datasets: [
+                {
+                    label: "Purchase",
+                    data: purchaseValues,
+                    borderColor: "rgba(255, 99, 132, 1)",
+                    backgroundColor: "rgba(255, 99, 132, 0.2)",
+                    borderWidth: 1,
+                    fill: false,
+                },
+            ],
+        };
 
-            percentageContainer.appendChild(iconContainer);
-            percentageContainer.appendChild(percentageValueContainer);
-            percentageValueContainer.appendChild(percentage);
-            dataContainer.appendChild(percentageContainer);
+        const chartOptions = {
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: "Purchase over months",
+                    font: {
+                        size: 20,
+                    },
+                },
+            },
+        };
 
-            overviewContentCol.appendChild(titleRow);
-            overviewContentCol.appendChild(dataRow);
+        this.initializeChart(chartCanvas, chartData, "line", chartOptions);
 
-            overviewContentRow.appendChild(overviewContentCol);
-        });
+        return chartContainer;
+    };
+
+    static createSaleChart = (title, id, data) => {
+        const dummyData = [
+            {
+                month: "January",
+                sale: "35500.75",
+            },
+            {
+                month: "February",
+                sale: "38250.50",
+            },
+            {
+                month: "March",
+                sale: "62890.25",
+            },
+            {
+                month: "April",
+                sale: "39760.80",
+            },
+            {
+                month: "May",
+                sale: "41567.20",
+            },
+            {
+                month: "June",
+                sale: "54680.10",
+            },
+            {
+                month: "July",
+                sale: "47520.45",
+            },
+            {
+                month: "August",
+                sale: "46430.60",
+            },
+            {
+                month: "September",
+                sale: "48890.75",
+            },
+            {
+                month: "October",
+                sale: "50670.30",
+            },
+            {
+                month: "November",
+                sale: "49500.15",
+            },
+            {
+                month: "December",
+                sale: "40065.49",
+            },
+        ];
+
+        const chartContainer = this.createCol();
+        chartContainer.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-12",
+            "col-lg-12",
+            "col-xl-6",
+            "col-xxl-6"
+        );
+
+        const chartContentRow = this.createRow();
+        const chartContentCol = this.createCol();
+        const chartContentContainer = this.createDiv();
+        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        const chartCanvas = this.createCanvas(id);
+        chartContentRow.appendChild(chartContentCol);
+        chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(chartCanvas);
+
+        chartContainer.appendChild(chartContentRow);
+
+        const months = dummyData.map((entry) => entry.month);
+        const saleValues = dummyData.map((entry) => parseFloat(entry.sale));
+
+        const chartData = {
+            labels: months,
+            datasets: [
+                {
+                    label: "Sale",
+                    data: saleValues,
+                    borderColor: "rgba(255, 96, 23, 1)",
+                    backgroundColor: "rgba(255, 96, 23, 0.2)",
+                    borderWidth: 1,
+                    fill: false,
+                },
+            ],
+        };
+
+        const chartOptions = {
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: "Sale over months",
+                    font: {
+                        size: 20,
+                    },
+                },
+            },
+        };
+
+        this.initializeChart(chartCanvas, chartData, "line", chartOptions);
+
+        return chartContainer;
+    };
+
+    static createRevenueProfitChart = (title, id, data) => {
+        const dummyData = [
+            {
+                month: "January",
+                revenue: "35500.75",
+                profit: "6123.45",
+            },
+            {
+                month: "February",
+                revenue: "38250.50",
+                profit: "7245.60",
+            },
+            {
+                month: "March",
+                revenue: "62890.25",
+                profit: "12345.30",
+            },
+            {
+                month: "April",
+                revenue: "39760.80",
+                profit: "7456.75",
+            },
+            {
+                month: "May",
+                revenue: "41567.20",
+                profit: "7634.90",
+            },
+            {
+                month: "June",
+                revenue: "54680.10",
+                profit: "20056.20",
+            },
+            {
+                month: "July",
+                revenue: "47520.45",
+                profit: "9345.75",
+            },
+            {
+                month: "August",
+                revenue: "46430.60",
+                profit: "8776.40",
+            },
+            {
+                month: "September",
+                revenue: "48890.75",
+                profit: "9234.60",
+            },
+            {
+                month: "October",
+                revenue: "50670.30",
+                profit: "10123.50",
+            },
+            {
+                month: "November",
+                revenue: "49500.15",
+                profit: "9789.25",
+            },
+            {
+                month: "December",
+                revenue: "40065.49",
+                profit: "7760.00",
+            },
+        ];
+
+        const chartContainer = this.createCol();
+        chartContainer.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-12",
+            "col-lg-12",
+            "col-xl-6",
+            "col-xxl-6"
+        );
+
+        const chartContentRow = this.createRow();
+        const chartContentCol = this.createCol();
+        const chartContentContainer = this.createDiv();
+        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        const chartCanvas = this.createCanvas(id);
+        chartContentRow.appendChild(chartContentCol);
+        chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(chartCanvas);
+
+        chartContainer.appendChild(chartContentRow);
+
+        const months = dummyData.map((entry) => entry.month);
+        const revenueValues = dummyData.map((entry) =>
+            parseFloat(entry.revenue)
+        );
+        const profitValues = dummyData.map((entry) => parseFloat(entry.profit));
+
+        const chartData = {
+            labels: months,
+            datasets: [
+                {
+                    label: "Revenue",
+                    data: revenueValues,
+                    borderColor: "rgba(255, 96, 23, 1)",
+                    backgroundColor: "rgba(255, 96, 23, 0.2)",
+                    borderWidth: 1,
+                    fill: false,
+                },
+                {
+                    label: "Profit",
+                    data: profitValues,
+                    borderColor: "rgba(73, 237, 47, 1)",
+                    backgroundColor: "rgba(73, 237, 47, 0.2)",
+                    borderWidth: 1,
+                    fill: false,
+                },
+            ],
+        };
+
+        const chartOptions = {
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                },
+                title: {
+                    display: true,
+                    text: "Revenue and Profit over months",
+                    font: {
+                        size: 20,
+                    },
+                },
+            },
+        };
+
+        this.initializeChart(chartCanvas, chartData, "line", chartOptions);
+
+        return chartContainer;
+    };
+
+    static createLowStockChart = (title, id, data) => {
+        const chartContainer = this.createCol();
+        chartContainer.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-12",
+            "col-lg-12",
+            "col-xl-6",
+            "col-xxl-6"
+        );
+
+        const chartContentRow = this.createRow();
+        const chartContentCol = this.createCol();
+        const chartContentContainer = this.createDiv();
+        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        const chartCanvas = this.createCanvas(id);
+        chartContentRow.appendChild(chartContentCol);
+        chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(chartCanvas);
+
+        chartContainer.appendChild(chartContentRow);
+
+        const labels = data.map((entry) => entry.product_name);
+        const values = data.map((entry) => parseInt(entry.quantity));
+
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    data: values,
+                    borderColor: "rgba(247, 244, 35, 1)",
+                    backgroundColor: "rgba(247, 244, 35, 0.8)",
+                    borderWidth: 1,
+                },
+            ],
+        };
+
+        const chartOptions = {
+            scales: {
+                x: {
+                    beginAtZero: true,
+                },
+                y: {
+                    beginAtZero: true,
+                },
+            },
+            indexAxis: "y",
+            plugins: {
+                legend: {
+                    display: false,
+                },
+                title: {
+                    display: true,
+                    text: "Low stock products",
+                    font: {
+                        size: 20,
+                    },
+                },
+            },
+        };
+
+        this.initializeChart(chartCanvas, chartData, "bar", chartOptions);
+
+        return chartContainer;
+    };
+
+    static createBestSellingChart = (title, id, data) => {
+        const chartContainer = this.createCol();
+        chartContainer.classList.add(
+            "col-12",
+            "col-sm-12",
+            "col-md-12",
+            "col-lg-12",
+            "col-xl-6",
+            "col-xxl-6"
+        );
+
+        const chartContentRow = this.createRow();
+        const chartContentCol = this.createCol();
+        const chartContentContainer = this.createDiv();
+        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        const chartCanvas = this.createCanvas(id);
+        chartContentRow.appendChild(chartContentCol);
+        chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(chartCanvas);
+
+        chartContainer.appendChild(chartContentRow);
+
+        const labels = data.map((entry) => entry.product_name);
+        const values = data.map((entry) => parseInt(entry.quantity_sold));
+
+        // Find the index of the maximum value in the 'values' array
+        const maxIndex = values.indexOf(Math.max(...values));
+
+        // Create an array with the same length as 'values' with zeros, except for the maximum value which has a non-zero offset
+        const offsets = values.map((value, index) =>
+            index === maxIndex ? 50 : 0
+        );
+
+        const chartData = {
+            labels: labels,
+            datasets: [
+                {
+                    data: values,
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 0.5)",
+                        "rgba(54, 162, 235, 0.5)",
+                        "rgba(255, 206, 86, 0.5)",
+                        "rgba(75, 192, 192, 0.5)",
+                        "rgba(153, 102, 255, 0.5)",
+                        "rgba(255, 159, 64, 0.5)",
+                    ],
+                    borderColor: [
+                        "rgba(255, 99, 132, 1)",
+                        "rgba(54, 162, 235, 1)",
+                        "rgba(255, 206, 86, 1)",
+                        "rgba(75, 192, 192, 1)",
+                        "rgba(153, 102, 255, 1)",
+                        "rgba(255, 159, 64, 1)",
+                    ],
+                    borderWidth: 1,
+                    offset: offsets,
+                },
+            ],
+        };
+
+        const chartOptions = {
+            legend: {
+                display: true,
+                position: "right",
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: "Best-selling products",
+                    font: {
+                        size: 20,
+                    },
+                },
+            },
+        };
+
+        this.initializeChart(chartCanvas, chartData, "pie", chartOptions);
+
+        return chartContainer;
     };
 
     static initializeChart(canvas, data, type, options) {
