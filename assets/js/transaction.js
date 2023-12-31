@@ -73,6 +73,14 @@ class Transaction {
                     $(transactionTable).DataTable({
                         order: [[0, "desc"]],
                     });
+
+                    transactionTableRow.appendChild(transactionTableCol);
+                    transactionTableCol.appendChild(transactionTableContainer);
+                    transactionTableContainer.appendChild(transactionTable);
+
+                    transactionSect.appendChild(transactionTitleRow);
+                    transactionSect.appendChild(transactionBtnRow);
+                    transactionSect.appendChild(transactionTableRow);
                 } else {
                     console.error(
                         "Error fetching transaction data: ",
@@ -83,14 +91,6 @@ class Transaction {
             .catch((error) => {
                 console.error("Error fetching transaction data: ", error);
             });
-
-        transactionTableRow.appendChild(transactionTableCol);
-        transactionTableCol.appendChild(transactionTableContainer);
-        transactionTableContainer.appendChild(transactionTable);
-
-        transactionSect.appendChild(transactionTitleRow);
-        transactionSect.appendChild(transactionBtnRow);
-        transactionSect.appendChild(transactionTableRow);
 
         MAIN_CONTENT.appendChild(transactionSect);
     }

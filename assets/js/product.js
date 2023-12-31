@@ -67,6 +67,14 @@ class Product {
                     $(productTable).DataTable({
                         order: [[0, "desc"]],
                     });
+
+                    productTableRow.appendChild(productTableCol);
+                    productTableCol.appendChild(productTableContainer);
+                    productTableContainer.appendChild(productTable);
+
+                    productSect.appendChild(productTitleRow);
+                    productSect.appendChild(productBtnRow);
+                    productSect.appendChild(productTableRow);
                 } else {
                     console.error(
                         "Error fetching product data: ",
@@ -77,14 +85,6 @@ class Product {
             .catch((error) => {
                 console.error("Error fetching product data: ", error);
             });
-
-        productTableRow.appendChild(productTableCol);
-        productTableCol.appendChild(productTableContainer);
-        productTableContainer.appendChild(productTable);
-
-        productSect.appendChild(productTitleRow);
-        productSect.appendChild(productBtnRow);
-        productSect.appendChild(productTableRow);
 
         MAIN_CONTENT.appendChild(productSect);
     }

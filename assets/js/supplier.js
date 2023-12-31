@@ -67,6 +67,14 @@ class Supplier {
                     $(supplierTable).DataTable({
                         order: [[0, "desc"]],
                     });
+
+                    supplierTableRow.appendChild(supplierTableCol);
+                    supplierTableCol.appendChild(supplierTableContainer);
+                    supplierTableContainer.appendChild(supplierTable);
+
+                    supplierSect.appendChild(supplierTitleRow);
+                    supplierSect.appendChild(supplierBtnRow);
+                    supplierSect.appendChild(supplierTableRow);
                 } else {
                     console.error(
                         "Error fetching supplier data: ",
@@ -77,14 +85,6 @@ class Supplier {
             .catch((error) => {
                 console.error("Error fetching supplier data: ", error);
             });
-
-        supplierTableRow.appendChild(supplierTableCol);
-        supplierTableCol.appendChild(supplierTableContainer);
-        supplierTableContainer.appendChild(supplierTable);
-
-        supplierSect.appendChild(supplierTitleRow);
-        supplierSect.appendChild(supplierBtnRow);
-        supplierSect.appendChild(supplierTableRow);
 
         MAIN_CONTENT.appendChild(supplierSect);
     }
