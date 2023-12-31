@@ -40,6 +40,12 @@ function retrieveTransactions()
         $transactions = $result->fetch_all(MYSQLI_ASSOC);
 
         if ($transactions) {
+            // Decode HTML special characters for specific fields
+            foreach ($transactions as &$transaction) {
+                $transaction['product_code'] = htmlspecialchars_decode($transaction['product_code']);
+                $transaction['product_name'] = htmlspecialchars_decode($transaction['product_name']);
+            }
+
             echo json_encode(array(
                 'success' => true,
                 'transactions' => $transactions

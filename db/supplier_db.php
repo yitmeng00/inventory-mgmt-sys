@@ -40,6 +40,14 @@ function retrieveSuppliers()
         $suppliers = $result->fetch_all(MYSQLI_ASSOC);
 
         if ($suppliers) {
+            // Decode HTML special characters for specific fields
+            foreach ($suppliers as &$supplier) {
+                $supplier['supplier_name'] = htmlspecialchars_decode($supplier['supplier_name']);
+                $supplier['contact_person'] = htmlspecialchars_decode($supplier['contact_person']);
+                $supplier['email'] = htmlspecialchars_decode($supplier['email']);
+                $supplier['location'] = htmlspecialchars_decode($supplier['location']);
+            }
+
             echo json_encode(array(
                 'success' => true,
                 'suppliers' => $suppliers
@@ -65,11 +73,11 @@ function createSupplier()
 {
     global $conn;
 
-    $supplierName = $_POST['supplier_name'];
-    $contactPerson = $_POST['contact_person'];
+    $supplierName = htmlspecialchars($_POST['supplier_name'], ENT_QUOTES);
+    $contactPerson = htmlspecialchars($_POST['contact_person'], ENT_QUOTES);
     $contactNo = $_POST['contact_no'];
-    $email = $_POST['email'];
-    $location = $_POST['location'];
+    $email = htmlspecialchars($_POST['email'], ENT_QUOTES);
+    $location = htmlspecialchars($_POST['location'], ENT_QUOTES);
 
     try {
         // Insert supplier data

@@ -241,7 +241,7 @@ function retrieveLowStockChartData()
         $lowStockData = [];
         while ($row = mysqli_fetch_assoc($lowStockDataResult)) {
             $lowStockData[] = [
-                'product_name' => $row['product_name'],
+                'product_name' => htmlspecialchars_decode($row['product_name']),
                 'quantity' => $row['quantity'],
             ];
         }
@@ -270,7 +270,7 @@ function retrieveBestSellingChartData()
         $bestSellingData = [];
         while ($row = mysqli_fetch_assoc($bestSellingDataResult)) {
             $bestSellingData[] = [
-                'product_name' => $row['product_name'],
+                'product_name' => htmlspecialchars_decode($row['product_name']),
                 'quantity_sold' => $row['total_quantity_sold'],
             ];
         }
