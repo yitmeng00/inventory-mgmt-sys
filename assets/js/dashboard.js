@@ -2,118 +2,248 @@ class Dashboard {
     static initDashboard() {
         const MAIN_CONTENT = document.getElementById("ims__main-dashboard");
 
-        // Overview section
-        const overviewSect = ElementFactory.createSection();
-        overviewSect.classList.add("border", "border-black", "mb-3");
-        const overviewSectRow = ElementFactory.createRow();
-        overviewSectRow.classList.add("p-3");
-        const overviewSectCol = ElementFactory.createCol();
-        overviewSect.appendChild(overviewSectRow);
-        overviewSectRow.appendChild(overviewSectCol);
+        fetch("db/dashboard_db.php?action=get_overview", {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    // Overview section
+                    const overviewSect = ElementFactory.createSection();
+                    overviewSect.classList.add("mb-3");
+                    const overviewSectRow = ElementFactory.createRow();
+                    const overviewSectCol = ElementFactory.createCol();
+                    const overviewSectWrapper = ElementFactory.createDiv();
+                    overviewSectWrapper.classList.add(
+                        "ims__overview-section-container",
+                        "rounded",
+                        "p-4"
+                    );
+                    overviewSect.appendChild(overviewSectRow);
+                    overviewSectRow.appendChild(overviewSectCol);
+                    overviewSectCol.appendChild(overviewSectWrapper);
 
-        const overviewTitleRow = ElementFactory.createTitle("Overview", "h4");
-        const overviewContentRow = ElementFactory.createRow();
-        overviewContentRow.classList.add("gap-3");
+                    const overviewTitleRow = ElementFactory.createTitle(
+                        "Overview",
+                        "h5"
+                    );
+                    overviewTitleRow.classList.add("mb-2");
+                    const overviewContentWrapperRow =
+                        ElementFactory.createRow();
+                    const overviewContentWrapperCol =
+                        ElementFactory.createCol();
+                    const overviewContentRow = ElementFactory.createRow();
+                    overviewContentWrapperRow.appendChild(
+                        overviewContentWrapperCol
+                    );
+                    overviewContentWrapperCol.appendChild(overviewContentRow);
 
-        const overviewContents = [
-            {
-                title: "TOTAL AVAILABLE STOCKS",
-                value: "7879",
-                icon: null,
-                percentage: null,
-            },
-            {
-                title: "LOW IN STOCK",
-                value: "3",
-                icon: null,
-                percentage: null,
-            },
-            {
-                title: "OUT OF STOCK",
-                value: "5",
-                icon: null,
-                percentage: null,
-            },
-            {
-                title: "TOTAL PURCHASES",
-                value: "7879",
-                icon: "fa-caret-up",
-                percentage: "3.2%",
-            },
-            {
-                title: "TOTAL SALES",
-                value: "7879",
-                icon: "fa-caret-up",
-                percentage: "3.2%",
-            },
-            {
-                title: "TOTAL REVENUES",
-                value: "7879",
-                icon: "fa-caret-up",
-                percentage: "3.2%",
-            },
-        ];
+                    ElementFactory.createOverviewContent(
+                        data.overview_contents,
+                        overviewContentRow
+                    );
 
-        ElementFactory.createOverviewContent(
-            overviewContents,
-            overviewContentRow
-        );
+                    overviewSectWrapper.appendChild(overviewTitleRow);
+                    overviewSectWrapper.appendChild(overviewContentWrapperRow);
 
-        overviewSectCol.appendChild(overviewTitleRow);
-        overviewSectCol.appendChild(overviewContentRow);
+                    // Chart Section
+                    const chartSect = ElementFactory.createSection();
+                    chartSect.classList.add("mb-3");
+                    const chartSectRow = ElementFactory.createRow();
+                    const chartSectCol = ElementFactory.createCol();
+                    chartSect.appendChild(chartSectRow);
+                    chartSectRow.appendChild(chartSectCol);
 
-        // Chart Section
-        const chartSect = ElementFactory.createSection();
-        chartSect.classList.add("mb-3");
-        const chartSectRow = ElementFactory.createRow();
-        const chartSectCol = ElementFactory.createCol();
-        chartSect.appendChild(chartSectRow);
-        chartSectRow.appendChild(chartSectCol);
+                    const chartRow1 = ElementFactory.createRow();
+                    chartRow1.classList.add("mb-3");
+                    const chartRow2 = ElementFactory.createRow();
+                    chartRow2.classList.add("mb-3");
+                    const chartRow3 = ElementFactory.createRow();
+                    chartRow3.classList.add("mb-3");
 
-        const chartRow1Contents = [
-            {
-                title: "Total products",
-                id: "dashboard__product-chart",
-                type: "bar",
-            },
-            {
-                title: "Month to date purchases",
-                id: "dashboard__purchase-chart",
-                type: "bar",
-            },
-        ];
+                    fetch("db/dashboard_db.php?action=get_product_chart", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const totalProductChart =
+                                    ElementFactory.createProductChart(
+                                        "Total products",
+                                        "dashboard__product-chart",
+                                        data.product_data
+                                    );
 
-        const chartRow2Contents = [
-            {
-                title: "Month to date sales",
-                id: "dashboard__sale-chart",
-                type: "line",
-            },
-            {
-                title: "Month to date revenue",
-                id: "dashboard__revenue-chart",
-                type: "line",
-            },
-        ];
+                                chartRow1.appendChild(totalProductChart);
+                            } else {
+                                console.error(
+                                    "Error fetching product chart data:",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product chart data:",
+                                error
+                            );
+                        });
 
-        const chartRow3Contents = [
-            {
-                title: "Low stock products",
-                id: "dashboard__low-stock-chart",
-                type: "bar",
-            },
-            {
-                title: "Best-selling products",
-                id: "dashboard__best-selling-chart",
-                type: "pie",
-            },
-        ];
+                    fetch(
+                        "db/dashboard_db.php?action=get_revenue_profit_chart",
+                        {
+                            method: "GET",
+                        }
+                    )
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const revenuesChart =
+                                    ElementFactory.createRevenueProfitChart(
+                                        "Revenues and Profits",
+                                        "dashboard__revenue-profit-chart",
+                                        data.revenue_profit_data
+                                    );
 
-        ElementFactory.createChartSection(chartRow1Contents, chartSectCol);
-        ElementFactory.createChartSection(chartRow2Contents, chartSectCol);
-        ElementFactory.createChartSection(chartRow3Contents, chartSectCol);
+                                chartRow1.appendChild(revenuesChart);
+                            } else {
+                                console.error(
+                                    "Error fetching product chart data:",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product chart data:",
+                                error
+                            );
+                        });
 
-        MAIN_CONTENT.appendChild(overviewSect);
-        MAIN_CONTENT.appendChild(chartSect);
+                    fetch("db/dashboard_db.php?action=get_purchase_chart", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const purchasesChart =
+                                    ElementFactory.createPurchaseChart(
+                                        "Purchases",
+                                        "dashboard__purchase-chart",
+                                        data.purchase_data
+                                    );
+
+                                chartRow2.appendChild(purchasesChart);
+                            } else {
+                                console.error(
+                                    "Error fetching product chart data:",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product chart data:",
+                                error
+                            );
+                        });
+
+                    fetch("db/dashboard_db.php?action=get_sale_chart", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const salesChart =
+                                    ElementFactory.createSaleChart(
+                                        "Sales",
+                                        "dashboard__sale-chart",
+                                        data.sale_data
+                                    );
+
+                                chartRow2.appendChild(salesChart);
+                            } else {
+                                console.error(
+                                    "Error fetching product chart data:",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product chart data:",
+                                error
+                            );
+                        });
+
+                    fetch("db/dashboard_db.php?action=get_low_stock_chart", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const lowStockChart =
+                                    ElementFactory.createLowStockChart(
+                                        "Low stock products",
+                                        "dashboard__low-stock-chart",
+                                        data.low_stock_data
+                                    );
+
+                                chartRow3.appendChild(lowStockChart);
+                            } else {
+                                console.error(
+                                    "Error fetching product chart data:",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product chart data:",
+                                error
+                            );
+                        });
+
+                    fetch("db/dashboard_db.php?action=get_best_selling_chart", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const bestSellingChart =
+                                    ElementFactory.createBestSellingChart(
+                                        "Best-selling products",
+                                        "dashboard__best-selling-chart",
+                                        data.best_selling_data
+                                    );
+
+                                chartRow3.appendChild(bestSellingChart);
+                            } else {
+                                console.error(
+                                    "Error fetching product chart data:",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product chart data:",
+                                error
+                            );
+                        });
+
+                    chartSectCol.appendChild(chartRow1);
+                    chartSectCol.appendChild(chartRow2);
+                    chartSectCol.appendChild(chartRow3);
+
+                    MAIN_CONTENT.appendChild(overviewSect);
+                    MAIN_CONTENT.appendChild(chartSect);
+                } else {
+                    console.error("Error fetching data:", data.error_msg);
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+            });
     }
 }
