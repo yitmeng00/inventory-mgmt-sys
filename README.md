@@ -18,18 +18,19 @@ This inventory management system allows you to record and store detailed informa
 
 This app includes the following features:
 
-- Create new product
-- Edit product detail
-- Delete product
-- Create new purchase or sale transaction
-- Edit transaction detail
-- Delete transaction
-- Create new supplier
-- Edit supplier detail
-- Delete supplier
-- View inventory status
+- Add a new product
+- Modify product details
+- Remove a product
+- Record a new purchase or sale transaction
+- Update transaction details
+- Delete a transaction
+- Add a new supplier
+- Modify supplier details
+- Remove a supplier
+- Check inventory status
 - View monthly purchases
 - View monthly sales
+- Export data from the dashboard, including monthly sales, purchases, revenues, profits, low stock, and best-selling items.
 
 ## Known Issues
 
