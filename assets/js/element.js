@@ -26,6 +26,7 @@ class ElementFactory {
         const div = this.createDiv();
 
         const value = document.createElement(fontType);
+        value.classList.add("fw-bold")
         value.textContent = title;
 
         row.appendChild(col);
@@ -51,7 +52,6 @@ class ElementFactory {
     static createButton = (type, value) => {
         const btn = document.createElement("button");
         btn.type = type;
-        btn.classList.add("btn");
         btn.innerHTML = value;
 
         return btn;
@@ -65,9 +65,11 @@ class ElementFactory {
         disabled
     ) => {
         const label = document.createElement("label");
+        label.classList.add("fw-bold");
         label.textContent = labelText;
 
         const input = document.createElement("input");
+        input.classList.add("ims__input-field", "px-2", "py-1", "w-100", "rounded");
         input.type = inputType;
         input.name = inputName;
         input.value = inputValue;
@@ -118,9 +120,11 @@ class ElementFactory {
         selectedID
     ) => {
         const label = document.createElement("label");
+        label.classList.add("fw-bold");
         label.textContent = labelText;
 
         const select = document.createElement("select");
+        select.classList.add("ims__input-field", "px-2", "py-1", "w-100", "rounded");
         select.name = idPropertyName;
         select.disabled = disabled;
 
@@ -168,6 +172,7 @@ class ElementFactory {
 
     static createLabel = (value) => {
         const label = document.createElement("label");
+        label.classList.add("fw-bold");
         label.textContent = value;
 
         return label;
@@ -255,7 +260,7 @@ class ElementFactory {
                     "button",
                     "View Detail"
                 );
-                viewDetailButton.classList.add("btn", "btn-info");
+                viewDetailButton.classList.add("ims__view-detail-btn");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
                 viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
 
@@ -296,7 +301,7 @@ class ElementFactory {
                     "button",
                     "View Detail"
                 );
-                viewDetailButton.classList.add("btn", "btn-info");
+                viewDetailButton.classList.add("ims__view-detail-btn");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
                 viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
 
@@ -337,7 +342,7 @@ class ElementFactory {
                     "button",
                     "View Detail"
                 );
-                viewDetailButton.classList.add("btn", "btn-info");
+                viewDetailButton.classList.add("ims__view-detail-btn");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
                 viewDetailButton.setAttribute("data-bs-target", "#ims__modal");
 
@@ -361,7 +366,7 @@ class ElementFactory {
             overviewContentCol.appendChild(overviewContentWrapper);
 
             const titleRow = this.createTitle(content.title, "p");
-            titleRow.classList.add("ims__overview-content-title");
+            titleRow.classList.add("ims__overview-content-title", "text-secondary");
 
             const dataRow = this.createRow();
             const dataCol = this.createCol();
@@ -478,6 +483,10 @@ class ElementFactory {
                 title: {
                     display: true,
                     text: "Total product over categories",
+                    align: "start",
+                    padding: {
+                        bottom: 30,
+                    },
                     font: {
                         size: 20,
                     },
@@ -598,6 +607,10 @@ class ElementFactory {
                 title: {
                     display: true,
                     text: "Purchase over months",
+                    align: "start",
+                    padding: {
+                        bottom: 30,
+                    },
                     font: {
                         size: 20,
                     },
@@ -716,6 +729,10 @@ class ElementFactory {
                 title: {
                     display: true,
                     text: "Sale over months",
+                    align: "start",
+                    padding: {
+                        bottom: 30,
+                    },
                     font: {
                         size: 20,
                     },
@@ -857,6 +874,10 @@ class ElementFactory {
                 title: {
                     display: true,
                     text: "Revenue and Profit over months",
+                    align: "start",
+                    padding: {
+                        bottom: 30,
+                    },
                     font: {
                         size: 20,
                     },
@@ -923,6 +944,10 @@ class ElementFactory {
                 title: {
                     display: true,
                     text: "Low stock products",
+                    align: "start",
+                    padding: {
+                        bottom: 30,
+                    },
                     font: {
                         size: 20,
                     },
@@ -1004,6 +1029,10 @@ class ElementFactory {
                 title: {
                     display: true,
                     text: "Best-selling products",
+                    align: "start",
+                    padding: {
+                        bottom: 30,
+                    },
                     font: {
                         size: 20,
                     },
@@ -1035,7 +1064,7 @@ class ElementFactory {
         const modalType =
             tableType.charAt(0).toUpperCase() + tableType.slice(1);
         if (actionType == "Add") {
-            this.renderModalHeader(modalHeader, `${actionType} ${modalType}`);
+            this.renderModalHeader(modalHeader, `New ${modalType}`);
         } else if (actionType == "Detail") {
             this.renderModalHeader(modalHeader, `${modalType} ${actionType}`);
         }
@@ -1080,7 +1109,7 @@ class ElementFactory {
 
     static renderModalHeader = (modalHeader, title) => {
         const modalTitle = document.createElement("h1");
-        modalTitle.classList.add("modal-title", "fs-5");
+        modalTitle.classList.add("modal-title", "fw-bold", "fs-4");
         modalTitle.textContent = title;
 
         const closeButton = this.createButton("button", "");
@@ -1310,13 +1339,13 @@ class ElementFactory {
             "gap-2"
         );
         const editButton = this.createButton("button", "Edit");
-        editButton.classList.add("btn-primary");
+        editButton.classList.add("ims__view-detail-edit-btn");
         editButton.addEventListener("click", () => {
             this.handleProductEditBtnEvent(editButton, form, response);
         });
 
         const deleteButton = this.createButton("button", "Delete");
-        deleteButton.classList.add("btn-danger");
+        deleteButton.classList.add("ims__view-detail-dlt-btn");
         deleteButton.addEventListener("click", () => {
             this.handleProductDltBtnEvent(response);
         });
@@ -1445,7 +1474,7 @@ class ElementFactory {
         const submitButtonContainer = this.createDiv();
         submitButtonContainer.classList.add("text-end");
         const submitButton = this.createButton("submit", "Submit");
-        submitButton.classList.add("btn-primary");
+        submitButton.classList.add("ims__add-item-submit-btn");
         submitButtonContainer.appendChild(submitButton);
 
         Promise.all([categoryPromise, supplierPromise]).then(() => {
@@ -1875,13 +1904,13 @@ class ElementFactory {
             "gap-2"
         );
         const editButton = this.createButton("button", "Edit");
-        editButton.classList.add("btn-primary");
+        editButton.classList.add("ims__view-detail-edit-btn");
         editButton.addEventListener("click", () => {
             this.handleTransactionEditBtnEvent(editButton, form, response);
         });
 
         const deleteButton = this.createButton("button", "Delete");
-        deleteButton.classList.add("btn-danger");
+        deleteButton.classList.add("ims__view-detail-dlt-btn");
         deleteButton.addEventListener("click", () => {
             this.handleTransactionDltBtnEvent(response);
         });
@@ -1970,7 +1999,7 @@ class ElementFactory {
         const submitButtonContainer = this.createDiv();
         submitButtonContainer.classList.add("text-end");
         const submitButton = this.createButton("submit", "Submit");
-        submitButton.classList.add("btn-primary");
+        submitButton.classList.add("ims__add-item-submit-btn");
         submitButtonContainer.appendChild(submitButton);
 
         Promise.all([typePromise, productPromise]).then(() => {
@@ -2271,13 +2300,13 @@ class ElementFactory {
             "gap-2"
         );
         const editButton = this.createButton("button", "Edit");
-        editButton.classList.add("btn-primary");
+        editButton.classList.add("ims__view-detail-edit-btn");
         editButton.addEventListener("click", () => {
             this.handleSupplierEditBtnEvent(editButton, form, response);
         });
 
         const deleteButton = this.createButton("button", "Delete");
-        deleteButton.classList.add("btn-danger");
+        deleteButton.classList.add("ims__view-detail-dlt-btn");
         deleteButton.addEventListener("click", () => {
             this.handleSupplierDltBtnEvent(response);
         });
@@ -2338,7 +2367,7 @@ class ElementFactory {
         const submitButtonContainer = this.createDiv();
         submitButtonContainer.classList.add("text-end");
         const submitButton = this.createButton("submit", "Submit");
-        submitButton.classList.add("btn-primary");
+        submitButton.classList.add("ims__add-item-submit-btn");
         submitButtonContainer.appendChild(submitButton);
 
         form.appendChild(supplierNameInput);

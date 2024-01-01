@@ -20,7 +20,7 @@ class Transaction {
             "button",
             "Add Transaction"
         );
-        transactionBtn.classList.add("btn-primary", "mb-4");
+        transactionBtn.classList.add("ims__add-btn", "mb-4");
         transactionBtn.setAttribute("data-bs-toggle", "modal");
         transactionBtn.setAttribute("data-bs-target", "#ims__modal");
         transactionBtn.addEventListener("click", () => {
@@ -70,10 +70,6 @@ class Transaction {
                         transactions
                     );
 
-                    $(transactionTable).DataTable({
-                        order: [[0, "desc"]],
-                    });
-
                     transactionTableRow.appendChild(transactionTableCol);
                     transactionTableCol.appendChild(transactionTableContainer);
                     transactionTableContainer.appendChild(transactionTable);
@@ -81,6 +77,10 @@ class Transaction {
                     transactionSect.appendChild(transactionTitleRow);
                     transactionSect.appendChild(transactionBtnRow);
                     transactionSect.appendChild(transactionTableRow);
+
+                    $(transactionTable).DataTable({
+                        order: [[0, "desc"]],
+                    });
                 } else {
                     console.error(
                         "Error fetching transaction data: ",

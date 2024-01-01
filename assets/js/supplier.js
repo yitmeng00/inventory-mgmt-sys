@@ -17,7 +17,7 @@ class Supplier {
             "button",
             "Add Supplier"
         );
-        supplierBtn.classList.add("btn-primary", "mb-4");
+        supplierBtn.classList.add("ims__add-btn", "mb-4");
         supplierBtn.setAttribute("data-bs-toggle", "modal");
         supplierBtn.setAttribute("data-bs-target", "#ims__modal");
         supplierBtn.addEventListener("click", () => {
@@ -64,10 +64,6 @@ class Supplier {
                         suppliers
                     );
 
-                    $(supplierTable).DataTable({
-                        order: [[0, "desc"]],
-                    });
-
                     supplierTableRow.appendChild(supplierTableCol);
                     supplierTableCol.appendChild(supplierTableContainer);
                     supplierTableContainer.appendChild(supplierTable);
@@ -75,6 +71,10 @@ class Supplier {
                     supplierSect.appendChild(supplierTitleRow);
                     supplierSect.appendChild(supplierBtnRow);
                     supplierSect.appendChild(supplierTableRow);
+
+                    $(supplierTable).DataTable({
+                        order: [[0, "desc"]],
+                    });
                 } else {
                     console.error(
                         "Error fetching supplier data: ",
