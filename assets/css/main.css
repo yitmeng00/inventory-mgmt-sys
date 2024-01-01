@@ -100,6 +100,29 @@ canvas {
     background-color: var(--primary-bg-color);
 }
 
+.dashboard__chart-action-btn {
+    right: 1rem;
+    background-color: inherit;
+}
+
+.dashboard__chart-action-btn i {
+    font-size: 1.2rem;
+}
+
+.dashboard__chart-action-btn i:hover {
+    color: black;
+}
+
+.dashboard__action-container {
+    top: 2.5rem;
+    right: 1rem;
+}
+
+.dashboard__export-btn:hover {
+    cursor: pointer;
+    background-color: rgb(243, 240, 240);
+}
+
 .ims__overview-section-container {
     box-shadow: var(--primary-box-shadow);
 }

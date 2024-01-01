@@ -26,7 +26,7 @@ class ElementFactory {
         const div = this.createDiv();
 
         const value = document.createElement(fontType);
-        value.classList.add("fw-bold")
+        value.classList.add("fw-bold");
         value.textContent = title;
 
         row.appendChild(col);
@@ -57,6 +57,79 @@ class ElementFactory {
         return btn;
     };
 
+    static createExportButton = (chartContentContainer, data) => {
+        const actionBtn = document.createElement("button");
+        actionBtn.type = "button";
+        actionBtn.title = "export_btn";
+        actionBtn.classList.add(
+            "dashboard__chart-action-btn",
+            "position-absolute",
+            "border",
+            "border-0",
+            "bg-inherit",
+            "text-secondary"
+        );
+
+        const icon = this.createIcon("fa-ellipsis");
+
+        actionBtn.appendChild(icon);
+
+        const actionContainer = this.createDiv();
+        actionContainer.classList.add(
+            "dashboard__action-container",
+            "position-absolute",
+            "border",
+            "rounded",
+            "py-2",
+            "bg-white",
+            "d-none"
+        );
+        const exportBtnWrapper = this.createDiv();
+        exportBtnWrapper.classList.add(
+            "dashboard__export-btn",
+            "w-100",
+            "py-2",
+            "px-3",
+            "d-flex",
+            "gap-2"
+        );
+        const exportBtnText = this.createParagraph("Export Data");
+        exportBtnText.classList.add("m-0");
+        const exportBtnIcon = this.createIcon("fa-download");
+
+        chartContentContainer.appendChild(actionContainer);
+        actionContainer.appendChild(exportBtnWrapper);
+        exportBtnWrapper.appendChild(exportBtnText);
+        exportBtnWrapper.appendChild(exportBtnIcon);
+
+        actionBtn.addEventListener("click", () => {
+            actionContainer.classList.toggle("d-none");
+            actionContainer.classList.toggle("d-block");
+        });
+
+        exportBtnWrapper.addEventListener("click", () => {
+            this.exportData(data);
+
+            actionContainer.classList.toggle("d-none");
+        });
+
+        return actionBtn;
+    };
+
+    static exportData = (data) => {
+        // Create a new workbook
+        const wb = XLSX.utils.book_new();
+
+        // Convert each array of data to a worksheet
+        const ws = XLSX.utils.json_to_sheet(data);
+
+        // Add the worksheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Exported Data");
+
+        // Save the workbook as an Excel file
+        XLSX.writeFile(wb, "exported_data.xlsx");
+    };
+
     static createInput = (
         labelText,
         inputType,
@@ -69,7 +142,13 @@ class ElementFactory {
         label.textContent = labelText;
 
         const input = document.createElement("input");
-        input.classList.add("ims__input-field", "px-2", "py-1", "w-100", "rounded");
+        input.classList.add(
+            "ims__input-field",
+            "px-2",
+            "py-1",
+            "w-100",
+            "rounded"
+        );
         input.type = inputType;
         input.name = inputName;
         input.value = inputValue;
@@ -124,7 +203,13 @@ class ElementFactory {
         label.textContent = labelText;
 
         const select = document.createElement("select");
-        select.classList.add("ims__input-field", "px-2", "py-1", "w-100", "rounded");
+        select.classList.add(
+            "ims__input-field",
+            "px-2",
+            "py-1",
+            "w-100",
+            "rounded"
+        );
         select.name = idPropertyName;
         select.disabled = disabled;
 
@@ -366,7 +451,10 @@ class ElementFactory {
             overviewContentCol.appendChild(overviewContentWrapper);
 
             const titleRow = this.createTitle(content.title, "p");
-            titleRow.classList.add("ims__overview-content-title", "text-secondary");
+            titleRow.classList.add(
+                "ims__overview-content-title",
+                "text-secondary"
+            );
 
             const dataRow = this.createRow();
             const dataCol = this.createCol();
@@ -429,10 +517,22 @@ class ElementFactory {
         const chartContentRow = this.createRow();
         const chartContentCol = this.createCol();
         const chartContentContainer = this.createDiv();
-        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        chartContentContainer.classList.add(
+            "dashboard__chart-content",
+            "p-3",
+            "position-relative"
+        );
+
+        const exportButton = this.createExportButton(
+            chartContentContainer,
+            data
+        );
+
         const chartCanvas = this.createCanvas(id);
+
         chartContentRow.appendChild(chartContentCol);
         chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(exportButton);
         chartContentContainer.appendChild(chartCanvas);
 
         chartContainer.appendChild(chartContentRow);
@@ -564,14 +664,28 @@ class ElementFactory {
         const chartContentRow = this.createRow();
         const chartContentCol = this.createCol();
         const chartContentContainer = this.createDiv();
-        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        chartContentContainer.classList.add(
+            "dashboard__chart-content",
+            "p-3",
+            "position-relative"
+        );
+
+        // Putting dummy data
+        const exportButton = this.createExportButton(
+            chartContentContainer,
+            dummyData
+        );
+
         const chartCanvas = this.createCanvas(id);
+
         chartContentRow.appendChild(chartContentCol);
         chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(exportButton);
         chartContentContainer.appendChild(chartCanvas);
 
         chartContainer.appendChild(chartContentRow);
 
+        // Putting dummy data
         const months = dummyData.map((entry) => entry.month);
         const purchaseValues = dummyData.map((entry) =>
             parseFloat(entry.purchase)
@@ -688,14 +802,28 @@ class ElementFactory {
         const chartContentRow = this.createRow();
         const chartContentCol = this.createCol();
         const chartContentContainer = this.createDiv();
-        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        chartContentContainer.classList.add(
+            "dashboard__chart-content",
+            "p-3",
+            "position-relative"
+        );
+
+        // Putting dummy data
+        const exportButton = this.createExportButton(
+            chartContentContainer,
+            dummyData
+        );
+
         const chartCanvas = this.createCanvas(id);
+
         chartContentRow.appendChild(chartContentCol);
         chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(exportButton);
         chartContentContainer.appendChild(chartCanvas);
 
         chartContainer.appendChild(chartContentRow);
 
+        // Putting dummy data
         const months = dummyData.map((entry) => entry.month);
         const saleValues = dummyData.map((entry) => parseFloat(entry.sale));
 
@@ -822,14 +950,28 @@ class ElementFactory {
         const chartContentRow = this.createRow();
         const chartContentCol = this.createCol();
         const chartContentContainer = this.createDiv();
-        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        chartContentContainer.classList.add(
+            "dashboard__chart-content",
+            "p-3",
+            "position-relative"
+        );
+
+        // Putting dummy data
+        const exportButton = this.createExportButton(
+            chartContentContainer,
+            dummyData
+        );
+
         const chartCanvas = this.createCanvas(id);
+
         chartContentRow.appendChild(chartContentCol);
         chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(exportButton);
         chartContentContainer.appendChild(chartCanvas);
 
         chartContainer.appendChild(chartContentRow);
 
+        // Putting dummy data
         const months = dummyData.map((entry) => entry.month);
         const revenueValues = dummyData.map((entry) =>
             parseFloat(entry.revenue)
@@ -904,10 +1046,22 @@ class ElementFactory {
         const chartContentRow = this.createRow();
         const chartContentCol = this.createCol();
         const chartContentContainer = this.createDiv();
-        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        chartContentContainer.classList.add(
+            "dashboard__chart-content",
+            "p-3",
+            "position-relative"
+        );
+
+        const exportButton = this.createExportButton(
+            chartContentContainer,
+            data
+        );
+
         const chartCanvas = this.createCanvas(id);
+
         chartContentRow.appendChild(chartContentCol);
         chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(exportButton);
         chartContentContainer.appendChild(chartCanvas);
 
         chartContainer.appendChild(chartContentRow);
@@ -974,10 +1128,22 @@ class ElementFactory {
         const chartContentRow = this.createRow();
         const chartContentCol = this.createCol();
         const chartContentContainer = this.createDiv();
-        chartContentContainer.classList.add("dashboard__chart-content", "p-3");
+        chartContentContainer.classList.add(
+            "dashboard__chart-content",
+            "p-3",
+            "position-relative"
+        );
+
+        const exportButton = this.createExportButton(
+            chartContentContainer,
+            data
+        );
+
         const chartCanvas = this.createCanvas(id);
+
         chartContentRow.appendChild(chartContentCol);
         chartContentCol.appendChild(chartContentContainer);
+        chartContentContainer.appendChild(exportButton);
         chartContentContainer.appendChild(chartCanvas);
 
         chartContainer.appendChild(chartContentRow);
