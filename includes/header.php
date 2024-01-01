@@ -6,7 +6,7 @@ $include_chartjs = isset($include_chartjs) ? $include_chartjs : false;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inventory Management System</title>
-    <link rel="icon" type="image/x-icon" href="assets/images/favicon.png">
+    <link rel="icon" type="image/x-icon" href="assets/images/inventory-mgmt-sys-logo-small.png">
 
     <!-- assets src -->
     <link rel="stylesheet" href="assets/css/main.css">

@@ -8,7 +8,7 @@ $current_page = basename($_SERVER['PHP_SELF']);
             <i class="fa-solid fa-bars ims__navbar-icon" id="ims__navbar-toggler" onclick="toggleNavbar()"></i>
         </div>
         <div class="mt-3 mb-5 ps-3">
-            <a class="navbar-brand" href="#">Logo</a>
+            <img id="ims__navbar-logo" class="w-100 img-fluid" src="assets/images/inventory-mgmt-sys-logo-large.png">
         </div>
         <div class="ims__navbar-link-container">
             <ul class="navbar-nav flex-column">
