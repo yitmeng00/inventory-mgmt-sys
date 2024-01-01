@@ -26,5 +26,6 @@ $include_chartjs = isset($include_chartjs) ? $include_chartjs : false;
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <?php if ($include_chartjs) : ?>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <?php endif; ?>
 </head>
