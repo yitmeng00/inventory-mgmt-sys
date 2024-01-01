@@ -14,7 +14,7 @@ class Product {
         const productBtnContainer = ElementFactory.createDiv();
         productBtnContainer.classList.add("text-end");
         const productBtn = ElementFactory.createButton("button", "Add Product");
-        productBtn.classList.add("btn-primary", "mb-4");
+        productBtn.classList.add("ims__add-btn", "mb-4");
         productBtn.setAttribute("data-bs-toggle", "modal");
         productBtn.setAttribute("data-bs-target", "#ims__modal");
         productBtn.addEventListener("click", () => {
@@ -64,10 +64,6 @@ class Product {
                         products
                     );
 
-                    $(productTable).DataTable({
-                        order: [[0, "desc"]],
-                    });
-
                     productTableRow.appendChild(productTableCol);
                     productTableCol.appendChild(productTableContainer);
                     productTableContainer.appendChild(productTable);
@@ -75,6 +71,10 @@ class Product {
                     productSect.appendChild(productTitleRow);
                     productSect.appendChild(productBtnRow);
                     productSect.appendChild(productTableRow);
+
+                    $(productTable).DataTable({
+                        order: [[0, "desc"]],
+                    });
                 } else {
                     console.error(
                         "Error fetching product data: ",

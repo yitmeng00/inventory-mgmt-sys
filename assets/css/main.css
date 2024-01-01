@@ -1,11 +1,17 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap");
 
 :root {
-    --primary-color: #22577a;
-    --secondary-color: #38a3a5;
-    --tertiary-clor: #184e77;
+    --primary-color: rgb(34, 87, 122);
+    --secondary-color: rgb(56, 163, 165);
+    --tertiary-clor: rgb(24, 78, 119);
+    --primary-bg-color: rgb(246, 247, 248);
+    --table-th-color: rgb(223, 222, 222);
+    --table-tr-hover: rgb(238, 237, 237);
     --primary-font: "Inter", sans-serif;
-    --navbar-font-color: #83afd1;
+    --navbar-font-color: rgb(131, 175, 209);
+    --navbar-active: rgb(255, 255, 255);
+    --primary-box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+    --secondary-box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
 }
 
 body {
@@ -18,7 +24,7 @@ body {
 
 .active,
 .active i {
-    color: white !important;
+    color: var(--navbar-active) !important;
 }
 
 .active::before {
@@ -27,7 +33,7 @@ body {
     left: 0;
     width: 0.2rem;
     height: 2rem;
-    background-color: white;
+    background-color: var(--navbar-active);
 }
 
 /** Navbar **/
@@ -55,7 +61,7 @@ body {
 .ims__navbar-content a:hover,
 .ims__navbar-content a:hover i,
 .ims__navbar-content i:hover {
-    color: white;
+    color: var(--navbar-active);
 }
 
 .ims__navbar-link-container {
@@ -83,16 +89,19 @@ canvas {
 
 .dashboard__chart-content {
     border-radius: 0.5rem;
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+    box-shadow: var(--primary-box-shadow);
 }
 
 /* Main Content */
-#ims__main-dashboard {
-    background-color: #f6f7f8;
+#ims__main-dashboard,
+#ims__main-product,
+#ims__main-transaction,
+#ims__main-supplier {
+    background-color: var(--primary-bg-color);
 }
 
 .ims__overview-section-container {
-    box-shadow: rgba(0, 0, 0, 0.15) 0px 5px 15px 0px;
+    box-shadow: var(--primary-box-shadow);
 }
 
 .ims__overview-content-title p {
@@ -108,20 +117,20 @@ canvas {
 #ims__supplier-table {
     border: none;
     border-radius: 0.5rem;
-    box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
+    box-shadow: var(--secondary-box-shadow);
 }
 
 #ims__product-table tbody tr:hover,
 #ims__transaction-table tbody tr:hover,
 #ims__supplier-table tbody tr:hover {
-    background-color: #f7f6f6;
+    background-color: var(--table-tr-hover);
 }
 
 #ims__product-table th,
 #ims__transaction-table th,
 #ims__supplier-table th {
     border: none;
-    background-color: #dfdede;
+    background-color: var(--table-th-color);
 }
 
 #ims__product-table_filter,
@@ -139,4 +148,81 @@ canvas {
 .ims__product-img {
     max-height: 20rem;
     width: auto;
+}
+
+.ims__add-btn {
+    padding: 0.5rem 1rem;
+    outline: none;
+    background-image: linear-gradient(
+        to top,
+        #d8d9db 0%,
+        #fff 80%,
+        #fdfdfd 100%
+    );
+    border-radius: 1rem;
+    border: 1px solid #8f9092;
+    transition: all 0.2s ease;
+    font-weight: 600;
+    text-shadow: 0 1px rgb(255, 255, 255);
+}
+
+.ims__add-btn:hover {
+    box-shadow: 0 4px 3px 1px rgb(252, 252, 252), 0 6px 8px rgb(214, 215, 217),
+        0 -4px 4px rgb(206, 207, 209), 0 -6px 4px rgb(254, 254, 254),
+        inset 0 0 3px 3px rgb(206, 207, 209);
+}
+
+.ims__add-btn:active {
+    box-shadow: 0 4px 3px 1px #fcfcfc, 0 6px 8px #d6d7d9, 0 -4px 4px #cecfd1,
+        0 -6px 4px #fefefe, inset 0 0 5px 3px #999, inset 0 0 30px #aaa;
+}
+
+.ims__view-detail-btn,
+.ims__add-item-submit-btn,
+.ims__view-detail-edit-btn,
+.ims__view-detail-dlt-btn {
+    border-radius: 0.5rem;
+    border: none;
+    box-shadow: rgba(45, 35, 66, 0.2) 0 2px 4px,
+        rgba(45, 35, 66, 0.15) 0 7px 13px -3px,
+        rgb(214, 214, 231) 0 -3px 0 inset;
+    color: #36395a;
+    padding: 0.5rem 1rem;
+    position: relative;
+    transition: box-shadow 0.15s, transform 0.15s;
+    white-space: nowrap;
+}
+
+.ims__view-detail-btn:hover,
+.ims__add-item-submit-btn:hover,
+.ims__view-detail-edit-btn:hover,
+.ims__view-detail-dlt-btn:hover {
+    box-shadow: rgba(45, 35, 66, 0.3) 0 4px 8px,
+        rgba(45, 35, 66, 0.2) 0 7px 13px -3px, rgb(214, 214, 231) 0 -3px 0 inset;
+    transform: translateY(-2px);
+}
+
+.ims__view-detail-btn:active,
+.ims__add-item-submit-btn:active,
+.ims__view-detail-edit-btn:active,
+.ims__view-detail-dlt-btn:active {
+    box-shadow: rgb(214, 214, 231) 0 3px 7px inset;
+    transform: translateY(2px);
+}
+
+.ims__view-detail-btn {
+    background-color: rgb(252, 252, 253);
+}
+
+.ims__add-item-submit-btn,
+.ims__view-detail-edit-btn {
+    background-color: rgb(115, 211, 255);
+}
+
+.ims__view-detail-dlt-btn {
+    background-color: rgb(255, 143, 143);
+}
+
+.ims__input-field {
+    border: 1px solid rgb(151, 151, 151);
 }
