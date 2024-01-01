@@ -38,6 +38,7 @@ This app includes the following features:
 - Issue 3: After adding a new supplier, there will be an issue with the supplier edit and delete functions.
 - Issue 4: After editing the details of a product, transaction, or supplier, when you click the "View Detail" button, it still shows the old information.
 - Issue 5: When loading the page, the header appears first, and then the table body loads. [Fixed]
+- Issue 6: When you click on other page after collapsing the navbar, it will auto expand.
 
 ## Technologies Used
 
