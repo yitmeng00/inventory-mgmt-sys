@@ -6,7 +6,7 @@ $include_chartjs = true;
 include("includes/header.php");
 ?>
 
-<body onload="Dashboard.initDashboard()">
+<body data-page="dashboard">
     <div class="ims__body-container d-flex">
         <?php include("includes/navbar.php"); ?>
 
