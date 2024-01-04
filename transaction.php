@@ -5,7 +5,7 @@
 include("includes/header.php");
 ?>
 
-<body onload="Transaction.initTransaction()">
+<body data-page="transaction">
     <div class="ims__body-container d-flex">
         <?php include("includes/navbar.php"); ?>
 

@@ -5,7 +5,7 @@
 include("includes/header.php");
 ?>
 
-<body onload="Supplier.initSupplier()">
+<body data-page="supplier">
     <div class="ims__body-container d-flex">
         <?php include("includes/navbar.php"); ?>
 
