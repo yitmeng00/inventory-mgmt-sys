@@ -230,12 +230,56 @@ function updateTransaction()
     $quantity = $data['quantity'];
 
     try {
-        $stmt = $conn->prepare("UPDATE `transaction` SET product_id=?, type_id=?, quantity=? WHERE transaction_id=?;");
-        $stmt->bind_param("iiii", $productId, $typeId, $quantity, $transactionId);
+        // Fetch product sale_price
+        $selectSalePriceStmt = $conn->prepare("SELECT sale_price FROM `product` WHERE product_id = ?;");
+        $selectSalePriceStmt->bind_param("i", $productId);
+        $selectSalePriceStmt->execute();
+        $salePriceResult = $selectSalePriceStmt->get_result();
+        $salePriceData = $salePriceResult->fetch_assoc();
+        $selectSalePriceStmt->close();
+        $unitPrice = $salePriceData['sale_price'];
 
-        $stmt->execute();
+        // Fetch old transaction data
+        $selectOldStmt = $conn->prepare("SELECT product_id, type_id, quantity FROM `transaction` WHERE transaction_id = ?;");
+        $selectOldStmt->bind_param("i", $transactionId);
+        $selectOldStmt->execute();
+        $oldResult = $selectOldStmt->get_result();
+        $oldData = $oldResult->fetch_assoc();
+        $selectOldStmt->close();
 
-        if ($stmt->affected_rows > 0) {
+        // Update the transaction
+        $updateStmt = $conn->prepare("UPDATE `transaction` SET product_id=?, type_id=?, quantity=?, unit_price=? WHERE transaction_id=?;");
+        $updateStmt->bind_param("iiidi", $productId, $typeId, $quantity, $unitPrice, $transactionId);
+        $updateStmt->execute();
+
+        if ($updateStmt->affected_rows > 0) {
+            // Update product's quantity based on old data
+            if ($oldData['type_id'] == 1) {
+                $updateOldQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
+                $updateOldQuantityStmt->bind_param("ii", $oldData['quantity'], $oldData['product_id']);
+                $updateOldQuantityStmt->execute();
+                $updateOldQuantityStmt->close();
+            } else if ($oldData['type_id'] == 2) {
+                $updateOldQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity - ? WHERE product_id = ?;");
+                $updateOldQuantityStmt->bind_param("ii", $oldData['quantity'], $oldData['product_id']);
+                $updateOldQuantityStmt->execute();
+                $updateOldQuantityStmt->close();
+            }
+
+            // Update product's quantity based on new data
+            if ($typeId == 1) {
+                $updateNewQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity - ? WHERE product_id = ?;");
+                $updateNewQuantityStmt->bind_param("ii", $quantity, $productId);
+                $updateNewQuantityStmt->execute();
+                $updateNewQuantityStmt->close();
+            } else if ($typeId == 2) {
+                $updateNewQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
+                $updateNewQuantityStmt->bind_param("ii", $quantity, $productId);
+                $updateNewQuantityStmt->execute();
+                $updateNewQuantityStmt->close();
+            }
+
+            // Fetch updated transaction data
             $selectStmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
             $selectStmt->bind_param("i", $transactionId);
             $selectStmt->execute();
@@ -260,8 +304,28 @@ function updateTransaction()
         ));
     }
 
-    $stmt->close();
+    $updateStmt->close();
     $conn->close();
+}
+
+// Function to update the product table
+function updateProductTable($productId, $typeId, $oldQuantity, $changeInQuantity)
+{
+    global $conn;
+
+    $productQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
+
+    // If it was a sale, subtract the old quantity
+    if ($typeId == 1) {
+        $productQuantityStmt->bind_param("ii", -$oldQuantity, $productId);
+        $productQuantityStmt->execute();
+    }
+
+    // Add the new quantity
+    $productQuantityStmt->bind_param("ii", $changeInQuantity, $productId);
+    $productQuantityStmt->execute();
+
+    $productQuantityStmt->close();
 }
 
 function deleteTransaction()

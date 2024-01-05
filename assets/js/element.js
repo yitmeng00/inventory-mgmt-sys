@@ -1377,15 +1377,14 @@ class ElementFactory {
                                 const categories = data.categories;
                                 const selectedCategoryId = category_id;
 
-                                const categoryDropdown =
-                                    this.createDropdown(
-                                        "Category:",
-                                        categories,
-                                        "category_id",
-                                        "category_name",
-                                        true,
-                                        selectedCategoryId
-                                    );
+                                const categoryDropdown = this.createDropdown(
+                                    "Category:",
+                                    categories,
+                                    "category_id",
+                                    "category_name",
+                                    true,
+                                    selectedCategoryId
+                                );
 
                                 formCol2.appendChild(categoryDropdown);
                             } else {
@@ -1411,15 +1410,14 @@ class ElementFactory {
                                 const suppliers = data.suppliers;
                                 const selectedSupplierId = supplier_id;
 
-                                const supplierDropdown =
-                                    this.createDropdown(
-                                        "Supplier:",
-                                        suppliers,
-                                        "supplier_id",
-                                        "supplier_name",
-                                        true,
-                                        selectedSupplierId
-                                    );
+                                const supplierDropdown = this.createDropdown(
+                                    "Supplier:",
+                                    suppliers,
+                                    "supplier_id",
+                                    "supplier_name",
+                                    true,
+                                    selectedSupplierId
+                                );
 
                                 formCol2.appendChild(supplierDropdown);
                             } else {
@@ -1977,15 +1975,14 @@ class ElementFactory {
                             if (data.success) {
                                 const txn_types = data.txn_types;
 
-                                const typeDropdown =
-                                    this.createDropdown(
-                                        "Type:",
-                                        txn_types,
-                                        "type_id",
-                                        "type_name",
-                                        true,
-                                        type_id
-                                    );
+                                const typeDropdown = this.createDropdown(
+                                    "Type:",
+                                    txn_types,
+                                    "type_id",
+                                    "type_name",
+                                    true,
+                                    type_id
+                                );
 
                                 form.appendChild(typeDropdown);
                             } else {
@@ -2010,15 +2007,14 @@ class ElementFactory {
                             if (data.success) {
                                 const products = data.products;
 
-                                const productDropdown =
-                                    this.createDropdown(
-                                        "Product:",
-                                        products,
-                                        "product_id",
-                                        "product_name",
-                                        true,
-                                        product_id
-                                    );
+                                const productDropdown = this.createDropdown(
+                                    "Product:",
+                                    products,
+                                    "product_id",
+                                    "product_name",
+                                    true,
+                                    product_id
+                                );
 
                                 form.appendChild(productDropdown);
                             } else {
@@ -2176,14 +2172,19 @@ class ElementFactory {
                         this.handleTransactionEditBtnEvent(
                             editButton,
                             form,
-                            transaction_id, transaction_code
+                            transaction_id,
+                            transaction_code
                         );
                     });
 
                     const deleteButton = this.createButton("button", "Delete");
                     deleteButton.classList.add("ims__view-detail-dlt-btn");
                     deleteButton.addEventListener("click", () => {
-                        this.handleTransactionDltBtnEvent(transaction_id, transaction_code, product_id);
+                        this.handleTransactionDltBtnEvent(
+                            transaction_id,
+                            transaction_code,
+                            product_id
+                        );
                     });
                     btnWrapperRow.appendChild(btnWrapperCol);
                     btnWrapperCol.appendChild(btnWrapperDiv);
@@ -2297,7 +2298,12 @@ class ElementFactory {
         });
     };
 
-    static handleTransactionEditBtnEvent = (editButton, form, transactionId, transactionCode) => {
+    static handleTransactionEditBtnEvent = (
+        editButton,
+        form,
+        transactionId,
+        transactionCode
+    ) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
             editButton.textContent = "Save Changes";
@@ -2349,8 +2355,12 @@ class ElementFactory {
                                     );
                                 });
 
-                            const { product_name, type_name, quantity } =
-                                data.transaction_data;
+                            const {
+                                product_name,
+                                type_name,
+                                quantity,
+                                unit_price,
+                            } = data.transaction_data;
 
                             if (rowIndex.length > 0) {
                                 const rowNode = transactionTable
@@ -2369,6 +2379,10 @@ class ElementFactory {
                                     {
                                         index: 5,
                                         value: quantity,
+                                    },
+                                    {
+                                        index: 6,
+                                        value: unit_price,
                                     },
                                 ];
 
@@ -2407,7 +2421,11 @@ class ElementFactory {
         }
     };
 
-    static handleTransactionDltBtnEvent = (transactionId, transactionCode, productId) => {
+    static handleTransactionDltBtnEvent = (
+        transactionId,
+        transactionCode,
+        productId
+    ) => {
         const userConfirmed = window.confirm(
             "Are you sure you want to delete this transaction?"
         );
@@ -2648,14 +2666,18 @@ class ElementFactory {
                         this.handleSupplierEditBtnEvent(
                             editButton,
                             form,
-                            supplier_id, supplier_code
+                            supplier_id,
+                            supplier_code
                         );
                     });
 
                     const deleteButton = this.createButton("button", "Delete");
                     deleteButton.classList.add("ims__view-detail-dlt-btn");
                     deleteButton.addEventListener("click", () => {
-                        this.handleSupplierDltBtnEvent(supplier_id, supplier_code);
+                        this.handleSupplierDltBtnEvent(
+                            supplier_id,
+                            supplier_code
+                        );
                     });
 
                     btnWrapperRow.appendChild(btnWrapperCol);
@@ -2743,7 +2765,12 @@ class ElementFactory {
         });
     };
 
-    static handleSupplierEditBtnEvent = (editButton, form, supplierId, supplierCode) => {
+    static handleSupplierEditBtnEvent = (
+        editButton,
+        form,
+        supplierId,
+        supplierCode
+    ) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
             editButton.textContent = "Save Changes";
