@@ -158,18 +158,30 @@ function createProduct()
                 $imgStmt->execute();
 
                 if ($imgStmt->affected_rows > 0) {
-                    // Retrieve the newly added product data
-                    $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
-                    $selectStmt->bind_param("i", $lastInsertedProductId);
-                    $selectStmt->execute();
-                    $result = $selectStmt->get_result();
-                    $productData = $result->fetch_assoc();
+                    // Insert into price_history
+                    $priceHistoryStmt = $conn->prepare("INSERT INTO price_history (product_id, cost_price, sale_price, start_date) VALUES (?, ?, ?, NOW());");
+                    $priceHistoryStmt->bind_param("idd", $lastInsertedProductId, $costPrice, $salePrice);
+                    $priceHistoryStmt->execute();
 
-                    echo json_encode(array(
-                        'success' => true,
-                        'message' => 'Product and image created successfully',
-                        'product_data' => $productData
-                    ));
+                    if ($priceHistoryStmt->affected_rows > 0) {
+                        // Retrieve the newly added product data
+                        $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
+                        $selectStmt->bind_param("i", $lastInsertedProductId);
+                        $selectStmt->execute();
+                        $result = $selectStmt->get_result();
+                        $productData = $result->fetch_assoc();
+
+                        echo json_encode(array(
+                            'success' => true,
+                            'message' => 'Product, image, and price history created successfully',
+                            'product_data' => $productData
+                        ));
+                    } else {
+                        echo json_encode(array(
+                            'success' => false,
+                            'error_msg' => 'Failed to insert price history data'
+                        ));
+                    }
                 } else {
                     echo json_encode(array(
                         'success' => false,
@@ -224,12 +236,37 @@ function updateProduct()
     $salePrice = $data['sale_price'];
 
     try {
-        $stmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, cost_price=?, sale_price=? WHERE product_id=?;");
-        $stmt->bind_param("sssssddi", $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice, $productId);
+        // Check if the cost_price and sale_price are different
+        $checkStmt = $conn->prepare("SELECT cost_price, sale_price, `start_date` FROM price_history WHERE product_id = ? ORDER BY `start_date` DESC LIMIT 1;");
+        $checkStmt->bind_param("i", $productId);
+        $checkStmt->execute();
+        $checkResult = $checkStmt->get_result();
 
-        $stmt->execute();
+        if ($checkResult->num_rows > 0) {
+            $row = $checkResult->fetch_assoc();
 
-        if ($stmt->affected_rows > 0) {
+            if ($row['cost_price'] != $costPrice || $row['sale_price'] != $salePrice) {
+                // If different, update the end_date in price_history
+                $updateHistoryStmt = $conn->prepare("UPDATE price_history SET end_date = NOW() WHERE product_id = ?;");
+                $updateHistoryStmt->bind_param("i", $productId);
+                $updateHistoryStmt->execute();
+
+                // Insert a new record into price_history
+                $insertHistoryStmt = $conn->prepare("INSERT INTO price_history (product_id, cost_price, sale_price, `start_date`) VALUES (?, ?, ?, NOW());");
+                $insertHistoryStmt->bind_param("idd", $productId, $costPrice, $salePrice);
+                $insertHistoryStmt->execute();
+
+                $updateHistoryStmt->close();
+                $insertHistoryStmt->close();
+            }
+        }
+
+        // Update the product information
+        $updateProductStmt = $conn->prepare("UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, `description`=?, cost_price=?, sale_price=? WHERE product_id=?;");
+        $updateProductStmt->bind_param("sssssddi", $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice, $productId);
+        $updateProductStmt->execute();
+
+        if ($updateProductStmt->affected_rows > 0) {
             $selectStmt = $conn->prepare("SELECT product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id WHERE product_id = ?;");
             $selectStmt->bind_param("i", $productId);
             $selectStmt->execute();
@@ -254,7 +291,10 @@ function updateProduct()
         ));
     }
 
-    $stmt->close();
+    $checkStmt->close();
+    $updateProductStmt->close();
+    $selectStmt->close();
+
     $conn->close();
 }
 
