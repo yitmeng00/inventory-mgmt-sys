@@ -1075,8 +1075,22 @@ class ElementFactory {
             datasets: [
                 {
                     data: values,
-                    borderColor: "rgba(247, 244, 35, 1)",
-                    backgroundColor: "rgba(247, 244, 35, 0.8)",
+                    backgroundColor: [
+                        "rgba(255, 99, 132, 0.5)",
+                        "rgba(54, 162, 235, 0.5)",
+                        "rgba(255, 206, 86, 0.5)",
+                        "rgba(75, 192, 192, 0.5)",
+                        "rgba(153, 102, 255, 0.5)",
+                        "rgba(255, 159, 64, 0.5)",
+                    ],
+                    borderColor: [
+                        "rgba(255, 99, 132, 1)",
+                        "rgba(54, 162, 235, 1)",
+                        "rgba(255, 206, 86, 1)",
+                        "rgba(75, 192, 192, 1)",
+                        "rgba(153, 102, 255, 1)",
+                        "rgba(255, 159, 64, 1)",
+                    ],
                     borderWidth: 1,
                 },
             ],
@@ -1085,16 +1099,15 @@ class ElementFactory {
         const chartOptions = {
             scales: {
                 x: {
-                    beginAtZero: true,
+                    display: false,
                 },
                 y: {
-                    beginAtZero: true,
+                    display: false,
                 },
             },
-            indexAxis: "y",
             plugins: {
                 legend: {
-                    display: false,
+                    display: true,
                 },
                 title: {
                     display: true,
@@ -1110,7 +1123,7 @@ class ElementFactory {
             },
         };
 
-        this.initializeChart(chartCanvas, chartData, "bar", chartOptions);
+        this.initializeChart(chartCanvas, chartData, "doughnut", chartOptions);
 
         return chartContainer;
     };
@@ -1152,14 +1165,6 @@ class ElementFactory {
         const labels = data.map((entry) => entry.product_name);
         const values = data.map((entry) => parseInt(entry.quantity_sold));
 
-        // Find the index of the maximum value in the 'values' array
-        const maxIndex = values.indexOf(Math.max(...values));
-
-        // Create an array with the same length as 'values' with zeros, except for the maximum value which has a non-zero offset
-        const offsets = values.map((value, index) =>
-            index === maxIndex ? 50 : 0
-        );
-
         const chartData = {
             labels: labels,
             datasets: [
@@ -1182,7 +1187,6 @@ class ElementFactory {
                         "rgba(255, 159, 64, 1)",
                     ],
                     borderWidth: 1,
-                    offset: offsets,
                 },
             ],
         };
@@ -1190,7 +1194,6 @@ class ElementFactory {
         const chartOptions = {
             legend: {
                 display: true,
-                position: "right",
             },
             plugins: {
                 title: {
@@ -1207,7 +1210,7 @@ class ElementFactory {
             },
         };
 
-        this.initializeChart(chartCanvas, chartData, "pie", chartOptions);
+        this.initializeChart(chartCanvas, chartData, "polarArea", chartOptions);
 
         return chartContainer;
     };
