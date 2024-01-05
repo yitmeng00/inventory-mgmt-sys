@@ -283,6 +283,12 @@ function deleteProduct()
         $stmtImg->execute();
         $stmtImg->close();
 
+        // Delete from transaction table
+        $stmtTransaction = $conn->prepare("DELETE FROM `transaction` WHERE product_id = ?;");
+        $stmtTransaction->bind_param("i", $productId);
+        $stmtTransaction->execute();
+        $stmtTransaction->close();
+
         // Delete from product table
         $stmt = $conn->prepare("DELETE FROM product WHERE product_id = ?;");
         $stmt->bind_param("i", $productId);
@@ -291,7 +297,7 @@ function deleteProduct()
         if ($stmt->affected_rows > 0) {
             echo json_encode(array(
                 'success' => true,
-                'message' => 'Product and associated images deleted successfully'
+                'message' => 'Product, associated images and associated transactions deleted successfully'
             ));
         } else {
             echo json_encode(array(
