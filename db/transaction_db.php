@@ -8,7 +8,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        retrieveTransactions();
+        if (isset($_GET['transaction_id'])) {
+            retrieveTransactionById();
+        } else {
+            retrieveTransactions();
+        }
         break;
 
     case 'POST':
@@ -34,7 +38,7 @@ function retrieveTransactions()
     global $conn;
 
     try {
-        $stmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id;");
+        $stmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id;");
         $stmt->execute();
         $result = $stmt->get_result();
         $transactions = $result->fetch_all(MYSQLI_ASSOC);
@@ -67,6 +71,47 @@ function retrieveTransactions()
     $conn->close();
 }
 
+function retrieveTransactionById()
+{
+    global $conn;
+
+    $transactionId = $_GET['transaction_id'];
+
+    try {
+        $stmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
+        $stmt->bind_param("i", $transactionId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $transactions = $result->fetch_all(MYSQLI_ASSOC);
+
+        if ($transactions) {
+            // Decode HTML special characters for specific fields
+            foreach ($transactions as &$transaction) {
+                $transaction['product_code'] = htmlspecialchars_decode($transaction['product_code']);
+                $transaction['product_name'] = htmlspecialchars_decode($transaction['product_name']);
+            }
+
+            echo json_encode(array(
+                'success' => true,
+                'transaction' => $transaction
+            ));
+        } else {
+            echo json_encode(array(
+                'success' => false,
+                'error_msg' => "Transaction does not exist"
+            ));
+        }
+    } catch (mysqli_sql_exception $exception) {
+        echo json_encode(array(
+            'success' => false,
+            'error_msg' => $exception->getMessage()
+        ));
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+
 function createTransaction()
 {
     global $conn;
@@ -76,6 +121,25 @@ function createTransaction()
     $quantity = $_POST['quantity'];
 
     try {
+        $transactionCode = generateTransactionCode();
+
+        // Check if the generated transaction code already exists in the database
+        $checkCodeStmt = $conn->prepare("SELECT COUNT(*) FROM `transaction` WHERE transaction_code = ?;");
+        $checkCodeStmt->bind_param("s", $transactionCode);
+        $checkCodeStmt->execute();
+        $checkCodeResult = $checkCodeStmt->get_result();
+        $codeExists = ($checkCodeResult->fetch_row()[0] > 0);
+        $checkCodeStmt->close();
+
+        // Regenerate code if it already exists
+        while ($codeExists) {
+            $transactionCode = generateTransactionCode();
+            $checkCodeStmt->bind_param("s", $transactionCode);
+            $checkCodeStmt->execute();
+            $checkCodeResult = $checkCodeStmt->get_result();
+            $codeExists = ($checkCodeResult->fetch_row()[0] > 0);
+        }
+
         // Fetch unit price from the product table based on product_id
         $fetchPriceStmt = $conn->prepare("SELECT sale_price FROM product WHERE product_id = ?;");
         $fetchPriceStmt->bind_param("i", $productId);
@@ -88,8 +152,8 @@ function createTransaction()
             $unitPrice = $row['sale_price'];
 
             // Insert transaction data
-            $insertStmt = $conn->prepare("INSERT INTO transaction (product_id, type_id, quantity, unit_price) VALUES (?, ?, ?, ?);");
-            $insertStmt->bind_param("iiid", $productId, $typeId, $quantity, $unitPrice);
+            $insertStmt = $conn->prepare("INSERT INTO `transaction` (transaction_code, product_id, type_id, quantity, unit_price) VALUES (?, ?, ?, ?, ?);");
+            $insertStmt->bind_param("siiid", $transactionCode, $productId, $typeId, $quantity, $unitPrice);
             $insertStmt->execute();
 
             $lastInsertedTransactionId = $conn->insert_id;
@@ -111,7 +175,7 @@ function createTransaction()
                 }
 
                 // Retrieve the newly added transaction data
-                $selectStmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
+                $selectStmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
                 $selectStmt->bind_param("i", $lastInsertedTransactionId);
                 $selectStmt->execute();
                 $result = $selectStmt->get_result();
@@ -172,7 +236,7 @@ function updateTransaction()
         $stmt->execute();
 
         if ($stmt->affected_rows > 0) {
-            $selectStmt = $conn->prepare("SELECT transaction_id, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
+            $selectStmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
             $selectStmt->bind_param("i", $transactionId);
             $selectStmt->execute();
             $result = $selectStmt->get_result();
@@ -277,4 +341,16 @@ function deleteTransaction()
 
     $stmt->close();
     $conn->close();
+}
+
+function generateTransactionCode()
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
+    $code = 'T';
+
+    for ($i = 0; $i < 6; $i++) {
+        $code .= $characters[rand(0, strlen($characters) - 1)];
+    }
+
+    return $code;
 }

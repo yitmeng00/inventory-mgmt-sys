@@ -291,7 +291,6 @@ class ElementFactory {
 
     static createTable = (id) => {
         const table = document.createElement("table");
-        // table.classList.add("table");
         table.id = id;
 
         return table;
@@ -367,6 +366,7 @@ class ElementFactory {
 
                 // Define the order of keys
                 const keysOrder = [
+                    "transaction_code",
                     "product_code",
                     "product_name",
                     "type_name",
@@ -409,6 +409,7 @@ class ElementFactory {
 
                 // Define the order of keys
                 const keysOrder = [
+                    "supplier_code",
                     "supplier_name",
                     "contact_person",
                     "contact_no",
@@ -1336,202 +1337,220 @@ class ElementFactory {
         formRow.appendChild(formCol1);
         formRow.appendChild(formCol2);
 
-        const imagePromise = fetch(
-            `db/product_img_db.php?product_id=${response.product_id}`,
-            {
-                method: "GET",
-            }
-        )
+        fetch(`db/product_db.php?product_id=${response.product_id}`, {
+            method: "GET",
+        })
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    if (data.product_imgs && data.product_imgs.length > 0) {
-                        const productImgSrc = data.product_imgs[0].img_path;
-                        const productImgContainer = this.createDiv();
-                        productImgContainer.classList.add("text-center");
-                        const productImg = this.createImage(
-                            productImgSrc,
-                            "Product Image"
+                    const {
+                        category_id,
+                        cost_price,
+                        description,
+                        product_code,
+                        product_id,
+                        product_name,
+                        quantity,
+                        sale_price,
+                        supplier_id,
+                        img_path,
+                    } = data.product;
+
+                    const productImgSrc = img_path;
+                    const productImgContainer = this.createDiv();
+                    productImgContainer.classList.add("text-center");
+                    const productImg = this.createImage(
+                        productImgSrc,
+                        "Product Image"
+                    );
+                    productImg.classList.add("ims__product-img");
+
+                    productImgContainer.appendChild(productImg);
+                    formCol1.appendChild(productImgContainer);
+
+                    const categoryPromise = fetch("db/category_db.php", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const categories = data.categories;
+                                const selectedCategoryId = category_id;
+
+                                const categoryDropdown =
+                                    this.createDropdown(
+                                        "Category:",
+                                        categories,
+                                        "category_id",
+                                        "category_name",
+                                        true,
+                                        selectedCategoryId
+                                    );
+
+                                formCol2.appendChild(categoryDropdown);
+                            } else {
+                                console.error(
+                                    "Error fetching category data: ",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching category data: ",
+                                error
+                            );
+                        });
+
+                    const supplierPromise = fetch("db/supplier_db.php", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const suppliers = data.suppliers;
+                                const selectedSupplierId = supplier_id;
+
+                                const supplierDropdown =
+                                    this.createDropdown(
+                                        "Supplier:",
+                                        suppliers,
+                                        "supplier_id",
+                                        "supplier_name",
+                                        true,
+                                        selectedSupplierId
+                                    );
+
+                                formCol2.appendChild(supplierDropdown);
+                            } else {
+                                console.error(
+                                    "Error fetching supplier data: ",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching supplier data: ",
+                                error
+                            );
+                        });
+
+                    const productCodeInput = this.createInput(
+                        "Product Code:",
+                        "text",
+                        "product_code",
+                        product_code,
+                        true
+                    );
+                    const productNameInput = this.createInput(
+                        "Product Name:",
+                        "text",
+                        "product_name",
+                        product_name,
+                        true
+                    );
+                    const descriptionInput = this.createInput(
+                        "Description:",
+                        "text",
+                        "description",
+                        description,
+                        true
+                    );
+                    const costPriceInput = this.createInput(
+                        "Cost Price:",
+                        "number",
+                        "cost_price",
+                        cost_price,
+                        true
+                    );
+                    const salePriceInput = this.createInput(
+                        "Sale Price:",
+                        "number",
+                        "sale_price",
+                        sale_price,
+                        true
+                    );
+
+                    const quantityInputContainer = this.createDiv();
+                    quantityInputContainer.classList.add("mb-3");
+                    const wrapperRow = this.createRow();
+                    const wrapperCol1 = this.createCol();
+                    wrapperCol1.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-3",
+                        "col-lg-3",
+                        "col-xl-3",
+                        "col-xxl-3"
+                    );
+                    const wrapperCol2 = this.createCol();
+                    wrapperCol2.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-9",
+                        "col-lg-9",
+                        "col-xl-9",
+                        "col-xxl-9"
+                    );
+                    const quantityInputLabel = this.createLabel("Quantity:");
+                    const quantityInput = this.createParagraph(quantity);
+                    quantityInputContainer.appendChild(wrapperRow);
+                    wrapperRow.appendChild(wrapperCol1);
+                    wrapperRow.appendChild(wrapperCol2);
+                    wrapperCol1.appendChild(quantityInputLabel);
+                    wrapperCol2.appendChild(quantityInput);
+
+                    const btnWrapperRow = this.createRow();
+                    const btnWrapperCol = this.createCol();
+                    const btnWrapperDiv = this.createDiv();
+                    btnWrapperDiv.classList.add(
+                        "d-flex",
+                        "flex-row",
+                        "justify-content-end",
+                        "gap-2"
+                    );
+                    const editButton = this.createButton("button", "Edit");
+                    editButton.classList.add("ims__view-detail-edit-btn");
+                    editButton.addEventListener("click", () => {
+                        this.handleProductEditBtnEvent(
+                            editButton,
+                            form,
+                            product_id,
+                            product_code
                         );
-                        productImg.classList.add("ims__product-img");
-                        formCol1.appendChild(productImgContainer);
-                        productImgContainer.appendChild(productImg);
-                    } else {
-                        console.error("No product images found.");
-                    }
+                    });
+
+                    const deleteButton = this.createButton("button", "Delete");
+                    deleteButton.classList.add("ims__view-detail-dlt-btn");
+                    deleteButton.addEventListener("click", () => {
+                        this.handleProductDltBtnEvent(product_id, product_code);
+                    });
+                    btnWrapperRow.appendChild(btnWrapperCol);
+                    btnWrapperCol.appendChild(btnWrapperDiv);
+                    btnWrapperDiv.appendChild(editButton);
+                    btnWrapperDiv.appendChild(deleteButton);
+
+                    Promise.all([categoryPromise, supplierPromise]).then(() => {
+                        formCol2.appendChild(productCodeInput);
+                        formCol2.appendChild(productNameInput);
+                        formCol2.appendChild(descriptionInput);
+                        formCol2.appendChild(costPriceInput);
+                        formCol2.appendChild(salePriceInput);
+                        formCol2.appendChild(quantityInputContainer);
+
+                        form.appendChild(btnWrapperRow);
+                    });
                 } else {
                     console.error(
-                        "Error fetching product image: ",
+                        "Error fetching product data: ",
                         data.error_msg
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching product image: ", error);
+                console.error("Error fetching product data: ", error);
             });
-
-        const categoryPromise = fetch("db/category_db.php", {
-            method: "GET",
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    const categories = data.categories;
-                    const selectedCategoryId = response.category_id;
-
-                    const categoryDropdown = ElementFactory.createDropdown(
-                        "Category:",
-                        categories,
-                        "category_id",
-                        "category_name",
-                        true,
-                        selectedCategoryId
-                    );
-
-                    formCol2.appendChild(categoryDropdown);
-                } else {
-                    console.error(
-                        "Error fetching category data: ",
-                        data.error_msg
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching category data: ", error);
-            });
-
-        const supplierPromise = fetch("db/supplier_db.php", {
-            method: "GET",
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    const suppliers = data.suppliers;
-                    const selectedSupplierId = response.supplier_id;
-
-                    const supplierDropdown = ElementFactory.createDropdown(
-                        "Supplier:",
-                        suppliers,
-                        "supplier_id",
-                        "supplier_name",
-                        true,
-                        selectedSupplierId
-                    );
-
-                    formCol2.appendChild(supplierDropdown);
-                } else {
-                    console.error(
-                        "Error fetching supplier data: ",
-                        data.error_msg
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching supplier data: ", error);
-            });
-
-        const productCodeInput = this.createInput(
-            "Product Code:",
-            "text",
-            "product_code",
-            response.product_code,
-            true
-        );
-        const productNameInput = this.createInput(
-            "Product Name:",
-            "text",
-            "product_name",
-            response.product_name,
-            true
-        );
-        const descriptionInput = this.createInput(
-            "Description:",
-            "text",
-            "description",
-            response.description,
-            true
-        );
-        const costPriceInput = this.createInput(
-            "Cost Price:",
-            "number",
-            "cost_price",
-            response.cost_price,
-            true
-        );
-        const salePriceInput = this.createInput(
-            "Sale Price:",
-            "number",
-            "sale_price",
-            response.sale_price,
-            true
-        );
-
-        const quantityInputContainer = this.createDiv();
-        quantityInputContainer.classList.add("mb-3");
-        const wrapperRow = this.createRow();
-        const wrapperCol1 = this.createCol();
-        wrapperCol1.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-3",
-            "col-lg-3",
-            "col-xl-3",
-            "col-xxl-3"
-        );
-        const wrapperCol2 = this.createCol();
-        wrapperCol2.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-9",
-            "col-lg-9",
-            "col-xl-9",
-            "col-xxl-9"
-        );
-        const quantityInputLabel = this.createLabel("Quantity:");
-        const quantityInput = this.createParagraph(response.quantity);
-        quantityInputContainer.appendChild(wrapperRow);
-        wrapperRow.appendChild(wrapperCol1);
-        wrapperRow.appendChild(wrapperCol2);
-        wrapperCol1.appendChild(quantityInputLabel);
-        wrapperCol2.appendChild(quantityInput);
-
-        const btnWrapperRow = this.createRow();
-        const btnWrapperCol = this.createCol();
-        const btnWrapperDiv = this.createDiv();
-        btnWrapperDiv.classList.add(
-            "d-flex",
-            "flex-row",
-            "justify-content-end",
-            "gap-2"
-        );
-        const editButton = this.createButton("button", "Edit");
-        editButton.classList.add("ims__view-detail-edit-btn");
-        editButton.addEventListener("click", () => {
-            this.handleProductEditBtnEvent(editButton, form, response);
-        });
-
-        const deleteButton = this.createButton("button", "Delete");
-        deleteButton.classList.add("ims__view-detail-dlt-btn");
-        deleteButton.addEventListener("click", () => {
-            this.handleProductDltBtnEvent(response);
-        });
-        btnWrapperRow.appendChild(btnWrapperCol);
-        btnWrapperCol.appendChild(btnWrapperDiv);
-        btnWrapperDiv.appendChild(editButton);
-        btnWrapperDiv.appendChild(deleteButton);
-
-        Promise.all([imagePromise, categoryPromise, supplierPromise]).then(
-            () => {
-                formCol2.appendChild(productCodeInput);
-                formCol2.appendChild(productNameInput);
-                formCol2.appendChild(descriptionInput);
-                formCol2.appendChild(costPriceInput);
-                formCol2.appendChild(salePriceInput);
-                formCol2.appendChild(quantityInputContainer);
-
-                form.appendChild(btnWrapperRow);
-            }
-        );
     };
 
     static renderProductAddForm = (form, tableType) => {
@@ -1543,7 +1562,7 @@ class ElementFactory {
                 if (data.success) {
                     const categories = data.categories;
 
-                    const categoryDropdown = ElementFactory.createDropdown(
+                    const categoryDropdown = this.createDropdown(
                         "Category:",
                         categories,
                         "category_id",
@@ -1572,7 +1591,7 @@ class ElementFactory {
                 if (data.success) {
                     const suppliers = data.suppliers;
 
-                    const supplierDropdown = ElementFactory.createDropdown(
+                    const supplierDropdown = this.createDropdown(
                         "Supplier:",
                         suppliers,
                         "supplier_id",
@@ -1661,7 +1680,12 @@ class ElementFactory {
         });
     };
 
-    static handleProductEditBtnEvent = (editButton, form, response) => {
+    static handleProductEditBtnEvent = (
+        editButton,
+        form,
+        productId,
+        productCode
+    ) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
             editButton.textContent = "Save Changes";
@@ -1685,7 +1709,7 @@ class ElementFactory {
                     jsonData[key] = value;
                 });
 
-                jsonData["product_id"] = response.product_id;
+                jsonData["product_id"] = productId;
 
                 fetch("db/product_db.php", {
                     method: "PUT",
@@ -1697,18 +1721,29 @@ class ElementFactory {
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
+                            console.log(data);
+                            const {
+                                category_name,
+                                cost_price,
+                                description,
+                                product_code,
+                                product_name,
+                                sale_price,
+                                supplier_name,
+                            } = data.product_data;
+
                             const productTable = $(
                                 "#ims__product-table"
                             ).DataTable();
 
-                            // Find the row index based on the product_code
+                            // Find the row index based on the productCode
                             const rowIndex = productTable
                                 .rows()
                                 .eq(0)
                                 .filter((rowIdx) => {
                                     return (
                                         productTable.cell(rowIdx, 1).data() ===
-                                        response.product_code
+                                        productCode
                                     );
                                 });
 
@@ -1720,31 +1755,31 @@ class ElementFactory {
                                 const cellUpdates = [
                                     {
                                         index: 1,
-                                        value: data.product_data.product_code,
+                                        value: product_code,
                                     },
                                     {
                                         index: 2,
-                                        value: data.product_data.product_name,
+                                        value: product_name,
                                     },
                                     {
                                         index: 3,
-                                        value: data.product_data.category_name,
+                                        value: category_name,
                                     },
                                     {
                                         index: 4,
-                                        value: data.product_data.supplier_name,
+                                        value: supplier_name,
                                     },
                                     {
                                         index: 5,
-                                        value: data.product_data.description,
+                                        value: description,
                                     },
                                     {
                                         index: 6,
-                                        value: data.product_data.cost_price,
+                                        value: cost_price,
                                     },
                                     {
                                         index: 7,
-                                        value: data.product_data.sale_price,
+                                        value: sale_price,
                                     },
                                 ];
 
@@ -1783,15 +1818,12 @@ class ElementFactory {
         }
     };
 
-    static handleProductDltBtnEvent = (response) => {
+    static handleProductDltBtnEvent = (productId, productCode) => {
         const userConfirmed = window.confirm(
             "Are you sure you want to delete this product?"
         );
 
         if (userConfirmed) {
-            const productId = response.product_id;
-            const productCode = response.product_code;
-
             fetch(`db/product_db.php`, {
                 method: "DELETE",
                 headers: {
@@ -1806,7 +1838,7 @@ class ElementFactory {
                             "#ims__product-table"
                         ).DataTable();
 
-                        // Find the row in DataTable based on the product_code and remove it
+                        // Find the row in DataTable based on the productCode and remove it
                         const rowIndex = productTable
                             .rows()
                             .eq(0)
@@ -1858,7 +1890,7 @@ class ElementFactory {
                         "button",
                         "View Detail"
                     );
-                    viewDetailButton.classList.add("btn", "btn-info");
+                    viewDetailButton.classList.add("ims__view-detail-btn");
                     viewDetailButton.setAttribute("data-bs-toggle", "modal");
                     viewDetailButton.setAttribute(
                         "data-bs-target",
@@ -1867,20 +1899,29 @@ class ElementFactory {
 
                     const viewDetailButtonHTML = viewDetailButton.outerHTML;
 
-                    const productData = data.product_data;
+                    const {
+                        product_code,
+                        product_name,
+                        category_name,
+                        supplier_name,
+                        description,
+                        cost_price,
+                        sale_price,
+                        quantity,
+                    } = data.product_data;
 
                     // Add new row to the DataTable
                     productTable.row
                         .add([
                             nextRowNumber,
-                            data.product_data.product_code,
-                            data.product_data.product_name,
-                            data.product_data.category_name,
-                            data.product_data.supplier_name,
-                            data.product_data.description,
-                            data.product_data.cost_price,
-                            data.product_data.sale_price,
-                            data.product_data.quantity,
+                            product_code,
+                            product_name,
+                            category_name,
+                            supplier_name,
+                            description,
+                            cost_price,
+                            sale_price,
+                            quantity,
                             viewDetailButtonHTML,
                         ])
                         .draw(false);
@@ -1890,10 +1931,11 @@ class ElementFactory {
                         .node();
 
                     // Attach the event listener to the button in the last added row
-                    const lastRowViewDetailButton =
-                        lastRowNode.querySelector(".btn-info");
+                    const lastRowViewDetailButton = lastRowNode.querySelector(
+                        ".ims__view-detail-btn"
+                    );
                     lastRowViewDetailButton.addEventListener("click", () => {
-                        this.showModal("Detail", tableType, productData);
+                        this.showModal("Detail", tableType, data.product_data);
                     });
 
                     $("#ims__modal").modal("hide");
@@ -1907,192 +1949,266 @@ class ElementFactory {
     };
 
     static renderTransactionDetailForm = (form, response) => {
-        const typePromise = fetch("db/transaction_type_db.php", {
-            method: "GET",
-        })
+        fetch(
+            `db/transaction_db.php?transaction_id=${response.transaction_id}`,
+            {
+                method: "GET",
+            }
+        )
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    const txn_types = data.txn_types;
+                    const {
+                        transaction_id,
+                        transaction_code,
+                        product_id,
+                        product_code,
+                        type_id,
+                        quantity,
+                        unit_price,
+                        created,
+                    } = data.transaction;
 
-                    const typeDropdown = ElementFactory.createDropdown(
-                        "Type:",
-                        txn_types,
-                        "type_id",
-                        "type_name",
-                        true,
-                        response.type_id
+                    const typePromise = fetch("db/transaction_type_db.php", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const txn_types = data.txn_types;
+
+                                const typeDropdown =
+                                    this.createDropdown(
+                                        "Type:",
+                                        txn_types,
+                                        "type_id",
+                                        "type_name",
+                                        true,
+                                        type_id
+                                    );
+
+                                form.appendChild(typeDropdown);
+                            } else {
+                                console.error(
+                                    "Error fetching transaction type data: ",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching transaction type data: ",
+                                error
+                            );
+                        });
+
+                    const productPromise = fetch("db/product_db.php", {
+                        method: "GET",
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                const products = data.products;
+
+                                const productDropdown =
+                                    this.createDropdown(
+                                        "Product:",
+                                        products,
+                                        "product_id",
+                                        "product_name",
+                                        true,
+                                        product_id
+                                    );
+
+                                form.appendChild(productDropdown);
+                            } else {
+                                console.error(
+                                    "Error fetching product data: ",
+                                    data.error_msg
+                                );
+                            }
+                        })
+                        .catch((error) => {
+                            console.error(
+                                "Error fetching product data: ",
+                                error
+                            );
+                        });
+
+                    const quantityInput = this.createInput(
+                        "Quantity:",
+                        "number",
+                        "quantity",
+                        quantity,
+                        true
                     );
 
-                    form.appendChild(typeDropdown);
+                    const txnCodeInputContainer = this.createDiv();
+                    txnCodeInputContainer.classList.add("mb-3");
+                    const txnCodeWrapperRow = this.createRow();
+                    const txnCodeWrapperCol1 = this.createCol();
+                    txnCodeWrapperCol1.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-3",
+                        "col-lg-3",
+                        "col-xl-3",
+                        "col-xxl-3"
+                    );
+                    const txnCodeWrapperCol2 = this.createCol();
+                    txnCodeWrapperCol2.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-9",
+                        "col-lg-9",
+                        "col-xl-9",
+                        "col-xxl-9"
+                    );
+                    const txnCodeInputLabel =
+                        this.createLabel("Transaction Code:");
+                    const txnCodeInput = this.createParagraph(transaction_code);
+                    txnCodeInputContainer.appendChild(txnCodeWrapperRow);
+                    txnCodeWrapperRow.appendChild(txnCodeWrapperCol1);
+                    txnCodeWrapperRow.appendChild(txnCodeWrapperCol2);
+                    txnCodeWrapperCol1.appendChild(txnCodeInputLabel);
+                    txnCodeWrapperCol2.appendChild(txnCodeInput);
+
+                    const prodCodeInputContainer = this.createDiv();
+                    prodCodeInputContainer.classList.add("mb-3");
+                    const prodCodeWrapperRow = this.createRow();
+                    const prodCodeWrapperCol1 = this.createCol();
+                    prodCodeWrapperCol1.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-3",
+                        "col-lg-3",
+                        "col-xl-3",
+                        "col-xxl-3"
+                    );
+                    const prodCodeWrapperCol2 = this.createCol();
+                    prodCodeWrapperCol2.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-9",
+                        "col-lg-9",
+                        "col-xl-9",
+                        "col-xxl-9"
+                    );
+                    const prodCodeInputLabel =
+                        this.createLabel("Product Code:");
+                    const prodCodeInput = this.createParagraph(product_code);
+                    prodCodeInputContainer.appendChild(prodCodeWrapperRow);
+                    prodCodeWrapperRow.appendChild(prodCodeWrapperCol1);
+                    prodCodeWrapperRow.appendChild(prodCodeWrapperCol2);
+                    prodCodeWrapperCol1.appendChild(prodCodeInputLabel);
+                    prodCodeWrapperCol2.appendChild(prodCodeInput);
+
+                    const unitPriceInputContainer = this.createDiv();
+                    unitPriceInputContainer.classList.add("mb-3");
+                    const unitPriceWrapperRow = this.createRow();
+                    const unitPriceWrapperCol1 = this.createCol();
+                    unitPriceWrapperCol1.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-3",
+                        "col-lg-3",
+                        "col-xl-3",
+                        "col-xxl-3"
+                    );
+                    const unitPriceWrapperCol2 = this.createCol();
+                    unitPriceWrapperCol2.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-9",
+                        "col-lg-9",
+                        "col-xl-9",
+                        "col-xxl-9"
+                    );
+                    const unitPriceInputLabel = this.createLabel("Unit Price:");
+                    const unitPriceInput = this.createParagraph(unit_price);
+                    unitPriceInputContainer.appendChild(unitPriceWrapperRow);
+                    unitPriceWrapperRow.appendChild(unitPriceWrapperCol1);
+                    unitPriceWrapperRow.appendChild(unitPriceWrapperCol2);
+                    unitPriceWrapperCol1.appendChild(unitPriceInputLabel);
+                    unitPriceWrapperCol2.appendChild(unitPriceInput);
+
+                    const createdInputContainer = this.createDiv();
+                    createdInputContainer.classList.add("mb-3");
+                    const createdInputWrapperRow = this.createRow();
+                    const createdInputWrapperCol1 = this.createCol();
+                    createdInputWrapperCol1.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-3",
+                        "col-lg-3",
+                        "col-xl-3",
+                        "col-xxl-3"
+                    );
+                    const createdInputWrapperCol2 = this.createCol();
+                    createdInputWrapperCol2.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-9",
+                        "col-lg-9",
+                        "col-xl-9",
+                        "col-xxl-9"
+                    );
+                    const createdInputLabel = this.createLabel("Created:");
+                    const createdInput = this.createParagraph(created);
+                    createdInputContainer.appendChild(createdInputWrapperRow);
+                    createdInputWrapperRow.appendChild(createdInputWrapperCol1);
+                    createdInputWrapperRow.appendChild(createdInputWrapperCol2);
+                    createdInputWrapperCol1.appendChild(createdInputLabel);
+                    createdInputWrapperCol2.appendChild(createdInput);
+
+                    const btnWrapperRow = this.createRow();
+                    const btnWrapperCol = this.createCol();
+                    const btnWrapperDiv = this.createDiv();
+                    btnWrapperDiv.classList.add(
+                        "d-flex",
+                        "flex-row",
+                        "justify-content-end",
+                        "gap-2"
+                    );
+                    const editButton = this.createButton("button", "Edit");
+                    editButton.classList.add("ims__view-detail-edit-btn");
+                    editButton.addEventListener("click", () => {
+                        this.handleTransactionEditBtnEvent(
+                            editButton,
+                            form,
+                            transaction_id, transaction_code
+                        );
+                    });
+
+                    const deleteButton = this.createButton("button", "Delete");
+                    deleteButton.classList.add("ims__view-detail-dlt-btn");
+                    deleteButton.addEventListener("click", () => {
+                        this.handleTransactionDltBtnEvent(transaction_id, transaction_code, product_id);
+                    });
+                    btnWrapperRow.appendChild(btnWrapperCol);
+                    btnWrapperCol.appendChild(btnWrapperDiv);
+                    btnWrapperDiv.appendChild(editButton);
+                    btnWrapperDiv.appendChild(deleteButton);
+
+                    Promise.all([typePromise, productPromise]).then(() => {
+                        form.appendChild(quantityInput);
+                        form.appendChild(txnCodeInputContainer);
+                        form.appendChild(prodCodeInputContainer);
+                        form.appendChild(unitPriceInputContainer);
+                        form.appendChild(createdInputContainer);
+
+                        form.appendChild(btnWrapperRow);
+                    });
                 } else {
                     console.error(
-                        "Error fetching transaction type data: ",
+                        "Error fetching transaction data: ",
                         data.error_msg
                     );
                 }
             })
             .catch((error) => {
-                console.error("Error fetching transaction type data: ", error);
+                console.error("Error fetching transaction data: ", error);
             });
-
-        const productPromise = fetch("db/product_db.php", {
-            method: "GET",
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.success) {
-                    const products = data.products;
-
-                    const productDropdown = ElementFactory.createDropdown(
-                        "Product:",
-                        products,
-                        "product_id",
-                        "product_name",
-                        true,
-                        response.product_id
-                    );
-
-                    form.appendChild(productDropdown);
-                } else {
-                    console.error(
-                        "Error fetching product data: ",
-                        data.error_msg
-                    );
-                }
-            })
-            .catch((error) => {
-                console.error("Error fetching product data: ", error);
-            });
-
-        const quantityInput = this.createInput(
-            "Quantity:",
-            "number",
-            "quantity",
-            response.quantity,
-            true
-        );
-
-        const productCodeInputContainer = this.createDiv();
-        productCodeInputContainer.classList.add("mb-3");
-        const wrapperRow1 = this.createRow();
-        const wrapperCol1 = this.createCol();
-        wrapperCol1.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-3",
-            "col-lg-3",
-            "col-xl-3",
-            "col-xxl-3"
-        );
-        const wrapperCol2 = this.createCol();
-        wrapperCol2.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-9",
-            "col-lg-9",
-            "col-xl-9",
-            "col-xxl-9"
-        );
-        const productCodeInputLabel = this.createLabel("Product Code:");
-        const productCodeInput = this.createParagraph(response.product_code);
-        productCodeInputContainer.appendChild(wrapperRow1);
-        wrapperRow1.appendChild(wrapperCol1);
-        wrapperRow1.appendChild(wrapperCol2);
-        wrapperCol1.appendChild(productCodeInputLabel);
-        wrapperCol2.appendChild(productCodeInput);
-
-        const unitPriceInputContainer = this.createDiv();
-        unitPriceInputContainer.classList.add("mb-3");
-        const wrapperRow2 = this.createRow();
-        const wrapperCol3 = this.createCol();
-        wrapperCol3.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-3",
-            "col-lg-3",
-            "col-xl-3",
-            "col-xxl-3"
-        );
-        const wrapperCol4 = this.createCol();
-        wrapperCol4.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-9",
-            "col-lg-9",
-            "col-xl-9",
-            "col-xxl-9"
-        );
-        const unitPriceInputLabel = this.createLabel("Unit Price:");
-        const unitPriceInput = this.createParagraph(response.unit_price);
-        unitPriceInputContainer.appendChild(wrapperRow2);
-        wrapperRow2.appendChild(wrapperCol3);
-        wrapperRow2.appendChild(wrapperCol4);
-        wrapperCol3.appendChild(unitPriceInputLabel);
-        wrapperCol4.appendChild(unitPriceInput);
-
-        const createdInputContainer = this.createDiv();
-        createdInputContainer.classList.add("mb-3");
-        const wrapperRow3 = this.createRow();
-        const wrapperCol5 = this.createCol();
-        wrapperCol5.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-3",
-            "col-lg-3",
-            "col-xl-3",
-            "col-xxl-3"
-        );
-        const wrapperCol6 = this.createCol();
-        wrapperCol6.classList.add(
-            "col-12",
-            "col-sm-12",
-            "col-md-9",
-            "col-lg-9",
-            "col-xl-9",
-            "col-xxl-9"
-        );
-        const createdInputLabel = this.createLabel("Created:");
-        const createdInput = this.createParagraph(response.created);
-        createdInputContainer.appendChild(wrapperRow3);
-        wrapperRow3.appendChild(wrapperCol5);
-        wrapperRow3.appendChild(wrapperCol6);
-        wrapperCol5.appendChild(createdInputLabel);
-        wrapperCol6.appendChild(createdInput);
-
-        const btnWrapperRow = this.createRow();
-        const btnWrapperCol = this.createCol();
-        const btnWrapperDiv = this.createDiv();
-        btnWrapperDiv.classList.add(
-            "d-flex",
-            "flex-row",
-            "justify-content-end",
-            "gap-2"
-        );
-        const editButton = this.createButton("button", "Edit");
-        editButton.classList.add("ims__view-detail-edit-btn");
-        editButton.addEventListener("click", () => {
-            this.handleTransactionEditBtnEvent(editButton, form, response);
-        });
-
-        const deleteButton = this.createButton("button", "Delete");
-        deleteButton.classList.add("ims__view-detail-dlt-btn");
-        deleteButton.addEventListener("click", () => {
-            this.handleTransactionDltBtnEvent(response);
-        });
-        btnWrapperRow.appendChild(btnWrapperCol);
-        btnWrapperCol.appendChild(btnWrapperDiv);
-        btnWrapperDiv.appendChild(editButton);
-        btnWrapperDiv.appendChild(deleteButton);
-
-        Promise.all([typePromise, productPromise]).then(() => {
-            form.appendChild(quantityInput);
-            form.appendChild(productCodeInputContainer);
-            form.appendChild(unitPriceInputContainer);
-            form.appendChild(createdInputContainer);
-
-            form.appendChild(btnWrapperRow);
-        });
     };
 
     static renderTransactionAddForm = (form, tableType) => {
@@ -2104,7 +2220,7 @@ class ElementFactory {
                 if (data.success) {
                     const txn_types = data.txn_types;
 
-                    const typeDropdown = ElementFactory.createDropdown(
+                    const typeDropdown = this.createDropdown(
                         "Type:",
                         txn_types,
                         "type_id",
@@ -2133,7 +2249,7 @@ class ElementFactory {
                 if (data.success) {
                     const products = data.products;
 
-                    const productDropdown = ElementFactory.createDropdown(
+                    const productDropdown = this.createDropdown(
                         "Product:",
                         products,
                         "product_id",
@@ -2181,7 +2297,7 @@ class ElementFactory {
         });
     };
 
-    static handleTransactionEditBtnEvent = (editButton, form, response) => {
+    static handleTransactionEditBtnEvent = (editButton, form, transactionId, transactionCode) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
             editButton.textContent = "Save Changes";
@@ -2198,9 +2314,6 @@ class ElementFactory {
             );
 
             if (userConfirmed) {
-                const no = response.no;
-                const number = no.toString();
-
                 const formData = new FormData(form);
                 const jsonData = {};
 
@@ -2208,7 +2321,7 @@ class ElementFactory {
                     jsonData[key] = value;
                 });
 
-                jsonData["transaction_id"] = response.transaction_id;
+                jsonData["transaction_id"] = transactionId;
 
                 fetch("db/transaction_db.php", {
                     method: "PUT",
@@ -2224,17 +2337,20 @@ class ElementFactory {
                                 "#ims__transaction-table"
                             ).DataTable();
 
-                            // Find the row index based on the no
+                            // Find the row index based on the transaction_code
                             const rowIndex = transactionTable
                                 .rows()
                                 .eq(0)
                                 .filter((rowIdx) => {
                                     return (
                                         transactionTable
-                                            .cell(rowIdx, 0)
-                                            .data() === number
+                                            .cell(rowIdx, 1)
+                                            .data() === transactionCode
                                     );
                                 });
+
+                            const { product_name, type_name, quantity } =
+                                data.transaction_data;
 
                             if (rowIndex.length > 0) {
                                 const rowNode = transactionTable
@@ -2243,17 +2359,16 @@ class ElementFactory {
 
                                 const cellUpdates = [
                                     {
-                                        index: 2,
-                                        value: data.transaction_data
-                                            .product_name,
-                                    },
-                                    {
                                         index: 3,
-                                        value: data.transaction_data.type_name,
+                                        value: product_name,
                                     },
                                     {
                                         index: 4,
-                                        value: data.transaction_data.quantity,
+                                        value: type_name,
+                                    },
+                                    {
+                                        index: 5,
+                                        value: quantity,
                                     },
                                 ];
 
@@ -2292,17 +2407,12 @@ class ElementFactory {
         }
     };
 
-    static handleTransactionDltBtnEvent = (response) => {
+    static handleTransactionDltBtnEvent = (transactionId, transactionCode, productId) => {
         const userConfirmed = window.confirm(
             "Are you sure you want to delete this transaction?"
         );
 
         if (userConfirmed) {
-            const transactionId = response.transaction_id;
-            const productId = response.product_id;
-            const no = response.no;
-            const number = no.toString();
-
             fetch(`db/transaction_db.php`, {
                 method: "DELETE",
                 headers: {
@@ -2320,14 +2430,14 @@ class ElementFactory {
                             "#ims__transaction-table"
                         ).DataTable();
 
-                        // Find the row in DataTable based on the transaction_id and remove it
+                        // Find the row in DataTable based on the transactionCode and remove it
                         const rowIndex = transactionTable
                             .rows()
                             .eq(0)
                             .filter((rowIdx) => {
                                 return (
-                                    transactionTable.cell(rowIdx, 0).data() ===
-                                    number
+                                    transactionTable.cell(rowIdx, 1).data() ===
+                                    transactionCode
                                 );
                             });
 
@@ -2369,7 +2479,10 @@ class ElementFactory {
                         "button",
                         "View Detail"
                     );
-                    viewDetailButton.classList.add("btn", "btn-info");
+                    viewDetailButton.classList.add(
+                        "btn",
+                        "ims__view-detail-btn"
+                    );
                     viewDetailButton.setAttribute("data-bs-toggle", "modal");
                     viewDetailButton.setAttribute(
                         "data-bs-target",
@@ -2378,18 +2491,27 @@ class ElementFactory {
 
                     const viewDetailButtonHTML = viewDetailButton.outerHTML;
 
-                    const transactionData = data.transaction_data;
+                    const {
+                        transaction_code,
+                        product_code,
+                        product_name,
+                        type_name,
+                        quantity,
+                        unit_price,
+                        created,
+                    } = data.transaction_data;
 
                     // Add new row to the DataTable
                     transactionTable.row
                         .add([
                             nextRowNumber,
-                            data.transaction_data.product_code,
-                            data.transaction_data.product_name,
-                            data.transaction_data.type_name,
-                            data.transaction_data.quantity,
-                            data.transaction_data.unit_price,
-                            data.transaction_data.created,
+                            transaction_code,
+                            product_code,
+                            product_name,
+                            type_name,
+                            quantity,
+                            unit_price,
+                            created,
                             viewDetailButtonHTML,
                         ])
                         .draw(false);
@@ -2399,10 +2521,15 @@ class ElementFactory {
                         .node();
 
                     // Attach the event listener to the button in the last added row
-                    const lastRowViewDetailButton =
-                        lastRowNode.querySelector(".btn-info");
+                    const lastRowViewDetailButton = lastRowNode.querySelector(
+                        ".ims__view-detail-btn"
+                    );
                     lastRowViewDetailButton.addEventListener("click", () => {
-                        this.showModal("Detail", tableType, transactionData);
+                        this.showModal(
+                            "Detail",
+                            tableType,
+                            data.transaction_data
+                        );
                     });
 
                     $("#ims__modal").modal("hide");
@@ -2416,77 +2543,143 @@ class ElementFactory {
     };
 
     static renderSupplierDetailForm = (form, response) => {
-        const supplierNameInput = this.createInput(
-            "Supplier Name:",
-            "text",
-            "supplier_name",
-            response.supplier_name,
-            true
-        );
+        fetch(`db/supplier_db.php?supplier_id=${response.supplier_id}`, {
+            method: "GET",
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.success) {
+                    const {
+                        supplier_id,
+                        supplier_code,
+                        supplier_name,
+                        contact_person,
+                        contact_no,
+                        email,
+                        location,
+                    } = data.supplier;
 
-        const contactPersonInput = this.createInput(
-            "Contact Person:",
-            "text",
-            "contact_person",
-            response.contact_person,
-            true
-        );
+                    const supplierCodeInputContainer = this.createDiv();
+                    supplierCodeInputContainer.classList.add("mb-3");
+                    const supplierCodeWrapperRow = this.createRow();
+                    const supplierCodeWrapperCol1 = this.createCol();
+                    supplierCodeWrapperCol1.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-3",
+                        "col-lg-3",
+                        "col-xl-3",
+                        "col-xxl-3"
+                    );
+                    const supplierCodeWrapperCol2 = this.createCol();
+                    supplierCodeWrapperCol2.classList.add(
+                        "col-12",
+                        "col-sm-12",
+                        "col-md-9",
+                        "col-lg-9",
+                        "col-xl-9",
+                        "col-xxl-9"
+                    );
+                    const supplierCodeInputLabel =
+                        this.createLabel("Supplier Code:");
+                    const supplierCodeInput =
+                        this.createParagraph(supplier_code);
+                    supplierCodeInputContainer.appendChild(
+                        supplierCodeWrapperRow
+                    );
+                    supplierCodeWrapperRow.appendChild(supplierCodeWrapperCol1);
+                    supplierCodeWrapperRow.appendChild(supplierCodeWrapperCol2);
+                    supplierCodeWrapperCol1.appendChild(supplierCodeInputLabel);
+                    supplierCodeWrapperCol2.appendChild(supplierCodeInput);
 
-        const contactNoInput = this.createInput(
-            "Contact No:",
-            "text",
-            "contact_no",
-            response.contact_no,
-            true
-        );
+                    const supplierNameInput = this.createInput(
+                        "Supplier Name:",
+                        "text",
+                        "supplier_name",
+                        supplier_name,
+                        true
+                    );
 
-        const emailInput = this.createInput(
-            "Email:",
-            "text",
-            "email",
-            response.email,
-            true
-        );
+                    const contactPersonInput = this.createInput(
+                        "Contact Person:",
+                        "text",
+                        "contact_person",
+                        contact_person,
+                        true
+                    );
 
-        const locationInput = this.createInput(
-            "Location:",
-            "text",
-            "location",
-            response.location,
-            true
-        );
+                    const contactNoInput = this.createInput(
+                        "Contact No:",
+                        "text",
+                        "contact_no",
+                        contact_no,
+                        true
+                    );
 
-        const btnWrapperRow = this.createRow();
-        const btnWrapperCol = this.createCol();
-        const btnWrapperDiv = this.createDiv();
-        btnWrapperDiv.classList.add(
-            "d-flex",
-            "flex-row",
-            "justify-content-end",
-            "gap-2"
-        );
-        const editButton = this.createButton("button", "Edit");
-        editButton.classList.add("ims__view-detail-edit-btn");
-        editButton.addEventListener("click", () => {
-            this.handleSupplierEditBtnEvent(editButton, form, response);
-        });
+                    const emailInput = this.createInput(
+                        "Email:",
+                        "text",
+                        "email",
+                        email,
+                        true
+                    );
 
-        const deleteButton = this.createButton("button", "Delete");
-        deleteButton.classList.add("ims__view-detail-dlt-btn");
-        deleteButton.addEventListener("click", () => {
-            this.handleSupplierDltBtnEvent(response);
-        });
-        btnWrapperRow.appendChild(btnWrapperCol);
-        btnWrapperCol.appendChild(btnWrapperDiv);
-        btnWrapperDiv.appendChild(editButton);
-        btnWrapperDiv.appendChild(deleteButton);
+                    const locationInput = this.createInput(
+                        "Location:",
+                        "text",
+                        "location",
+                        location,
+                        true
+                    );
 
-        form.appendChild(supplierNameInput);
-        form.appendChild(contactPersonInput);
-        form.appendChild(contactNoInput);
-        form.appendChild(emailInput);
-        form.appendChild(locationInput);
-        form.appendChild(btnWrapperRow);
+                    const btnWrapperRow = this.createRow();
+                    const btnWrapperCol = this.createCol();
+                    const btnWrapperDiv = this.createDiv();
+                    btnWrapperDiv.classList.add(
+                        "d-flex",
+                        "flex-row",
+                        "justify-content-end",
+                        "gap-2"
+                    );
+
+                    const editButton = this.createButton("button", "Edit");
+                    editButton.classList.add("ims__view-detail-edit-btn");
+                    editButton.addEventListener("click", () => {
+                        this.handleSupplierEditBtnEvent(
+                            editButton,
+                            form,
+                            supplier_id, supplier_code
+                        );
+                    });
+
+                    const deleteButton = this.createButton("button", "Delete");
+                    deleteButton.classList.add("ims__view-detail-dlt-btn");
+                    deleteButton.addEventListener("click", () => {
+                        this.handleSupplierDltBtnEvent(supplier_id, supplier_code);
+                    });
+
+                    btnWrapperRow.appendChild(btnWrapperCol);
+                    btnWrapperCol.appendChild(btnWrapperDiv);
+                    btnWrapperDiv.appendChild(editButton);
+                    btnWrapperDiv.appendChild(deleteButton);
+
+                    form.appendChild(supplierCodeInputContainer);
+                    form.appendChild(supplierNameInput);
+                    form.appendChild(contactPersonInput);
+                    form.appendChild(contactNoInput);
+                    form.appendChild(emailInput);
+                    form.appendChild(locationInput);
+                    form.appendChild(btnWrapperRow);
+                } else {
+                    console.error(
+                        "Error fetching supplier data: ",
+                        data.error_msg
+                    );
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching supplier data: ", error);
+            });
     };
 
     static renderSupplierAddForm = (form, tableType) => {
@@ -2550,7 +2743,7 @@ class ElementFactory {
         });
     };
 
-    static handleSupplierEditBtnEvent = (editButton, form, response) => {
+    static handleSupplierEditBtnEvent = (editButton, form, supplierId, supplierCode) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
             editButton.textContent = "Save Changes";
@@ -2567,9 +2760,6 @@ class ElementFactory {
             );
 
             if (userConfirmed) {
-                const no = response.no;
-                const number = no.toString();
-
                 const formData = new FormData(form);
                 const jsonData = {};
 
@@ -2577,7 +2767,7 @@ class ElementFactory {
                     jsonData[key] = value;
                 });
 
-                jsonData["supplier_id"] = response.supplier_id;
+                jsonData["supplier_id"] = supplierId;
 
                 fetch("db/supplier_db.php", {
                     method: "PUT",
@@ -2599,10 +2789,18 @@ class ElementFactory {
                                 .eq(0)
                                 .filter((rowIdx) => {
                                     return (
-                                        supplierTable.cell(rowIdx, 0).data() ===
-                                        number
+                                        supplierTable.cell(rowIdx, 1).data() ===
+                                        supplierCode
                                     );
                                 });
+
+                            const {
+                                supplier_name,
+                                contact_person,
+                                contact_no,
+                                email,
+                                location,
+                            } = data.supplier_data;
 
                             if (rowIndex.length > 0) {
                                 const rowNode = supplierTable
@@ -2611,25 +2809,24 @@ class ElementFactory {
 
                                 const cellUpdates = [
                                     {
-                                        index: 1,
-                                        value: data.supplier_data.supplier_name,
-                                    },
-                                    {
                                         index: 2,
-                                        value: data.supplier_data
-                                            .contact_person,
+                                        value: supplier_name,
                                     },
                                     {
                                         index: 3,
-                                        value: data.supplier_data.contact_no,
+                                        value: contact_person,
                                     },
                                     {
                                         index: 4,
-                                        value: data.supplier_data.email,
+                                        value: contact_no,
                                     },
                                     {
                                         index: 5,
-                                        value: data.supplier_data.location,
+                                        value: email,
+                                    },
+                                    {
+                                        index: 6,
+                                        value: location,
                                     },
                                 ];
 
@@ -2668,16 +2865,12 @@ class ElementFactory {
         }
     };
 
-    static handleSupplierDltBtnEvent = (response) => {
+    static handleSupplierDltBtnEvent = (supplierId, supplierCode) => {
         const userConfirmed = window.confirm(
             "Are you sure you want to delete this supplier?"
         );
 
         if (userConfirmed) {
-            const supplierId = response.supplier_id;
-            const no = response.no;
-            const number = no.toString();
-
             fetch(`db/supplier_db.php`, {
                 method: "DELETE",
                 headers: {
@@ -2694,14 +2887,14 @@ class ElementFactory {
                             "#ims__supplier-table"
                         ).DataTable();
 
-                        // Find the row in DataTable based on the supplier_id and remove it
+                        // Find the row in DataTable based on the supplierCode and remove it
                         const rowIndex = supplierTable
                             .rows()
                             .eq(0)
                             .filter((rowIdx) => {
                                 return (
-                                    supplierTable.cell(rowIdx, 0).data() ===
-                                    number
+                                    supplierTable.cell(rowIdx, 1).data() ===
+                                    supplierCode
                                 );
                             });
 
@@ -2741,7 +2934,10 @@ class ElementFactory {
                         "button",
                         "View Detail"
                     );
-                    viewDetailButton.classList.add("btn", "btn-info");
+                    viewDetailButton.classList.add(
+                        "btn",
+                        "ims__view-detail-btn"
+                    );
                     viewDetailButton.setAttribute("data-bs-toggle", "modal");
                     viewDetailButton.setAttribute(
                         "data-bs-target",
@@ -2750,17 +2946,25 @@ class ElementFactory {
 
                     const viewDetailButtonHTML = viewDetailButton.outerHTML;
 
-                    const supplierData = data.supplier_data;
+                    const {
+                        supplier_code,
+                        supplier_name,
+                        contact_person,
+                        contact_no,
+                        email,
+                        location,
+                    } = data.supplier_data;
 
                     // Add new row to the DataTable
                     supplierTable.row
                         .add([
                             nextRowNumber,
-                            data.supplier_data.supplier_name,
-                            data.supplier_data.contact_person,
-                            data.supplier_data.contact_no,
-                            data.supplier_data.email,
-                            data.supplier_data.location,
+                            supplier_code,
+                            supplier_name,
+                            contact_person,
+                            contact_no,
+                            email,
+                            location,
                             viewDetailButtonHTML,
                         ])
                         .draw(false);
@@ -2770,10 +2974,11 @@ class ElementFactory {
                         .node();
 
                     // Attach the event listener to the button in the last added row
-                    const lastRowViewDetailButton =
-                        lastRowNode.querySelector(".btn-info");
+                    const lastRowViewDetailButton = lastRowNode.querySelector(
+                        ".ims__view-detail-btn"
+                    );
                     lastRowViewDetailButton.addEventListener("click", () => {
-                        this.showModal("Detail", tableType, supplierData);
+                        this.showModal("Detail", tableType, data.supplier_data);
                     });
 
                     $("#ims__modal").modal("hide");

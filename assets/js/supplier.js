@@ -41,6 +41,7 @@ class Supplier {
 
         const headerLabels = [
             "No",
+            "Supplier Code",
             "Supplier Name",
             "Contact Person",
             "Contact No",
