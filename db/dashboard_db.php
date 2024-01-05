@@ -263,7 +263,7 @@ function retrieveBestSellingChartData()
     global $conn;
 
     try {
-        $bestSellingDataQuery = "SELECT p.product_name, SUM(t.quantity) AS total_quantity_sold FROM product p INNER JOIN transaction t ON p.product_id = t.product_id WHERE t.type_id = 1 GROUP BY p.product_id, p.product_name, p.category_id, p.supplier_id, p.product_code, p.description ORDER BY total_quantity_sold DESC LIMIT 6;";
+        $bestSellingDataQuery = "SELECT p.product_name, SUM(t.quantity) AS total_quantity_sold FROM product p INNER JOIN `transaction` t ON p.product_id = t.product_id WHERE t.type_id = 1 GROUP BY p.product_id, p.product_name, p.category_id, p.supplier_id, p.product_code, p.description ORDER BY total_quantity_sold DESC LIMIT 6;";
 
         $bestSellingDataResult = mysqli_query($conn, $bestSellingDataQuery);
 

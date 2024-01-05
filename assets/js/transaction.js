@@ -46,6 +46,7 @@ class Transaction {
 
         const headerLabels = [
             "No",
+            "Transaction Code",
             "Product Code",
             "Product Name",
             "Type",

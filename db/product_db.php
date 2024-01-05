@@ -8,7 +8,11 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        retrieveProducts();
+        if (isset($_GET['product_id'])) {
+            retrieveProductById();
+        } else {
+            retrieveProducts();
+        }
         break;
 
     case 'POST':
@@ -55,6 +59,46 @@ function retrieveProducts()
             echo json_encode(array(
                 'success' => false,
                 'error_msg' => "Product does not exist"
+            ));
+        }
+    } catch (mysqli_sql_exception $exception) {
+        echo json_encode(array(
+            'success' => false,
+            'error_msg' => $exception->getMessage()
+        ));
+    }
+
+    $stmt->close();
+    $conn->close();
+}
+
+function retrieveProductById()
+{
+    global $conn;
+
+    $productId = $_GET['product_id'];
+
+    try {
+        $stmt = $conn->prepare("SELECT p.product_id, product_name, c.category_id, c.category_name, s.supplier_id, s.supplier_name, product_code, `description`, cost_price, sale_price, quantity, i.img_path FROM product p INNER JOIN category c ON p.category_id = c.category_id INNER JOIN supplier s ON p.supplier_id = s.supplier_id INNER JOIN product_img i ON p.product_id = i.product_id WHERE p.product_id = ?;");
+        $stmt->bind_param("i", $productId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $product = $result->fetch_assoc();
+
+        if ($product) {
+            // Decode HTML special characters for specific fields
+            $product['product_name'] = htmlspecialchars_decode($product['product_name']);
+            $product['product_code'] = htmlspecialchars_decode($product['product_code']);
+            $product['description'] = htmlspecialchars_decode($product['description']);
+
+            echo json_encode(array(
+                'success' => true,
+                'product' => $product
+            ));
+        } else {
+            echo json_encode(array(
+                'success' => false,
+                'error_msg' => 'Product not found'
             ));
         }
     } catch (mysqli_sql_exception $exception) {
