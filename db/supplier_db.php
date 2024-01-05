@@ -257,15 +257,33 @@ function deleteSupplier()
     $supplierId = $data['supplier_id'];
 
     try {
-        // Delete from supplier table
-        $stmt = $conn->prepare("DELETE FROM supplier WHERE supplier_id = ?;");
-        $stmt->bind_param("i", $supplierId);
-        $stmt->execute();
+        $productCount = "";
 
-        if ($stmt->affected_rows > 0) {
+        // Check if there are linked products
+        $stmt_check_products = $conn->prepare("SELECT COUNT(product_id) FROM product WHERE supplier_id = ?");
+        $stmt_check_products->bind_param("i", $supplierId);
+        $stmt_check_products->execute();
+        $stmt_check_products->bind_result($productCount);
+        $stmt_check_products->fetch();
+        $stmt_check_products->close();
+
+        if ($productCount > 0) {
+            // Linked products found, cannot delete supplier
+            echo json_encode(array(
+                'success' => false,
+                'error_msg' => 'Cannot delete supplier. There is product linked with the supplier.'
+            ));
+            return;
+        }
+
+        $stmt_delete_supplier = $conn->prepare("DELETE FROM supplier WHERE supplier_id = ?");
+        $stmt_delete_supplier->bind_param("i", $supplierId);
+        $stmt_delete_supplier->execute();
+
+        if ($stmt_delete_supplier->affected_rows > 0) {
             echo json_encode(array(
                 'success' => true,
-                'message' => 'Supplier and associated images deleted successfully'
+                'message' => 'Supplier deleted successfully'
             ));
         } else {
             echo json_encode(array(
@@ -273,6 +291,8 @@ function deleteSupplier()
                 'error_msg' => 'No rows affected. Supplier may not exist.'
             ));
         }
+
+        $stmt_delete_supplier->close();
     } catch (mysqli_sql_exception $exception) {
         echo json_encode(array(
             'success' => false,
@@ -280,7 +300,6 @@ function deleteSupplier()
         ));
     }
 
-    $stmt->close();
     $conn->close();
 }
 
