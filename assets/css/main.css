@@ -40,7 +40,14 @@ body {
 .ims__navbar-content {
     width: 9.5rem;
     transition: 0.3s ease-in-out;
-    background-color: var(--primary-color);
+    background-image: linear-gradient(
+        to right top,
+        var(--primary-color),
+        #1f5b83,
+        #1b608d,
+        #186496,
+        #1568a0
+    );
 }
 
 .ims__collapsible-navbar {
