@@ -2,6 +2,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var currentPage = document.body.dataset.page;
 
     switch (currentPage) {
+        case "login":
+            Login.initLogin();
+            break;
         case "dashboard":
             Dashboard.initDashboard();
             break;

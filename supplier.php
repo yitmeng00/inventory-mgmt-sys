@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+    echo '<script>alert("Your session has expired. Please log in again.");</script>';
+    echo '<script>setTimeout(function(){ window.location.href = "login.php"; }, 500);</script>';
+    // header("Location: login.php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
