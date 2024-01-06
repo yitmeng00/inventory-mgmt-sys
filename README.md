@@ -38,10 +38,14 @@ This app was built using the following technologies:
 - PHP
 - JavaScript
 - jQuery
-- HTML
-- CSS
-- bootstrap
+- HTML5
+- CSS3
+- Bootstrap5
 - MySQL
+- DataTables
+- Chart.js
+- xlsx
+- bcrypt
 
 ## License
 This project does not has any license.
