@@ -49,12 +49,26 @@ class ElementFactory {
         return p;
     };
 
+    static createSpan = (content) => {
+        const span = document.createElement("span");
+        span.textContent = content;
+
+        return span;
+    };
+
     static createButton = (type, value) => {
         const btn = document.createElement("button");
         btn.type = type;
         btn.innerHTML = value;
 
         return btn;
+    };
+
+    static createLink = (value) => {
+        var link = document.createElement("a");
+        link.textContent = value;
+
+        return link;
     };
 
     static createExportButton = (chartContentContainer, data) => {
@@ -1722,7 +1736,6 @@ class ElementFactory {
                     .then((response) => response.json())
                     .then((data) => {
                         if (data.success) {
-                            console.log(data);
                             const {
                                 category_name,
                                 cost_price,

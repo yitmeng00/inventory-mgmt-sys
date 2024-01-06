@@ -10,10 +10,10 @@ $current_page = basename($_SERVER['PHP_SELF']);
         <div class="mt-3 mb-5 ps-3">
             <img id="ims__navbar-logo" class="w-100 img-fluid" src="assets/images/inventory-mgmt-sys-logo-large.png">
         </div>
-        <div class="ims__navbar-link-container">
+        <div class="ims__navbar-link-container d-flex flex-column justify-content-between h-100">
             <ul class="navbar-nav flex-column">
                 <li class="nav-item position-relative">
-                    <a href="index.php" class="nav-link ps-3 align-items-center <?php echo ($current_page == 'index.php') ? 'active' : ''; ?>">
+                    <a href="index.php" class="nav-link ps-3 align-items-center <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
                         <div class="d-flex align-items-center gap-1">
                             <div class="ims__navbar-logo-container d-flex align-items-center">
                                 <i class="fa-solid fa-table ims__navbar-icon"></i>
@@ -57,6 +57,20 @@ $current_page = basename($_SERVER['PHP_SELF']);
                             </div>
                             <div>
                                 <p class="m-0">Supplier</p>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            </ul>
+            <ul class="navbar-nav flex-column">
+                <li class="nav-item position-relative">
+                    <a href="logout.php" class="nav-link ps-3 align-items-center">
+                        <div class="d-flex align-items-center gap-1">
+                            <div class="ims__navbar-logo-container d-flex align-items-center">
+                                <i class="fa-solid fa-right-from-bracket ims__navbar-icon"></i>
+                            </div>
+                            <div>
+                                <p class="m-0">Logout</p>
                             </div>
                         </div>
                     </a>
