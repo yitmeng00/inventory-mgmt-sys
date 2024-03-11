@@ -204,7 +204,7 @@ function retrieveRevenueProfitChartData()
     global $conn;
 
     try {
-        $revenueProfitDataQuery = "SELECT MONTHNAME(t.created) AS month, SUM(CASE WHEN t.type_id = 1 THEN t.unit_price * t.quantity ELSE 0 END) AS total_revenue, SUM(CASE WHEN t.type_id = 1 THEN (t.unit_price - p.cost_price) * t.quantity ELSE 0 END) AS total_profit FROM `transaction` t INNER JOIN product p ON t.product_id = p.product_id WHERE t.type_id = 1 AND YEAR(t.created) = YEAR(CURRENT_DATE) GROUP BY month ORDER BY month;";
+        $revenueProfitDataQuery = "SELECT MONTHNAME(t.created) AS month, SUM(CASE WHEN t.type_id = 1 THEN t.unit_price * t.quantity ELSE 0 END) AS total_revenue, SUM(CASE WHEN t.type_id = 1 THEN (t.unit_price - ph.cost_price) * t.quantity ELSE 0 END) AS total_profit FROM `transaction` t INNER JOIN price_history ph ON t.product_id = ph.product_id WHERE t.type_id = 1 AND YEAR(t.created) = YEAR(CURRENT_DATE) AND t.created BETWEEN ph.start_date AND COALESCE(ph.end_date, NOW()) GROUP BY month ORDER BY month;";
 
         $revenueProfitDataResult = mysqli_query($conn, $revenueProfitDataQuery);
 
