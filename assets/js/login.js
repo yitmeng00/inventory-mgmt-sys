@@ -109,7 +109,6 @@ class Login {
             .then((response) => response.json())
             .then((data) => {
                 if (data.success) {
-                    console.log(data);
                     window.location.href = "dashboard.php";
                 } else {
                     console.error("Error login to the system:", data.error_msg);
