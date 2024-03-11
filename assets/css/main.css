@@ -312,7 +312,7 @@ body[data-page="login"] .ims__body-container {
 }
 
 .login__form label input {
-    padding: 10px 10px 20px 10px;
+    padding: 1em;
     outline: 0;
     border: 1px solid rgba(105, 105, 105, 0.397);
 }
@@ -320,7 +320,7 @@ body[data-page="login"] .ims__body-container {
 .login__form label input + span {
     position: absolute;
     left: 10px;
-    top: 15px;
+    bottom: 5px;
     color: grey;
     font-size: 0.9rem;
     cursor: text;
@@ -328,13 +328,13 @@ body[data-page="login"] .ims__body-container {
 }
 
 .login__form label input:placeholder-shown + span {
-    top: 15px;
+    bottom: 15px;
     font-size: 0.9rem;
 }
 
 .login__form label input:focus + span,
 .login__form label input:valid + span {
-    top: 30px;
+    bottom: 40px;
     font-size: 0.7rem;
     font-weight: 600;
 }
