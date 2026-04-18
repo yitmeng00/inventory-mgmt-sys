@@ -149,3 +149,14 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     }
 });
+
+// Prevent scroll-to-change on number inputs (works in all browsers including Edge)
+document.addEventListener(
+    "wheel",
+    (e) => {
+        if (document.activeElement.type === "number") {
+            e.preventDefault();
+        }
+    },
+    { passive: false },
+);
