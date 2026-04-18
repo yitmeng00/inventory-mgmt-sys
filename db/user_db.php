@@ -293,6 +293,18 @@ function updateProfile(object $authUser)
     $stmt->execute();
     $stmt->close();
 
+    // Re-issue JWT so the updated name/designation is reflected on next page load
+    $token = JWTHelper::generate([
+        'user_id'     => $userId,
+        'staff_id'    => $authUser->staff_id,
+        'username'    => $authUser->username,
+        'first_name'  => $firstName,
+        'last_name'   => $lastName,
+        'designation' => $designation,
+        'role'        => $authUser->role,
+    ]);
+    JWTHelper::setTokenCookie($token);
+
     echo json_encode(['success' => true, 'message' => 'Profile updated']);
 }
 
