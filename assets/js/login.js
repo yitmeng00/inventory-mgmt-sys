@@ -17,7 +17,7 @@ class Login {
         const usernameinput = this.createInputLabel(
             "username",
             "Username",
-            "text"
+            "text",
         );
         loginFormUsernameRow.appendChild(loginFormUsernameCol);
         loginFormUsernameCol.appendChild(usernameinput);
@@ -27,7 +27,7 @@ class Login {
         const passwordInput = this.createInputLabel(
             "password",
             "Password",
-            "password"
+            "password",
         );
         loginFormPasswordRow.appendChild(loginFormPasswordCol);
         loginFormPasswordCol.appendChild(passwordInput);
@@ -43,7 +43,7 @@ class Login {
             "py-2",
             "px-3",
             "text-white",
-            "rounded"
+            "rounded",
         );
         loginFormSubmitRow.appendChild(loginFormSubmitCol);
         loginFormSubmitCol.appendChild(submitButton);
@@ -54,7 +54,7 @@ class Login {
         forgotPasswordWrapper.classList.add(
             "login__forgot-pw-btn",
             "text-center",
-            "m-0"
+            "m-0",
         );
         const forgotPasswordLink =
             ElementFactory.createLink("Forgot password?");

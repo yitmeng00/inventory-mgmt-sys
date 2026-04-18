@@ -1,9 +1,10 @@
 <?php
-session_start();
+require_once 'lib/jwt_helper.php';
 
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: login.php");
+$token = $_COOKIE['ims_token'] ?? null;
+if ($token && JWTHelper::decode($token)) {
+    header('Location: /dashboard.php');
 } else {
-    header('Location: dashboard.php');
+    header('Location: /login.php');
 }
-?>
+exit;

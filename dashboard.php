@@ -1,21 +1,13 @@
 <?php
-session_start();
-
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    echo '<script>alert("Your session has expired. Please log in again.");</script>';
-    echo '<script>setTimeout(function(){ window.location.href = "login.php"; }, 500);</script>';
-    // header("Location: login.php");
-    exit();
-}
+require_once 'lib/jwt_helper.php';
+$auth_user  = JWTHelper::authenticate();
+$page_title = 'Dashboard';
+$include_chartjs = true;
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
-<?php
-$include_chartjs = true;
-include("includes/header.php");
-?>
+<?php include 'includes/header.php'; ?>
 
 <body data-page="dashboard">
     <div class="ims__body-container d-flex">
