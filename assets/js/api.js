@@ -24,7 +24,7 @@ const API = (() => {
         post: (url, body) =>
             request(url, {
                 method: "POST",
-                body,
+                body: body instanceof FormData ? body : JSON.stringify(body),
                 headers:
                     body instanceof FormData
                         ? undefined
