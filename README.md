@@ -27,26 +27,27 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 - **Dashboard** — Live KPI cards (stock, sales, purchases), 6 charts visualisations
 - **Product Management** — Add/edit/delete products with image upload, category & supplier linkage, CSV bulk import
 - **Category Management** — Full CRUD with product-count guard on deletion
-- **Supplier Management** — Full CRUD with CSV import, product-link guard on deletion
+- **Supplier Management** — Full CRUD with CSV bulk import, product-link guard on deletion
 - **Transaction Ledger** — Record sales & purchases; stock levels adjust automatically on create/edit/delete
 - **Staff Accounts** — Admin-only; create, edit, activate/deactivate staff accounts
 - **Profile Page** — Update personal info and change password; JWT refreshed on save
 - **Toast Notifications** — Contextual success/error/warning/info toasts
 - **CSV Export** — Export products and transactions to CSV
+- **Chart Export** — Export charts to image
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend | PHP 8.1+ |
-| Database | MySQL 8.0+ |
-| Authentication | `firebase/php-jwt` v7, httpOnly cookie |
-| Frontend | Tailwind v4 (`@tailwindcss/cli`), Vanilla JS |
-| Tables | DataTables v2.3.7 |
-| Charts | Chart.js (CDN, dashboard only) |
-| Package Manager | Composer (PHP), npm (CSS build) |
+| Layer           | Technology                                   |
+| --------------- | -------------------------------------------- |
+| Backend         | PHP 8.1+                                     |
+| Database        | MySQL 8.0+                                   |
+| Authentication  | `firebase/php-jwt` v7, httpOnly cookie       |
+| Frontend        | Tailwind v4 (`@tailwindcss/cli`), Vanilla JS |
+| Tables          | DataTables v2.3.7                            |
+| Charts          | Chart.js (CDN, dashboard only)               |
+| Package Manager | Composer (PHP), npm (CSS build)              |
 
 ---
 
@@ -54,16 +55,31 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 
 > Place screenshots in `assets/images/screenshots/` and update the paths below.
 
-| Page | Desktop | Mobile |
-|---|---|
-| Login |  | |
-| Dashboard |  | |
-| Products |  | |
-| Transactions |  | |
-| Suppliers |  | |
-| Categories |  | |
-| Staff Accounts |  | |
-| Profile |  | |
+| Page                   | Desktop                                                                                                                                     | Mobile                                                                                                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Login                  | ![Web Login Page](assets/images/screenshots/login-page-desktop.png)                                                                         | ![Mobile Login Page](assets/images/screenshots/login-page-mobile.png)                                                                                           |
+| Dashboard (Admin View) | ![Web Dashboard Page](assets/images/screenshots/dashboard-desktop.png)                                                                      | ![Mobile Dashboard Page 1](assets/images/screenshots/dashboard-mobile1.png) ![Mobile Dashboard Page 2](assets/images/screenshots/dashboard-mobile2.png)         |
+| Products               | ![Web Product Page](assets/images/screenshots/product-desktop.png)                                                                          | ![Mobile Product Page](assets/images/screenshots/product-mobile.png)                                                                                            |
+| Transactions           | ![Web Transaction Page](assets/images/screenshots/transaction-desktop.png)                                                                  | ![Mobile Transaction Page 1](assets/images/screenshots/transaction-mobile1.png) ![Mobile Transaction Page 2](assets/images/screenshots/transaction-mobile2.png) |
+| Suppliers              | ![Web Supplier Page](assets/images/screenshots/supplier-desktop.png)                                                                        | ![Mobile Supplier Page](assets/images/screenshots/supplier-mobile.png)                                                                                          |
+| Categories             | ![Web Category Page](assets/images/screenshots/category-desktop.png)                                                                        | ![Mobile Category Page](assets/images/screenshots/category-mobile.png)                                                                                          |
+| Staff Accounts         | ![Web Staff Account Page](assets/images/screenshots/staff-acc-desktop.png)                                                                  | ![Mobile Staff Account Page](assets/images/screenshots/staff-acc-mobile.png)                                                                                    |
+| Profile                | ![Web Profile Page 1](assets/images/screenshots/profile-desktop1.png) ![Web Profile Page 2](assets/images/screenshots/profile-desktop2.png) | ![Mobile Profile Page](assets/images/screenshots/profile-mobile.png)                                                                                            |
+
+| Component                      | Screenshot                                                                            |
+| ------------------------------ | ------------------------------------------------------------------------------------- |
+| Dashboard (Staff View)         | ![Dashboard - Staff](assets/images/screenshots/dashboard-staff.png)                   |
+| Charts                         | ![Charts](assets/images/screenshots/charts.png)                                       |
+| Add Product Modal              | ![Add Product Modal](assets/images/screenshots/add-product.png)                       |
+| Edit Product Modal             | ![Edit Product Modal](assets/images/screenshots/edit-product.png)                     |
+| Add Category Modal             | ![Add Category Modal](assets/images/screenshots/add-category.png)                     |
+| Edit Supplier Modal            | ![Edit Supplier Modal](assets/images/screenshots/edit-supplier.png)                   |
+| Add Transaction Modal          | ![Add Transaction Modal](assets/images/screenshots/add-transaction.png)               |
+| Edit Transaction Modal         | ![Edit Transaction Modal](assets/images/screenshots/edit-transaction.png)             |
+| Add Staff Account Modal        | ![Add Staff Account Modal](assets/images/screenshots/add-staff.png)                   |
+| Edit Staff Account Modal       | ![Edit Staff Account Modal](assets/images/screenshots/edit-staff.png)                 |
+| Deactivate Staff Account Modal | ![Deactivate Staff Account Modal](assets/images/screenshots/deactivate-modal.png.png) |
+| Bulk Import Modal              | ![Bulk Import Modal](assets/images/screenshots/bulk-import.png.png)                   |
 
 ---
 
@@ -175,10 +191,10 @@ Configure a virtual host pointing to the project root, e.g. `http://ims.local`.
 
 ## Default Credentials
 
-| Role | Username | Password |
-|---|---|---|
-| Admin | `admin` | `admin123` |
-| Staff | `john.doe` | `staff123` |
+| Role  | Username     | Password   |
+| ----- | ------------ | ---------- |
+| Admin | `admin`      | `admin123` |
+| Staff | `john.doe`   | `staff123` |
 | Staff | `jane.smith` | `staff123` |
 
 > **Change all default passwords immediately in a production environment.**
