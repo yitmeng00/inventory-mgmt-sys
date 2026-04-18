@@ -1,81 +1,77 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
+$user_role    = $auth_user->role ?? 'staff';
+$user_name    = ($auth_user->first_name ?? '') . ' ' . ($auth_user->last_name ?? '');
+$user_initials = strtoupper(substr($auth_user->first_name ?? 'U', 0, 1) . substr($auth_user->last_name ?? '', 0, 1));
+
+function nav_active(string $page, string $current): string
+{
+    return $page === $current ? 'active' : '';
+}
 ?>
 
-<nav class="navbar bg-light h-100 p-0">
-    <div class="ims__navbar-content border border-dark d-flex flex-column h-100 py-3 pe-3 overflow-hidden">
-        <div class="ims__navbar-logo-container ps-3">
-            <i class="fa-solid fa-bars ims__navbar-icon" id="ims__navbar-toggler" onclick="toggleNavbar()"></i>
+<aside id="sidebar" class="w-60 bg-white border-r border-gray-200 flex flex-col shrink-0 h-screen overflow-y-auto overflow-x-hidden">
+    <!-- Logo area -->
+    <div class="flex items-center gap-3 px-4 py-5 border-b border-gray-100">
+        <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
+            <img src="assets/images/inventory-mgmt-sys-logo-small.png" />
         </div>
-        <div class="mt-3 mb-5 ps-3">
-            <img id="ims__navbar-logo" class="w-100 img-fluid" src="assets/images/inventory-mgmt-sys-logo-large.png">
-        </div>
-        <div class="ims__navbar-link-container d-flex flex-column justify-content-between h-100">
-            <ul class="navbar-nav flex-column">
-                <li class="nav-item position-relative">
-                    <a href="index.php" class="nav-link ps-3 align-items-center <?php echo ($current_page == 'dashboard.php') ? 'active' : ''; ?>">
-                        <div class="d-flex align-items-center gap-1">
-                            <div class="ims__navbar-logo-container d-flex align-items-center">
-                                <i class="fa-solid fa-table ims__navbar-icon"></i>
-                            </div>
-                            <div>
-                                <p class="m-0">Dashboard</p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="nav-item position-relative">
-                    <a href="product.php" class="nav-link ps-3 align-items-center <?php echo ($current_page == 'product.php') ? 'active' : ''; ?>">
-                        <div class="d-flex align-items-center gap-1">
-                            <div class="ims__navbar-logo-container d-flex align-items-center">
-                                <i class="fa-solid fa-box ims__navbar-icon"></i>
-                            </div>
-                            <div>
-                                <p class="m-0">Product</p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-                <li class="nav-item position-relative">
-                    <a href="transaction.php" class="nav-link ps-3 align-items-center <?php echo ($current_page == 'transaction.php') ? 'active' : ''; ?>">
-                        <div class="d-flex align-items-center gap-1">
-                            <div class="ims__navbar-logo-container d-flex align-items-center">
-                                <i class="fa-solid fa-money-bill-transfer ims__navbar-icon"></i>
-                            </div>
-                            <div>
-                                <p class="m-0">Transaction</p>
-                            </div>
-                        </div>
-                    </a>
-
-                </li>
-                <li class="nav-item position-relative">
-                    <a href="supplier.php" class="nav-link ps-3 align-items-center <?php echo ($current_page == 'supplier.php') ? 'active' : ''; ?>">
-                        <div class="d-flex align-items-center gap-1">
-                            <div class="ims__navbar-logo-container d-flex align-items-center">
-                                <i class="fa-solid fa-truck-field ims__navbar-icon"></i>
-                            </div>
-                            <div>
-                                <p class="m-0">Supplier</p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-            <ul class="navbar-nav flex-column">
-                <li class="nav-item position-relative">
-                    <a href="logout.php" class="nav-link ps-3 align-items-center">
-                        <div class="d-flex align-items-center gap-1">
-                            <div class="ims__navbar-logo-container d-flex align-items-center">
-                                <i class="fa-solid fa-right-from-bracket ims__navbar-icon"></i>
-                            </div>
-                            <div>
-                                <p class="m-0">Logout</p>
-                            </div>
-                        </div>
-                    </a>
-                </li>
-            </ul>
+        <div class="sidebar-logo-text overflow-hidden">
+            <p class="text-gray-900 font-semibold text-sm leading-tight">InvenTrack</p>
+            <p class="text-gray-400 text-xs">Management System</p>
         </div>
     </div>
-</nav>
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-4 space-y-0.5">
+        <p class="nav-group-label">Main</p>
+        <a href="/dashboard.php" class="nav-item <?= nav_active('dashboard.php', $current_page) ?>">
+            <i class="fa-solid fa-gauge-high"></i>
+            <span class="sidebar-label">Dashboard</span>
+        </a>
+        <p class="nav-group-label">Inventory</p>
+        <a href="/products.php" class="nav-item <?= nav_active('products.php', $current_page) ?>">
+            <i class="fa-solid fa-box"></i>
+            <span class="sidebar-label">Products</span>
+        </a>
+        <a href="/categories.php" class="nav-item <?= nav_active('categories.php', $current_page) ?>">
+            <i class="fa-solid fa-tag"></i>
+            <span class="sidebar-label">Categories</span>
+        </a>
+        <a href="/suppliers.php" class="nav-item <?= nav_active('suppliers.php', $current_page) ?>">
+            <i class="fa-solid fa-truck-field"></i>
+            <span class="sidebar-label">Suppliers</span>
+        </a>
+        <p class="nav-group-label">Operations</p>
+        <a href="/transactions.php" class="nav-item <?= nav_active('transactions.php', $current_page) ?>">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+            <span class="sidebar-label">Transactions</span>
+        </a>
+        <?php if ($user_role === 'admin'): ?>
+            <p class="nav-group-label">Administration</p>
+            <a href="/users.php" class="nav-item <?= nav_active('users.php', $current_page) ?>">
+                <i class="fa-solid fa-users"></i>
+                <span class="sidebar-label">Staff Accounts</span>
+            </a>
+        <?php endif; ?>
+        <p class="nav-group-label">Account</p>
+        <a href="/profile.php" class="nav-item <?= nav_active('profile.php', $current_page) ?>">
+            <i class="fa-solid fa-circle-user"></i>
+            <span class="sidebar-label">My Profile</span>
+        </a>
+    </nav>
+    <!-- User card + logout -->
+    <div class="px-3 py-3 border-t border-gray-100">
+        <div class="flex flex-col md:flex-row items-center gap-3 px-3 py-2.5 rounded-lg">
+            <div class="w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-white text-xs font-semibold shrink-0">
+                <?= htmlspecialchars($user_initials) ?>
+            </div>
+            <div class="sidebar-label overflow-hidden flex-1">
+                <p class="text-gray-800 text-sm font-medium leading-tight truncate"><?= htmlspecialchars(trim($user_name)) ?></p>
+                <p class="text-gray-400 text-xs capitalize"><?= htmlspecialchars($user_role) ?></p>
+            </div>
+            <a href="/logout.php" title="Logout" class="text-gray-400 hover:text-red-500 transition-colors shrink-0 cursor-pointer">
+                <i class="fa-solid fa-right-from-bracket text-sm"></i>
+            </a>
+        </div>
+    </div>
+</aside>

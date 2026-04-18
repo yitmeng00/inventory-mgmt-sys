@@ -88,6 +88,26 @@ body {
     font-size: 1rem;
 }
 
+/* ── Sidebar ──────────────────────────────────────────────────── */
+#sidebar {
+    transition: width 0.25s ease;
+}
+#sidebar.collapsed {
+    width: 4rem;
+}
+#sidebar.collapsed .sidebar-label,
+#sidebar.collapsed .sidebar-logo-text,
+#sidebar.collapsed .nav-group-label {
+    display: none;
+}
+#sidebar.collapsed .nav-item {
+    justify-content: center;
+    padding: 0.625rem;
+}
+#sidebar.collapsed .nav-item i {
+    width: auto;
+}
+
 /* Chart */
 canvas {
     width: 100% !important;
