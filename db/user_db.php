@@ -162,8 +162,27 @@ function createUser()
 function updateUser()
 {
     global $conn;
-    $data        = json_decode(file_get_contents('php://input'), true);
-    $userId      = (int)($data['user_id'] ?? 0);
+    $data   = json_decode(file_get_contents('php://input'), true);
+    $userId = (int)($data['user_id'] ?? 0);
+
+    if (!$userId) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error_msg' => 'User ID required']);
+        return;
+    }
+
+    // Status-only toggle (deactivate/activate button) — do not touch other fields
+    if (isset($data['status']) && !isset($data['first_name'])) {
+        $status = in_array($data['status'], ['active', 'inactive']) ? $data['status'] : 'active';
+        $stmt   = $conn->prepare("UPDATE user SET status=? WHERE user_id=?");
+        $stmt->bind_param('si', $status, $userId);
+        $stmt->execute();
+        $stmt->close();
+        $label = $status === 'active' ? 'activated' : 'deactivated';
+        echo json_encode(['success' => true, 'message' => "Account $label"]);
+        return;
+    }
+
     $firstName   = htmlspecialchars(trim($data['first_name'] ?? ''), ENT_QUOTES);
     $lastName    = htmlspecialchars(trim($data['last_name'] ?? ''), ENT_QUOTES);
     $username    = trim($data['username'] ?? '');
@@ -173,12 +192,6 @@ function updateUser()
     $role        = in_array($data['role'] ?? '', ['admin', 'staff']) ? $data['role'] : 'staff';
     $status      = in_array($data['status'] ?? '', ['active', 'inactive']) ? $data['status'] : 'active';
     $password    = $data['password'] ?? '';
-
-    if (!$userId) {
-        http_response_code(400);
-        echo json_encode(['success' => false, 'error_msg' => 'User ID required']);
-        return;
-    }
 
     if ($password) {
         if (strlen($password) < 8) {
