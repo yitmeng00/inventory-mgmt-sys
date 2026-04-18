@@ -78,8 +78,8 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 | Edit Transaction Modal         | ![Edit Transaction Modal](assets/images/screenshots/edit-transaction.png)             |
 | Add Staff Account Modal        | ![Add Staff Account Modal](assets/images/screenshots/add-staff.png)                   |
 | Edit Staff Account Modal       | ![Edit Staff Account Modal](assets/images/screenshots/edit-staff.png)                 |
-| Deactivate Staff Account Modal | ![Deactivate Staff Account Modal](assets/images/screenshots/deactivate-modal.png.png) |
-| Bulk Import Modal              | ![Bulk Import Modal](assets/images/screenshots/bulk-import.png.png)                   |
+| Deactivate Staff Account Modal | ![Deactivate Staff Account Modal](assets/images/screenshots/deactivate-modal.png) |
+| Bulk Import Modal              | ![Bulk Import Modal](assets/images/screenshots/bulk-import.png)                   |
 
 ---
 
