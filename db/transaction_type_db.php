@@ -1,6 +1,11 @@
 <?php
+header('Content-Type: application/json');
 
-require_once "mysql_conn.php";
+require_once __DIR__ . '/../lib/jwt_helper.php';
+require_once 'mysql_conn.php';
+
+JWTHelper::authenticateAPI();
+
 $conf = new DBConnection();
 $conn = $conf->connect();
 
@@ -30,7 +35,7 @@ function retrieveTransactionTypes()
         if ($txn_types) {
             echo json_encode(array(
                 'success' => true,
-                'txn_types' => $txn_types
+                'transaction_types' => $txn_types
             ));
         } else {
             echo json_encode(array(
