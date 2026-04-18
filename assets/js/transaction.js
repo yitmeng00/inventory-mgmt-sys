@@ -9,7 +9,7 @@ class Transaction {
 
         const transactionTitleRow = ElementFactory.createTitle(
             "Transactions",
-            "h3"
+            "h3",
         );
 
         const transactionBtnRow = ElementFactory.createRow();
@@ -18,7 +18,7 @@ class Transaction {
         transactionBtnContainer.classList.add("text-end");
         const transactionBtn = ElementFactory.createButton(
             "button",
-            "Add Transaction"
+            "Add Transaction",
         );
         transactionBtn.classList.add("ims__add-btn", "mb-4");
         transactionBtn.setAttribute("data-bs-toggle", "modal");
@@ -37,10 +37,10 @@ class Transaction {
         transactionTableContainer.classList.add(
             "ims__transaction-table-container",
             "overflow-hidden",
-            "overflow-x-scroll"
+            "overflow-x-scroll",
         );
         const transactionTable = ElementFactory.createTable(
-            "ims__transaction-table"
+            "ims__transaction-table",
         );
         transactionTable.classList.add("mb-2", "overflow-hidden");
 
@@ -68,7 +68,7 @@ class Transaction {
                     ElementFactory.createTableBody(
                         "transaction",
                         transactionTable,
-                        transactions
+                        transactions,
                     );
 
                     transactionTableRow.appendChild(transactionTableCol);
@@ -85,7 +85,7 @@ class Transaction {
                 } else {
                     console.error(
                         "Error fetching transaction data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })

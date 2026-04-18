@@ -1,290 +1,150 @@
 <?php
+header('Content-Type: application/json');
 
-require_once "mysql_conn.php";
+require_once __DIR__ . '/../lib/jwt_helper.php';
+require_once 'mysql_conn.php';
+
+JWTHelper::authenticateAPI();
+
 $conf = new DBConnection();
 $conn = $conf->connect();
 
-$method = $_SERVER['REQUEST_METHOD'];
+$action = $_GET['action'] ?? '';
 
-switch ($method) {
-    case 'GET':
-        $action = isset($_GET['action']) ? $_GET['action'] : '';
-
-        switch ($action) {
-            case 'get_overview':
-                retrieveOverviewData();
-                break;
-            case 'get_product_chart':
-                retrieveProductChartData();
-                break;
-            case 'get_purchase_chart':
-                retrievePurchaseChartData();
-                break;
-            case 'get_sale_chart':
-                retrieveSaleChartData();
-                break;
-            case 'get_revenue_profit_chart':
-                retrieveRevenueProfitChartData();
-                break;
-            case 'get_low_stock_chart':
-                retrieveLowStockChartData();
-                break;
-            case 'get_best_selling_chart':
-                retrieveBestSellingChartData();
-                break;
-            default:
-                // Unsupported action
-                http_response_code(400); // Bad Request
-                echo json_encode(array('error_msg' => 'Unsupported action'));
-        }
+switch ($action) {
+    case 'get_overview':
+        getOverview();
         break;
-
+    case 'get_product_chart':
+        getProductChart();
+        break;
+    case 'get_purchase_chart':
+        getPurchaseChart();
+        break;
+    case 'get_sale_chart':
+        getSaleChart();
+        break;
+    case 'get_revenue_profit_chart':
+        getRevenueProfitChart();
+        break;
+    case 'get_low_stock_chart':
+        getLowStockChart();
+        break;
+    case 'get_best_selling_chart':
+        getBestSellingChart();
+        break;
     default:
-        // Unsupported method
-        http_response_code(405); // Method Not Allowed
-        echo json_encode(array('error_msg' => 'Unsupported HTTP method'));
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error_msg' => 'Unknown action']);
 }
 
-function retrieveOverviewData()
+function getOverview()
 {
     global $conn;
+    $data = [];
 
-    try {
-        // Total available stock
-        $totalAvailableStockQuery = "SELECT SUM(quantity) AS total_quantity FROM product;";
-        $totalAvailableStockResult = mysqli_query($conn, $totalAvailableStockQuery);
-        $totalAvailableStock = mysqli_fetch_assoc($totalAvailableStockResult)['total_quantity'];
+    $queries = [
+        'total_stock'    => "SELECT COALESCE(SUM(quantity), 0) AS v FROM product",
+        'low_stock'      => "SELECT COUNT(*) AS v FROM product WHERE quantity > 0 AND quantity < 20",
+        'out_of_stock'   => "SELECT COUNT(*) AS v FROM product WHERE quantity = 0",
+        'total_sales'    => "SELECT COALESCE(SUM(quantity * unit_price), 0) AS v FROM `transaction` WHERE type_id = 1",
+        'total_purchases' => "SELECT COALESCE(SUM(quantity * unit_price), 0) AS v FROM `transaction` WHERE type_id = 2",
+    ];
 
-        // Low stock product
-        $lowStockProductQuery = "SELECT COUNT(product_id) AS low_stock_product FROM product WHERE quantity < 20;";
-        $lowStockProductResult = mysqli_query($conn, $lowStockProductQuery);
-        $lowStockProductData = mysqli_fetch_assoc($lowStockProductResult);
-        $lowStockProductCount = $lowStockProductData['low_stock_product'];
-
-        // Out of stock
-        $outOfStockQuery = "SELECT COUNT(product_id) AS out_of_stock_product FROM product WHERE quantity = 0;";
-        $outOfStockResult = mysqli_query($conn, $outOfStockQuery);
-        $outOfStockProductCount = mysqli_fetch_assoc($outOfStockResult)['out_of_stock_product'];
-
-        // Total Sales
-        $totalSalesQuery = "SELECT SUM(quantity * unit_price) AS total_sales FROM `transaction` WHERE type_id = 1;";
-        $totalSalesResult = mysqli_query($conn, $totalSalesQuery);
-        $totalSales = mysqli_fetch_assoc($totalSalesResult)['total_sales'];
-
-        // Total Purchases
-        $totalPurchasesQuery = "SELECT SUM(quantity * unit_price) AS total_purchases FROM `transaction` WHERE type_id = 2;";
-        $totalPurchasesResult = mysqli_query($conn, $totalPurchasesQuery);
-        $totalPurchases = mysqli_fetch_assoc($totalPurchasesResult)['total_purchases'];
-
-        // Now create the overviewContents array with the fetched data
-        $overviewContents = [
-            [
-                'title' => 'TOTAL AVAILABLE STOCKS',
-                'value' => $totalAvailableStock,
-            ],
-            [
-                'title' => 'LOW IN STOCK',
-                'value' => $lowStockProductCount,
-            ],
-            [
-                'title' => 'OUT OF STOCK',
-                'value' => $outOfStockProductCount,
-            ],
-            [
-                'title' => 'TOTAL PURCHASES',
-                'value' => $totalPurchases,
-            ],
-            [
-                'title' => 'TOTAL SALES',
-                'value' => $totalSales,
-            ],
-        ];
-
-        echo json_encode(array(
-            'success' => true,
-            'overview_contents' => $overviewContents
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage()
-        ));
+    foreach ($queries as $key => $sql) {
+        $r = $conn->query($sql);
+        $data[$key] = $r->fetch_assoc()['v'];
     }
+
+    echo json_encode(['success' => true, 'data' => $data]);
 }
 
-function retrieveProductChartData()
+function getProductChart()
 {
     global $conn;
-
-    try {
-        $productDataQuery = "SELECT c.category_name, COUNT(p.product_id) AS total_products FROM product p INNER JOIN category c ON p.category_id = c.category_id GROUP BY p.category_id;";
-
-        $productDataResult = mysqli_query($conn, $productDataQuery);
-
-        $productData = [];
-        while ($row = mysqli_fetch_assoc($productDataResult)) {
-            $productData[] = [
-                'category_name' => $row['category_name'],
-                'value' => $row['total_products'],
-            ];
-        }
-
-        echo json_encode(array(
-            'success' => true,
-            'product_data' => $productData,
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage(),
-        ));
-    }
+    $result = $conn->query(
+        "SELECT c.category_name, COUNT(p.product_id) AS total
+         FROM product p INNER JOIN category c ON p.category_id = c.category_id
+         GROUP BY c.category_id ORDER BY total DESC"
+    );
+    $rows = [];
+    while ($row = $result->fetch_assoc()) $rows[] = $row;
+    echo json_encode(['success' => true, 'data' => $rows]);
 }
 
-function retrievePurchaseChartData()
+function getPurchaseChart()
 {
     global $conn;
-
-    try {
-        $purchaseDataQuery = "SELECT MONTHNAME(created) AS month, SUM(quantity * unit_price) AS total_purchase FROM `transaction` WHERE type_id = 2 AND YEAR(created) = YEAR(CURDATE()) GROUP BY month ORDER BY month;";
-
-        $purchaseDataResult = mysqli_query($conn, $purchaseDataQuery);
-
-        $purchaseData = [];
-        while ($row = mysqli_fetch_assoc($purchaseDataResult)) {
-            $purchaseData[] = [
-                'month' => $row['month'],
-                'purchase' => $row['total_purchase'],
-            ];
-        }
-
-        echo json_encode(array(
-            'success' => true,
-            'purchase_data' => $purchaseData,
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage(),
-        ));
-    }
+    $result = $conn->query(
+        "SELECT MONTH(created) AS month_num, MONTHNAME(created) AS month,
+                SUM(quantity * unit_price) AS total
+         FROM `transaction` WHERE type_id = 2 AND YEAR(created) = YEAR(CURDATE())
+         GROUP BY MONTH(created) ORDER BY month_num"
+    );
+    $rows = [];
+    while ($row = $result->fetch_assoc()) $rows[] = ['month' => $row['month'], 'value' => (float)$row['total']];
+    echo json_encode(['success' => true, 'data' => $rows]);
 }
 
-function retrieveSaleChartData()
+function getSaleChart()
 {
     global $conn;
-
-    try {
-        $saleDataQuery = "SELECT MONTHNAME(created) AS month, SUM(quantity * unit_price) AS total_sale FROM `transaction` WHERE type_id = 1 AND YEAR(created) = YEAR(CURDATE()) GROUP BY month ORDER BY month;";
-
-        $saleDataResult = mysqli_query($conn, $saleDataQuery);
-
-        $saleData = [];
-        while ($row = mysqli_fetch_assoc($saleDataResult)) {
-            $saleData[] = [
-                'month' => $row['month'],
-                'sale' => $row['total_sale'],
-            ];
-        }
-
-        echo json_encode(array(
-            'success' => true,
-            'sale_data' => $saleData,
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage(),
-        ));
-    }
+    $result = $conn->query(
+        "SELECT MONTH(created) AS month_num, MONTHNAME(created) AS month,
+                SUM(quantity * unit_price) AS total
+         FROM `transaction` WHERE type_id = 1 AND YEAR(created) = YEAR(CURDATE())
+         GROUP BY MONTH(created) ORDER BY month_num"
+    );
+    $rows = [];
+    while ($row = $result->fetch_assoc()) $rows[] = ['month' => $row['month'], 'value' => (float)$row['total']];
+    echo json_encode(['success' => true, 'data' => $rows]);
 }
 
-function retrieveRevenueProfitChartData()
+function getRevenueProfitChart()
 {
     global $conn;
-
-    try {
-        $revenueProfitDataQuery = "SELECT MONTHNAME(t.created) AS month, SUM(CASE WHEN t.type_id = 1 THEN t.unit_price * t.quantity ELSE 0 END) AS total_revenue, SUM(CASE WHEN t.type_id = 1 THEN (t.unit_price - ph.cost_price) * t.quantity ELSE 0 END) AS total_profit FROM `transaction` t INNER JOIN price_history ph ON t.product_id = ph.product_id WHERE t.type_id = 1 AND YEAR(t.created) = YEAR(CURRENT_DATE) AND t.created BETWEEN ph.start_date AND COALESCE(ph.end_date, NOW()) GROUP BY month ORDER BY month;";
-
-        $revenueProfitDataResult = mysqli_query($conn, $revenueProfitDataQuery);
-
-        $revenueProfitData = [];
-        while ($row = mysqli_fetch_assoc($revenueProfitDataResult)) {
-            $revenueProfitData[] = [
-                'month' => $row['month'],
-                'revenue' => $row['total_revenue'],
-                'profit' => $row['total_profit'],
-            ];
-        }
-
-        echo json_encode(array(
-            'success' => true,
-            'revenue_profit_data' => $revenueProfitData,
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage(),
-        ));
+    $result = $conn->query(
+        "SELECT MONTH(t.created) AS month_num, MONTHNAME(t.created) AS month,
+                SUM(t.unit_price * t.quantity) AS revenue,
+                SUM((t.unit_price - p.cost_price) * t.quantity) AS profit
+         FROM `transaction` t
+         INNER JOIN product p ON t.product_id = p.product_id
+         WHERE t.type_id = 1
+           AND YEAR(t.created) = YEAR(CURRENT_DATE)
+         GROUP BY MONTH(t.created) ORDER BY month_num"
+    );
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = ['month' => $row['month'], 'revenue' => (float)$row['revenue'], 'profit' => (float)$row['profit']];
     }
+    echo json_encode(['success' => true, 'data' => $rows]);
 }
 
-function retrieveLowStockChartData()
+function getLowStockChart()
 {
     global $conn;
-
-    try {
-        $lowStockDataQuery = "SELECT product_name, quantity FROM product WHERE quantity < 20;";
-
-        $lowStockDataResult = mysqli_query($conn, $lowStockDataQuery);
-
-        $lowStockData = [];
-        while ($row = mysqli_fetch_assoc($lowStockDataResult)) {
-            $lowStockData[] = [
-                'product_name' => htmlspecialchars_decode($row['product_name']),
-                'quantity' => $row['quantity'],
-            ];
-        }
-
-        echo json_encode(array(
-            'success' => true,
-            'low_stock_data' => $lowStockData,
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage(),
-        ));
+    $result = $conn->query("SELECT product_name, quantity FROM product WHERE quantity > 0 AND quantity < 20 ORDER BY quantity ASC LIMIT 10");
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = ['label' => htmlspecialchars_decode($row['product_name']), 'value' => (int)$row['quantity']];
     }
+    echo json_encode(['success' => true, 'data' => $rows]);
 }
 
-function retrieveBestSellingChartData()
+function getBestSellingChart()
 {
     global $conn;
-
-    try {
-        $bestSellingDataQuery = "SELECT p.product_name, SUM(t.quantity) AS total_quantity_sold FROM product p INNER JOIN `transaction` t ON p.product_id = t.product_id WHERE t.type_id = 1 GROUP BY p.product_id, p.product_name, p.category_id, p.supplier_id, p.product_code, p.description ORDER BY total_quantity_sold DESC LIMIT 6;";
-
-        $bestSellingDataResult = mysqli_query($conn, $bestSellingDataQuery);
-
-        $bestSellingData = [];
-        while ($row = mysqli_fetch_assoc($bestSellingDataResult)) {
-            $bestSellingData[] = [
-                'product_name' => htmlspecialchars_decode($row['product_name']),
-                'quantity_sold' => $row['total_quantity_sold'],
-            ];
-        }
-
-        echo json_encode(array(
-            'success' => true,
-            'best_selling_data' => $bestSellingData,
-        ));
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage(),
-        ));
+    $result = $conn->query(
+        "SELECT p.product_name, SUM(t.quantity) AS total_sold
+         FROM product p INNER JOIN `transaction` t ON p.product_id = t.product_id
+         WHERE t.type_id = 1
+         GROUP BY p.product_id ORDER BY total_sold DESC LIMIT 8"
+    );
+    $rows = [];
+    while ($row = $result->fetch_assoc()) {
+        $rows[] = ['label' => htmlspecialchars_decode($row['product_name']), 'value' => (int)$row['total_sold']];
     }
+    echo json_encode(['success' => true, 'data' => $rows]);
 }
 
 ?>

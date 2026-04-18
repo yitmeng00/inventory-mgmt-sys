@@ -81,7 +81,7 @@ class ElementFactory {
             "border",
             "border-0",
             "bg-inherit",
-            "text-secondary"
+            "text-secondary",
         );
 
         const icon = this.createIcon("fa-ellipsis");
@@ -96,7 +96,7 @@ class ElementFactory {
             "rounded",
             "py-2",
             "bg-white",
-            "d-none"
+            "d-none",
         );
         const exportBtnWrapper = this.createDiv();
         exportBtnWrapper.classList.add(
@@ -105,7 +105,7 @@ class ElementFactory {
             "py-2",
             "px-3",
             "d-flex",
-            "gap-2"
+            "gap-2",
         );
         const exportBtnText = this.createParagraph("Export Data");
         exportBtnText.classList.add("m-0");
@@ -149,7 +149,7 @@ class ElementFactory {
         inputType,
         inputName,
         inputValue,
-        disabled
+        disabled,
     ) => {
         const label = document.createElement("label");
         label.classList.add("fw-bold");
@@ -161,7 +161,7 @@ class ElementFactory {
             "px-2",
             "py-1",
             "w-100",
-            "rounded"
+            "rounded",
         );
         input.type = inputType;
         input.name = inputName;
@@ -184,7 +184,7 @@ class ElementFactory {
             "col-md-3",
             "col-lg-3",
             "col-xl-3",
-            "col-xxl-3"
+            "col-xxl-3",
         );
         const wrapperCol2 = this.createCol();
         wrapperCol2.classList.add(
@@ -193,7 +193,7 @@ class ElementFactory {
             "col-md-9",
             "col-lg-9",
             "col-xl-9",
-            "col-xxl-9"
+            "col-xxl-9",
         );
         wrapper.appendChild(wrapperRow);
         wrapperRow.appendChild(wrapperCol1);
@@ -210,7 +210,7 @@ class ElementFactory {
         idPropertyName,
         namePropertyName,
         disabled,
-        selectedID
+        selectedID,
     ) => {
         const label = document.createElement("label");
         label.classList.add("fw-bold");
@@ -222,7 +222,7 @@ class ElementFactory {
             "px-2",
             "py-1",
             "w-100",
-            "rounded"
+            "rounded",
         );
         select.name = idPropertyName;
         select.disabled = disabled;
@@ -249,7 +249,7 @@ class ElementFactory {
             "col-md-3",
             "col-lg-3",
             "col-xl-3",
-            "col-xxl-3"
+            "col-xxl-3",
         );
         const wrapperCol2 = this.createCol();
         wrapperCol2.classList.add(
@@ -258,7 +258,7 @@ class ElementFactory {
             "col-md-9",
             "col-lg-9",
             "col-xl-9",
-            "col-xxl-9"
+            "col-xxl-9",
         );
         wrapper.appendChild(wrapperRow);
         wrapperRow.appendChild(wrapperCol1);
@@ -356,7 +356,7 @@ class ElementFactory {
 
                 const viewDetailButton = this.createButton(
                     "button",
-                    "View Detail"
+                    "View Detail",
                 );
                 viewDetailButton.classList.add("ims__view-detail-btn");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
@@ -398,7 +398,7 @@ class ElementFactory {
 
                 const viewDetailButton = this.createButton(
                     "button",
-                    "View Detail"
+                    "View Detail",
                 );
                 viewDetailButton.classList.add("ims__view-detail-btn");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
@@ -440,7 +440,7 @@ class ElementFactory {
 
                 const viewDetailButton = this.createButton(
                     "button",
-                    "View Detail"
+                    "View Detail",
                 );
                 viewDetailButton.classList.add("ims__view-detail-btn");
                 viewDetailButton.setAttribute("data-bs-toggle", "modal");
@@ -468,7 +468,7 @@ class ElementFactory {
             const titleRow = this.createTitle(content.title, "p");
             titleRow.classList.add(
                 "ims__overview-content-title",
-                "text-secondary"
+                "text-secondary",
             );
 
             const dataRow = this.createRow();
@@ -526,7 +526,7 @@ class ElementFactory {
             "col-md-12",
             "col-lg-12",
             "col-xl-6",
-            "col-xxl-6"
+            "col-xxl-6",
         );
 
         const chartContentRow = this.createRow();
@@ -535,12 +535,12 @@ class ElementFactory {
         chartContentContainer.classList.add(
             "dashboard__chart-content",
             "p-3",
-            "position-relative"
+            "position-relative",
         );
 
         const exportButton = this.createExportButton(
             chartContentContainer,
-            data
+            data,
         );
 
         const chartCanvas = this.createCanvas(id);
@@ -673,7 +673,7 @@ class ElementFactory {
             "col-md-12",
             "col-lg-12",
             "col-xl-6",
-            "col-xxl-6"
+            "col-xxl-6",
         );
 
         const chartContentRow = this.createRow();
@@ -682,13 +682,13 @@ class ElementFactory {
         chartContentContainer.classList.add(
             "dashboard__chart-content",
             "p-3",
-            "position-relative"
+            "position-relative",
         );
 
         // Putting dummy data
         const exportButton = this.createExportButton(
             chartContentContainer,
-            dummyData
+            dummyData,
         );
 
         const chartCanvas = this.createCanvas(id);
@@ -703,7 +703,7 @@ class ElementFactory {
         // Putting dummy data
         const months = dummyData.map((entry) => entry.month);
         const purchaseValues = dummyData.map((entry) =>
-            parseFloat(entry.purchase)
+            parseFloat(entry.purchase),
         );
 
         const chartData = {
@@ -811,7 +811,7 @@ class ElementFactory {
             "col-md-12",
             "col-lg-12",
             "col-xl-6",
-            "col-xxl-6"
+            "col-xxl-6",
         );
 
         const chartContentRow = this.createRow();
@@ -820,13 +820,13 @@ class ElementFactory {
         chartContentContainer.classList.add(
             "dashboard__chart-content",
             "p-3",
-            "position-relative"
+            "position-relative",
         );
 
         // Putting dummy data
         const exportButton = this.createExportButton(
             chartContentContainer,
-            dummyData
+            dummyData,
         );
 
         const chartCanvas = this.createCanvas(id);
@@ -959,7 +959,7 @@ class ElementFactory {
             "col-md-12",
             "col-lg-12",
             "col-xl-6",
-            "col-xxl-6"
+            "col-xxl-6",
         );
 
         const chartContentRow = this.createRow();
@@ -968,13 +968,13 @@ class ElementFactory {
         chartContentContainer.classList.add(
             "dashboard__chart-content",
             "p-3",
-            "position-relative"
+            "position-relative",
         );
 
         // Putting dummy data
         const exportButton = this.createExportButton(
             chartContentContainer,
-            dummyData
+            dummyData,
         );
 
         const chartCanvas = this.createCanvas(id);
@@ -989,7 +989,7 @@ class ElementFactory {
         // Putting dummy data
         const months = dummyData.map((entry) => entry.month);
         const revenueValues = dummyData.map((entry) =>
-            parseFloat(entry.revenue)
+            parseFloat(entry.revenue),
         );
         const profitValues = dummyData.map((entry) => parseFloat(entry.profit));
 
@@ -1055,7 +1055,7 @@ class ElementFactory {
             "col-md-12",
             "col-lg-12",
             "col-xl-6",
-            "col-xxl-6"
+            "col-xxl-6",
         );
 
         const chartContentRow = this.createRow();
@@ -1064,12 +1064,12 @@ class ElementFactory {
         chartContentContainer.classList.add(
             "dashboard__chart-content",
             "p-3",
-            "position-relative"
+            "position-relative",
         );
 
         const exportButton = this.createExportButton(
             chartContentContainer,
-            data
+            data,
         );
 
         const chartCanvas = this.createCanvas(id);
@@ -1150,7 +1150,7 @@ class ElementFactory {
             "col-md-12",
             "col-lg-12",
             "col-xl-6",
-            "col-xxl-6"
+            "col-xxl-6",
         );
 
         const chartContentRow = this.createRow();
@@ -1159,12 +1159,12 @@ class ElementFactory {
         chartContentContainer.classList.add(
             "dashboard__chart-content",
             "p-3",
-            "position-relative"
+            "position-relative",
         );
 
         const exportButton = this.createExportButton(
             chartContentContainer,
-            data
+            data,
         );
 
         const chartCanvas = this.createCanvas(id);
@@ -1267,7 +1267,7 @@ class ElementFactory {
             "modal-dialog",
             "modal-lg",
             "modal-dialog-centered",
-            "modal-dialog-scrollable"
+            "modal-dialog-scrollable",
         );
 
         var modalContent = this.createDiv();
@@ -1378,7 +1378,7 @@ class ElementFactory {
                     productImgContainer.classList.add("text-center");
                     const productImg = this.createImage(
                         productImgSrc,
-                        "Product Image"
+                        "Product Image",
                     );
                     productImg.classList.add("ims__product-img");
 
@@ -1400,21 +1400,21 @@ class ElementFactory {
                                     "category_id",
                                     "category_name",
                                     true,
-                                    selectedCategoryId
+                                    selectedCategoryId,
                                 );
 
                                 formCol2.appendChild(categoryDropdown);
                             } else {
                                 console.error(
                                     "Error fetching category data: ",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching category data: ",
-                                error
+                                error,
                             );
                         });
 
@@ -1433,21 +1433,21 @@ class ElementFactory {
                                     "supplier_id",
                                     "supplier_name",
                                     true,
-                                    selectedSupplierId
+                                    selectedSupplierId,
                                 );
 
                                 formCol2.appendChild(supplierDropdown);
                             } else {
                                 console.error(
                                     "Error fetching supplier data: ",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching supplier data: ",
-                                error
+                                error,
                             );
                         });
 
@@ -1456,35 +1456,35 @@ class ElementFactory {
                         "text",
                         "product_code",
                         product_code,
-                        true
+                        true,
                     );
                     const productNameInput = this.createInput(
                         "Product Name:",
                         "text",
                         "product_name",
                         product_name,
-                        true
+                        true,
                     );
                     const descriptionInput = this.createInput(
                         "Description:",
                         "text",
                         "description",
                         description,
-                        true
+                        true,
                     );
                     const costPriceInput = this.createInput(
                         "Cost Price:",
                         "number",
                         "cost_price",
                         cost_price,
-                        true
+                        true,
                     );
                     const salePriceInput = this.createInput(
                         "Sale Price:",
                         "number",
                         "sale_price",
                         sale_price,
-                        true
+                        true,
                     );
 
                     const quantityInputContainer = this.createDiv();
@@ -1497,7 +1497,7 @@ class ElementFactory {
                         "col-md-3",
                         "col-lg-3",
                         "col-xl-3",
-                        "col-xxl-3"
+                        "col-xxl-3",
                     );
                     const wrapperCol2 = this.createCol();
                     wrapperCol2.classList.add(
@@ -1506,7 +1506,7 @@ class ElementFactory {
                         "col-md-9",
                         "col-lg-9",
                         "col-xl-9",
-                        "col-xxl-9"
+                        "col-xxl-9",
                     );
                     const quantityInputLabel = this.createLabel("Quantity:");
                     const quantityInput = this.createParagraph(quantity);
@@ -1523,7 +1523,7 @@ class ElementFactory {
                         "d-flex",
                         "flex-row",
                         "justify-content-end",
-                        "gap-2"
+                        "gap-2",
                     );
                     const editButton = this.createButton("button", "Edit");
                     editButton.classList.add("ims__view-detail-edit-btn");
@@ -1532,7 +1532,7 @@ class ElementFactory {
                             editButton,
                             form,
                             product_id,
-                            product_code
+                            product_code,
                         );
                     });
 
@@ -1559,7 +1559,7 @@ class ElementFactory {
                 } else {
                     console.error(
                         "Error fetching product data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -1583,14 +1583,14 @@ class ElementFactory {
                         "category_id",
                         "category_name",
                         false,
-                        ""
+                        "",
                     );
 
                     form.appendChild(categoryDropdown);
                 } else {
                     console.error(
                         "Error fetching category data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -1612,14 +1612,14 @@ class ElementFactory {
                         "supplier_id",
                         "supplier_name",
                         false,
-                        ""
+                        "",
                     );
 
                     form.appendChild(supplierDropdown);
                 } else {
                     console.error(
                         "Error fetching supplier data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -1632,42 +1632,42 @@ class ElementFactory {
             "text",
             "product_code",
             "",
-            false
+            false,
         );
         const productNameInput = this.createInput(
             "Product Name:",
             "text",
             "product_name",
             "",
-            false
+            false,
         );
         const descriptionInput = this.createInput(
             "Description:",
             "text",
             "description",
             "",
-            false
+            false,
         );
         const costPriceInput = this.createInput(
             "Cost Price:",
             "number",
             "cost_price",
             "",
-            false
+            false,
         );
         const salePriceInput = this.createInput(
             "Sale Price:",
             "number",
             "sale_price",
             "",
-            false
+            false,
         );
         const attachmentInput = this.createInput(
             "Attachment:",
             "file",
             "attachment",
             "",
-            false
+            false,
         );
         attachmentInput.id = "ims__add-product-img-input";
 
@@ -1699,7 +1699,7 @@ class ElementFactory {
         editButton,
         form,
         productId,
-        productCode
+        productCode,
     ) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
@@ -1713,7 +1713,7 @@ class ElementFactory {
         } else {
             // Save Changes mode - Prompt user for confirmation
             const userConfirmed = window.confirm(
-                "Are you sure you want to make the changes for the product detail?"
+                "Are you sure you want to make the changes for the product detail?",
             );
 
             if (userConfirmed) {
@@ -1747,7 +1747,7 @@ class ElementFactory {
                             } = data.product_data;
 
                             const productTable = $(
-                                "#ims__product-table"
+                                "#ims__product-table",
                             ).DataTable();
 
                             // Find the row index based on the productCode
@@ -1821,7 +1821,7 @@ class ElementFactory {
                         } else {
                             console.error(
                                 "Error updating product:",
-                                data.error_msg
+                                data.error_msg,
                             );
                         }
                     })
@@ -1834,7 +1834,7 @@ class ElementFactory {
 
     static handleProductDltBtnEvent = (productId, productCode) => {
         const userConfirmed = window.confirm(
-            "Are you sure you want to delete this product?"
+            "Are you sure you want to delete this product?",
         );
 
         if (userConfirmed) {
@@ -1849,7 +1849,7 @@ class ElementFactory {
                 .then((data) => {
                     if (data.success) {
                         const productTable = $(
-                            "#ims__product-table"
+                            "#ims__product-table",
                         ).DataTable();
 
                         // Find the row in DataTable based on the productCode and remove it
@@ -1871,7 +1871,7 @@ class ElementFactory {
                     } else {
                         console.error(
                             "Error deleting product:",
-                            data.error_msg
+                            data.error_msg,
                         );
                     }
                 })
@@ -1883,7 +1883,7 @@ class ElementFactory {
 
     static handleProductFormEvent = (form, tableType) => {
         const fileInput = document.querySelector(
-            '#ims__add-product-img-input input[type="file"]'
+            '#ims__add-product-img-input input[type="file"]',
         );
 
         const formData = new FormData(form);
@@ -1902,13 +1902,13 @@ class ElementFactory {
 
                     const viewDetailButton = this.createButton(
                         "button",
-                        "View Detail"
+                        "View Detail",
                     );
                     viewDetailButton.classList.add("ims__view-detail-btn");
                     viewDetailButton.setAttribute("data-bs-toggle", "modal");
                     viewDetailButton.setAttribute(
                         "data-bs-target",
-                        "#ims__modal"
+                        "#ims__modal",
                     );
 
                     const viewDetailButtonHTML = viewDetailButton.outerHTML;
@@ -1946,7 +1946,7 @@ class ElementFactory {
 
                     // Attach the event listener to the button in the last added row
                     const lastRowViewDetailButton = lastRowNode.querySelector(
-                        ".ims__view-detail-btn"
+                        ".ims__view-detail-btn",
                     );
                     lastRowViewDetailButton.addEventListener("click", () => {
                         this.showModal("Detail", tableType, data.product_data);
@@ -1967,7 +1967,7 @@ class ElementFactory {
             `db/transaction_db.php?transaction_id=${response.transaction_id}`,
             {
                 method: "GET",
-            }
+            },
         )
             .then((response) => response.json())
             .then((data) => {
@@ -1997,21 +1997,21 @@ class ElementFactory {
                                     "type_id",
                                     "type_name",
                                     true,
-                                    type_id
+                                    type_id,
                                 );
 
                                 form.appendChild(typeDropdown);
                             } else {
                                 console.error(
                                     "Error fetching transaction type data: ",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching transaction type data: ",
-                                error
+                                error,
                             );
                         });
 
@@ -2029,21 +2029,21 @@ class ElementFactory {
                                     "product_id",
                                     "product_name",
                                     true,
-                                    product_id
+                                    product_id,
                                 );
 
                                 form.appendChild(productDropdown);
                             } else {
                                 console.error(
                                     "Error fetching product data: ",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product data: ",
-                                error
+                                error,
                             );
                         });
 
@@ -2052,7 +2052,7 @@ class ElementFactory {
                         "number",
                         "quantity",
                         quantity,
-                        true
+                        true,
                     );
 
                     const txnCodeInputContainer = this.createDiv();
@@ -2065,7 +2065,7 @@ class ElementFactory {
                         "col-md-3",
                         "col-lg-3",
                         "col-xl-3",
-                        "col-xxl-3"
+                        "col-xxl-3",
                     );
                     const txnCodeWrapperCol2 = this.createCol();
                     txnCodeWrapperCol2.classList.add(
@@ -2074,7 +2074,7 @@ class ElementFactory {
                         "col-md-9",
                         "col-lg-9",
                         "col-xl-9",
-                        "col-xxl-9"
+                        "col-xxl-9",
                     );
                     const txnCodeInputLabel =
                         this.createLabel("Transaction Code:");
@@ -2095,7 +2095,7 @@ class ElementFactory {
                         "col-md-3",
                         "col-lg-3",
                         "col-xl-3",
-                        "col-xxl-3"
+                        "col-xxl-3",
                     );
                     const prodCodeWrapperCol2 = this.createCol();
                     prodCodeWrapperCol2.classList.add(
@@ -2104,7 +2104,7 @@ class ElementFactory {
                         "col-md-9",
                         "col-lg-9",
                         "col-xl-9",
-                        "col-xxl-9"
+                        "col-xxl-9",
                     );
                     const prodCodeInputLabel =
                         this.createLabel("Product Code:");
@@ -2125,7 +2125,7 @@ class ElementFactory {
                         "col-md-3",
                         "col-lg-3",
                         "col-xl-3",
-                        "col-xxl-3"
+                        "col-xxl-3",
                     );
                     const unitPriceWrapperCol2 = this.createCol();
                     unitPriceWrapperCol2.classList.add(
@@ -2134,7 +2134,7 @@ class ElementFactory {
                         "col-md-9",
                         "col-lg-9",
                         "col-xl-9",
-                        "col-xxl-9"
+                        "col-xxl-9",
                     );
                     const unitPriceInputLabel = this.createLabel("Unit Price:");
                     const unitPriceInput = this.createParagraph(unit_price);
@@ -2154,7 +2154,7 @@ class ElementFactory {
                         "col-md-3",
                         "col-lg-3",
                         "col-xl-3",
-                        "col-xxl-3"
+                        "col-xxl-3",
                     );
                     const createdInputWrapperCol2 = this.createCol();
                     createdInputWrapperCol2.classList.add(
@@ -2163,7 +2163,7 @@ class ElementFactory {
                         "col-md-9",
                         "col-lg-9",
                         "col-xl-9",
-                        "col-xxl-9"
+                        "col-xxl-9",
                     );
                     const createdInputLabel = this.createLabel("Created:");
                     const createdInput = this.createParagraph(created);
@@ -2180,7 +2180,7 @@ class ElementFactory {
                         "d-flex",
                         "flex-row",
                         "justify-content-end",
-                        "gap-2"
+                        "gap-2",
                     );
                     const editButton = this.createButton("button", "Edit");
                     editButton.classList.add("ims__view-detail-edit-btn");
@@ -2189,7 +2189,7 @@ class ElementFactory {
                             editButton,
                             form,
                             transaction_id,
-                            transaction_code
+                            transaction_code,
                         );
                     });
 
@@ -2199,7 +2199,7 @@ class ElementFactory {
                         this.handleTransactionDltBtnEvent(
                             transaction_id,
                             transaction_code,
-                            product_id
+                            product_id,
                         );
                     });
                     btnWrapperRow.appendChild(btnWrapperCol);
@@ -2219,7 +2219,7 @@ class ElementFactory {
                 } else {
                     console.error(
                         "Error fetching transaction data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -2243,14 +2243,14 @@ class ElementFactory {
                         "type_id",
                         "type_name",
                         false,
-                        ""
+                        "",
                     );
 
                     form.appendChild(typeDropdown);
                 } else {
                     console.error(
                         "Error fetching transaction type data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -2272,14 +2272,14 @@ class ElementFactory {
                         "product_id",
                         "product_name",
                         false,
-                        ""
+                        "",
                     );
 
                     form.appendChild(productDropdown);
                 } else {
                     console.error(
                         "Error fetching product data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -2292,7 +2292,7 @@ class ElementFactory {
             "number",
             "quantity",
             "",
-            false
+            false,
         );
 
         const submitButtonContainer = this.createDiv();
@@ -2318,7 +2318,7 @@ class ElementFactory {
         editButton,
         form,
         transactionId,
-        transactionCode
+        transactionCode,
     ) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
@@ -2332,7 +2332,7 @@ class ElementFactory {
         } else {
             // Save Changes mode - Prompt user for confirmation
             const userConfirmed = window.confirm(
-                "Are you sure you want to make the changes for the transaction detail?"
+                "Are you sure you want to make the changes for the transaction detail?",
             );
 
             if (userConfirmed) {
@@ -2356,7 +2356,7 @@ class ElementFactory {
                     .then((data) => {
                         if (data.success) {
                             const transactionTable = $(
-                                "#ims__transaction-table"
+                                "#ims__transaction-table",
                             ).DataTable();
 
                             // Find the row index based on the transaction_code
@@ -2426,7 +2426,7 @@ class ElementFactory {
                         } else {
                             console.error(
                                 "Error updating transaction:",
-                                data.error_msg
+                                data.error_msg,
                             );
                         }
                     })
@@ -2440,10 +2440,10 @@ class ElementFactory {
     static handleTransactionDltBtnEvent = (
         transactionId,
         transactionCode,
-        productId
+        productId,
     ) => {
         const userConfirmed = window.confirm(
-            "Are you sure you want to delete this transaction?"
+            "Are you sure you want to delete this transaction?",
         );
 
         if (userConfirmed) {
@@ -2461,7 +2461,7 @@ class ElementFactory {
                 .then((data) => {
                     if (data.success) {
                         const transactionTable = $(
-                            "#ims__transaction-table"
+                            "#ims__transaction-table",
                         ).DataTable();
 
                         // Find the row in DataTable based on the transactionCode and remove it
@@ -2483,7 +2483,7 @@ class ElementFactory {
                     } else {
                         console.error(
                             "Error deleting transaction:",
-                            data.error_msg
+                            data.error_msg,
                         );
                     }
                 })
@@ -2504,23 +2504,23 @@ class ElementFactory {
             .then((data) => {
                 if (data.success) {
                     const transactionTable = $(
-                        "#ims__transaction-table"
+                        "#ims__transaction-table",
                     ).DataTable();
 
                     const nextRowNumber = transactionTable.rows().count() + 1;
 
                     const viewDetailButton = this.createButton(
                         "button",
-                        "View Detail"
+                        "View Detail",
                     );
                     viewDetailButton.classList.add(
                         "btn",
-                        "ims__view-detail-btn"
+                        "ims__view-detail-btn",
                     );
                     viewDetailButton.setAttribute("data-bs-toggle", "modal");
                     viewDetailButton.setAttribute(
                         "data-bs-target",
-                        "#ims__modal"
+                        "#ims__modal",
                     );
 
                     const viewDetailButtonHTML = viewDetailButton.outerHTML;
@@ -2556,13 +2556,13 @@ class ElementFactory {
 
                     // Attach the event listener to the button in the last added row
                     const lastRowViewDetailButton = lastRowNode.querySelector(
-                        ".ims__view-detail-btn"
+                        ".ims__view-detail-btn",
                     );
                     lastRowViewDetailButton.addEventListener("click", () => {
                         this.showModal(
                             "Detail",
                             tableType,
-                            data.transaction_data
+                            data.transaction_data,
                         );
                     });
 
@@ -2603,7 +2603,7 @@ class ElementFactory {
                         "col-md-3",
                         "col-lg-3",
                         "col-xl-3",
-                        "col-xxl-3"
+                        "col-xxl-3",
                     );
                     const supplierCodeWrapperCol2 = this.createCol();
                     supplierCodeWrapperCol2.classList.add(
@@ -2612,14 +2612,14 @@ class ElementFactory {
                         "col-md-9",
                         "col-lg-9",
                         "col-xl-9",
-                        "col-xxl-9"
+                        "col-xxl-9",
                     );
                     const supplierCodeInputLabel =
                         this.createLabel("Supplier Code:");
                     const supplierCodeInput =
                         this.createParagraph(supplier_code);
                     supplierCodeInputContainer.appendChild(
-                        supplierCodeWrapperRow
+                        supplierCodeWrapperRow,
                     );
                     supplierCodeWrapperRow.appendChild(supplierCodeWrapperCol1);
                     supplierCodeWrapperRow.appendChild(supplierCodeWrapperCol2);
@@ -2631,7 +2631,7 @@ class ElementFactory {
                         "text",
                         "supplier_name",
                         supplier_name,
-                        true
+                        true,
                     );
 
                     const contactPersonInput = this.createInput(
@@ -2639,7 +2639,7 @@ class ElementFactory {
                         "text",
                         "contact_person",
                         contact_person,
-                        true
+                        true,
                     );
 
                     const contactNoInput = this.createInput(
@@ -2647,7 +2647,7 @@ class ElementFactory {
                         "text",
                         "contact_no",
                         contact_no,
-                        true
+                        true,
                     );
 
                     const emailInput = this.createInput(
@@ -2655,7 +2655,7 @@ class ElementFactory {
                         "text",
                         "email",
                         email,
-                        true
+                        true,
                     );
 
                     const locationInput = this.createInput(
@@ -2663,7 +2663,7 @@ class ElementFactory {
                         "text",
                         "location",
                         location,
-                        true
+                        true,
                     );
 
                     const btnWrapperRow = this.createRow();
@@ -2673,7 +2673,7 @@ class ElementFactory {
                         "d-flex",
                         "flex-row",
                         "justify-content-end",
-                        "gap-2"
+                        "gap-2",
                     );
 
                     const editButton = this.createButton("button", "Edit");
@@ -2683,7 +2683,7 @@ class ElementFactory {
                             editButton,
                             form,
                             supplier_id,
-                            supplier_code
+                            supplier_code,
                         );
                     });
 
@@ -2692,7 +2692,7 @@ class ElementFactory {
                     deleteButton.addEventListener("click", () => {
                         this.handleSupplierDltBtnEvent(
                             supplier_id,
-                            supplier_code
+                            supplier_code,
                         );
                     });
 
@@ -2711,7 +2711,7 @@ class ElementFactory {
                 } else {
                     console.error(
                         "Error fetching supplier data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })
@@ -2726,7 +2726,7 @@ class ElementFactory {
             "text",
             "supplier_name",
             "",
-            false
+            false,
         );
 
         const contactPersonInput = this.createInput(
@@ -2734,7 +2734,7 @@ class ElementFactory {
             "text",
             "contact_person",
             "",
-            false
+            false,
         );
 
         const contactNoInput = this.createInput(
@@ -2742,7 +2742,7 @@ class ElementFactory {
             "text",
             "contact_no",
             "",
-            false
+            false,
         );
 
         const emailInput = this.createInput(
@@ -2750,7 +2750,7 @@ class ElementFactory {
             "text",
             "email",
             "",
-            false
+            false,
         );
 
         const locationInput = this.createInput(
@@ -2758,7 +2758,7 @@ class ElementFactory {
             "text",
             "location",
             "",
-            false
+            false,
         );
 
         const submitButtonContainer = this.createDiv();
@@ -2785,7 +2785,7 @@ class ElementFactory {
         editButton,
         form,
         supplierId,
-        supplierCode
+        supplierCode,
     ) => {
         if (editButton.textContent === "Edit") {
             // Toggle to "Save Changes" mode
@@ -2799,7 +2799,7 @@ class ElementFactory {
         } else {
             // Save Changes mode - Prompt user for confirmation
             const userConfirmed = window.confirm(
-                "Are you sure you want to make the changes for the supplier detail?"
+                "Are you sure you want to make the changes for the supplier detail?",
             );
 
             if (userConfirmed) {
@@ -2823,7 +2823,7 @@ class ElementFactory {
                     .then((data) => {
                         if (data.success) {
                             const supplierTable = $(
-                                "#ims__supplier-table"
+                                "#ims__supplier-table",
                             ).DataTable();
 
                             // Find the row index based on the no
@@ -2897,7 +2897,7 @@ class ElementFactory {
                         } else {
                             console.error(
                                 "Error updating supplier:",
-                                data.error_msg
+                                data.error_msg,
                             );
                         }
                     })
@@ -2910,7 +2910,7 @@ class ElementFactory {
 
     static handleSupplierDltBtnEvent = (supplierId, supplierCode) => {
         const userConfirmed = window.confirm(
-            "Are you sure you want to delete this supplier?"
+            "Are you sure you want to delete this supplier?",
         );
 
         if (userConfirmed) {
@@ -2927,7 +2927,7 @@ class ElementFactory {
                 .then((data) => {
                     if (data.success) {
                         const supplierTable = $(
-                            "#ims__supplier-table"
+                            "#ims__supplier-table",
                         ).DataTable();
 
                         // Find the row in DataTable based on the supplierCode and remove it
@@ -2949,7 +2949,7 @@ class ElementFactory {
                     } else {
                         console.error(
                             "Error deleting supplier:",
-                            data.error_msg
+                            data.error_msg,
                         );
                     }
                 })
@@ -2975,16 +2975,16 @@ class ElementFactory {
 
                     const viewDetailButton = this.createButton(
                         "button",
-                        "View Detail"
+                        "View Detail",
                     );
                     viewDetailButton.classList.add(
                         "btn",
-                        "ims__view-detail-btn"
+                        "ims__view-detail-btn",
                     );
                     viewDetailButton.setAttribute("data-bs-toggle", "modal");
                     viewDetailButton.setAttribute(
                         "data-bs-target",
-                        "#ims__modal"
+                        "#ims__modal",
                     );
 
                     const viewDetailButtonHTML = viewDetailButton.outerHTML;
@@ -3018,7 +3018,7 @@ class ElementFactory {
 
                     // Attach the event listener to the button in the last added row
                     const lastRowViewDetailButton = lastRowNode.querySelector(
-                        ".ims__view-detail-btn"
+                        ".ims__view-detail-btn",
                     );
                     lastRowViewDetailButton.addEventListener("click", () => {
                         this.showModal("Detail", tableType, data.supplier_data);

@@ -48,3 +48,5 @@ function retrieveTransactionTypes()
     $stmt->close();
     $conn->close();
 }
+
+?>
