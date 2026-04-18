@@ -75,11 +75,12 @@ function retrieveSupplierById()
 function createSupplier()
 {
     global $conn;
-    $supplierName   = htmlspecialchars(trim($_POST['supplier_name'] ?? ''), ENT_QUOTES);
-    $contactPerson  = htmlspecialchars(trim($_POST['contact_person'] ?? ''), ENT_QUOTES);
-    $contactNo      = trim($_POST['contact_no'] ?? '');
-    $email          = htmlspecialchars(trim($_POST['email'] ?? ''), ENT_QUOTES);
-    $location       = htmlspecialchars(trim($_POST['location'] ?? ''), ENT_QUOTES);
+    $data           = json_decode(file_get_contents('php://input'), true) ?? [];
+    $supplierName   = htmlspecialchars(trim($data['supplier_name'] ?? ''), ENT_QUOTES);
+    $contactPerson  = htmlspecialchars(trim($data['contact_person'] ?? ''), ENT_QUOTES);
+    $contactNo      = trim($data['contact_no'] ?? '');
+    $email          = htmlspecialchars(trim($data['email'] ?? ''), ENT_QUOTES);
+    $location       = htmlspecialchars(trim($data['location'] ?? ''), ENT_QUOTES);
 
     if (!$supplierName || !$contactPerson || !$contactNo || !$email) {
         http_response_code(400);
