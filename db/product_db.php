@@ -17,7 +17,11 @@ switch ($method) {
         else retrieveProducts();
         break;
     case 'POST':
-        createProduct();
+        if (!empty($_POST['product_id'])) {
+            updateProduct();
+        } else {
+            createProduct();
+        }
         break;
     case 'PUT':
         updateProduct();
@@ -173,7 +177,14 @@ function createProduct()
 function updateProduct()
 {
     global $conn;
-    $data = json_decode(file_get_contents('php://input'), true);
+
+    $isMultipart = !empty($_POST);
+    if ($isMultipart) {
+        $data = $_POST;
+    } else {
+        $data = json_decode(file_get_contents('php://input'), true);
+    }
+
     if (!$data) {
         http_response_code(400);
         echo json_encode(['success' => false, 'error_msg' => 'Invalid input']);
@@ -195,14 +206,53 @@ function updateProduct()
         return;
     }
 
+    $newImgPath = null;
+    if ($isMultipart && isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = __DIR__ . '/../uploads/';
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+
+        $ext     = strtolower(pathinfo($_FILES['attachment']['name'], PATHINFO_EXTENSION));
+        $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!in_array($ext, $allowed)) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error_msg' => 'Invalid image type. Allowed: jpg, png, gif, webp']);
+            return;
+        }
+        $newFilename = uniqid('img_', true) . '.' . $ext;
+        if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $uploadDir . $newFilename)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error_msg' => 'File upload failed']);
+            return;
+        }
+        $newImgPath = 'uploads/' . $newFilename;
+    }
+
     try {
-        $stmt = $conn->prepare(
-            "UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, description=?, cost_price=?, sale_price=?
-             WHERE product_id=?"
-        );
-        $stmt->bind_param('siissddi', $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice, $productId);
-        $stmt->execute();
-        $stmt->close();
+        if ($newImgPath) {
+            $imgStmt = $conn->prepare("SELECT img_path FROM product WHERE product_id = ?");
+            $imgStmt->bind_param('i', $productId);
+            $imgStmt->execute();
+            $oldImg = $imgStmt->get_result()->fetch_assoc()['img_path'] ?? null;
+            $imgStmt->close();
+
+            $stmt = $conn->prepare(
+                "UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, description=?, cost_price=?, sale_price=?, img_path=?
+                 WHERE product_id=?"
+            );
+            $stmt->bind_param('siissddsi', $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice, $newImgPath, $productId);
+            $stmt->execute();
+            $stmt->close();
+
+            if ($oldImg) @unlink(__DIR__ . '/../' . $oldImg);
+        } else {
+            $stmt = $conn->prepare(
+                "UPDATE product SET product_name=?, category_id=?, supplier_id=?, product_code=?, description=?, cost_price=?, sale_price=?
+                 WHERE product_id=?"
+            );
+            $stmt->bind_param('siissddi', $productName, $categoryId, $supplierId, $productCode, $description, $costPrice, $salePrice, $productId);
+            $stmt->execute();
+            $stmt->close();
+        }
 
         $selStmt = $conn->prepare(
             "SELECT p.product_id, p.product_code, p.product_name, p.description,

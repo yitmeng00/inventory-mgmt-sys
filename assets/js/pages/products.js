@@ -162,9 +162,8 @@ async function handleSave() {
         let data;
         if (editProductId) {
             const formData = new FormData(form);
-            const payload = Object.fromEntries(formData.entries());
-            payload.product_id = editProductId;
-            data = await API.put("/db/product_db.php", payload);
+            formData.set("product_id", editProductId);
+            data = await API.postForm("/db/product_db.php", formData);
         } else {
             data = await API.postForm("/db/product_db.php", form);
         }
