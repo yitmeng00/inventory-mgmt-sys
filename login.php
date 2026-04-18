@@ -14,7 +14,7 @@ $page_title = 'Sign In';
 <html lang="en">
 <?php include 'includes/header.php'; ?>
 
-<body class="bg-slate-900 min-h-screen flex items-center justify-center p-4" data-page="login">
+<body class="bg-slate-800 min-h-screen flex items-center justify-center p-4" data-page="login">
 
     <div class="w-full max-w-md">
 
@@ -34,7 +34,7 @@ $page_title = 'Sign In';
 
             <!-- Error alert -->
             <div id="login-error" class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
-                <i class="fa-solid fa-circle-exclamation flex-shrink-0"></i>
+                <i class="fa-solid fa-circle-exclamation shrink-0"></i>
                 <span id="login-error-msg">Invalid credentials.</span>
             </div>
 
@@ -68,7 +68,7 @@ $page_title = 'Sign In';
                 <button id="login-btn" type="submit"
                     class="btn-primary w-full flex items-center justify-center gap-2 py-2.5">
                     <span id="login-btn-text">Sign In</span>
-                    <i id="login-spinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
+                    <i id="login-spinner" class="fa-solid fa-circle-notch fa-spin hidden!"></i>
                 </button>
             </form>
         </div>
@@ -113,7 +113,7 @@ $page_title = 'Sign In';
 
                 btn.disabled = true;
                 btnText.textContent = 'Signing in…';
-                spinner.classList.remove('hidden');
+                spinner.classList.remove('hidden!');
                 errBox.style.display = 'none';
 
                 try {
@@ -140,7 +140,7 @@ $page_title = 'Sign In';
                 } finally {
                     btn.disabled = false;
                     btnText.textContent = 'Sign In';
-                    spinner.classList.add('hidden');
+                    spinner.classList.add('hidden!');
                 }
             });
         });
