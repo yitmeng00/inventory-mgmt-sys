@@ -126,7 +126,12 @@ const IMS = {
                 infoEmpty: "No entries",
                 paginate: { previous: "‹", next: "›" },
             },
-            dom: "<'dataTables_top'lf>t<'dataTables_bottom'ip>",
+            layout: {
+                topStart: "pageLength",
+                topEnd: "search",
+                bottomStart: "info",
+                bottomEnd: "paging",
+            },
         };
         return $(`#${id}`).DataTable({ ...defaults, ...options });
     },

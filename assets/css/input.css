@@ -120,4 +120,8 @@
     .data-table tbody tr:hover td {
         @apply bg-gray-50;
     }
+
+    .dataTables_top {
+        @apply my-3 mx-4;
+    }
 }
