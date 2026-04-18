@@ -15,7 +15,7 @@ class Supplier {
         supplierBtnContainer.classList.add("text-end");
         const supplierBtn = ElementFactory.createButton(
             "button",
-            "Add Supplier"
+            "Add Supplier",
         );
         supplierBtn.classList.add("ims__add-btn", "mb-4");
         supplierBtn.setAttribute("data-bs-toggle", "modal");
@@ -34,7 +34,7 @@ class Supplier {
         supplierTableContainer.classList.add(
             "ims__supplier-table-container",
             "overflow-hidden",
-            "overflow-x-scroll"
+            "overflow-x-scroll",
         );
         const supplierTable = ElementFactory.createTable("ims__supplier-table");
         supplierTable.classList.add("mb-2", "overflow-hidden");
@@ -62,7 +62,7 @@ class Supplier {
                     ElementFactory.createTableBody(
                         "supplier",
                         supplierTable,
-                        suppliers
+                        suppliers,
                     );
 
                     supplierTableRow.appendChild(supplierTableCol);
@@ -79,7 +79,7 @@ class Supplier {
                 } else {
                     console.error(
                         "Error fetching supplier data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })

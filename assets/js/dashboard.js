@@ -17,7 +17,7 @@ class Dashboard {
                     overviewSectWrapper.classList.add(
                         "ims__overview-section-container",
                         "rounded",
-                        "p-4"
+                        "p-4",
                     );
                     overviewSect.appendChild(overviewSectRow);
                     overviewSectRow.appendChild(overviewSectCol);
@@ -25,7 +25,7 @@ class Dashboard {
 
                     const overviewTitleRow = ElementFactory.createTitle(
                         "Overview",
-                        "h5"
+                        "h5",
                     );
                     overviewTitleRow.classList.add("mb-2");
                     const overviewContentWrapperRow =
@@ -34,13 +34,13 @@ class Dashboard {
                         ElementFactory.createCol();
                     const overviewContentRow = ElementFactory.createRow();
                     overviewContentWrapperRow.appendChild(
-                        overviewContentWrapperCol
+                        overviewContentWrapperCol,
                     );
                     overviewContentWrapperCol.appendChild(overviewContentRow);
 
                     ElementFactory.createOverviewContent(
                         data.overview_contents,
-                        overviewContentRow
+                        overviewContentRow,
                     );
 
                     overviewSectWrapper.appendChild(overviewTitleRow);
@@ -71,21 +71,21 @@ class Dashboard {
                                     ElementFactory.createProductChart(
                                         "Total products",
                                         "dashboard__product-chart",
-                                        data.product_data
+                                        data.product_data,
                                     );
 
                                 chartRow1.appendChild(totalProductChart);
                             } else {
                                 console.error(
                                     "Error fetching product chart data:",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product chart data:",
-                                error
+                                error,
                             );
                         });
 
@@ -93,7 +93,7 @@ class Dashboard {
                         "db/dashboard_db.php?action=get_revenue_profit_chart",
                         {
                             method: "GET",
-                        }
+                        },
                     )
                         .then((response) => response.json())
                         .then((data) => {
@@ -102,21 +102,21 @@ class Dashboard {
                                     ElementFactory.createRevenueProfitChart(
                                         "Revenues and Profits",
                                         "dashboard__revenue-profit-chart",
-                                        data.revenue_profit_data
+                                        data.revenue_profit_data,
                                     );
 
                                 chartRow1.appendChild(revenuesChart);
                             } else {
                                 console.error(
                                     "Error fetching product chart data:",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product chart data:",
-                                error
+                                error,
                             );
                         });
 
@@ -130,21 +130,21 @@ class Dashboard {
                                     ElementFactory.createPurchaseChart(
                                         "Purchases",
                                         "dashboard__purchase-chart",
-                                        data.purchase_data
+                                        data.purchase_data,
                                     );
 
                                 chartRow2.appendChild(purchasesChart);
                             } else {
                                 console.error(
                                     "Error fetching product chart data:",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product chart data:",
-                                error
+                                error,
                             );
                         });
 
@@ -158,21 +158,21 @@ class Dashboard {
                                     ElementFactory.createSaleChart(
                                         "Sales",
                                         "dashboard__sale-chart",
-                                        data.sale_data
+                                        data.sale_data,
                                     );
 
                                 chartRow2.appendChild(salesChart);
                             } else {
                                 console.error(
                                     "Error fetching product chart data:",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product chart data:",
-                                error
+                                error,
                             );
                         });
 
@@ -186,21 +186,21 @@ class Dashboard {
                                     ElementFactory.createLowStockChart(
                                         "Low stock products",
                                         "dashboard__low-stock-chart",
-                                        data.low_stock_data
+                                        data.low_stock_data,
                                     );
 
                                 chartRow3.appendChild(lowStockChart);
                             } else {
                                 console.error(
                                     "Error fetching product chart data:",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product chart data:",
-                                error
+                                error,
                             );
                         });
 
@@ -214,21 +214,21 @@ class Dashboard {
                                     ElementFactory.createBestSellingChart(
                                         "Best-selling products",
                                         "dashboard__best-selling-chart",
-                                        data.best_selling_data
+                                        data.best_selling_data,
                                     );
 
                                 chartRow3.appendChild(bestSellingChart);
                             } else {
                                 console.error(
                                     "Error fetching product chart data:",
-                                    data.error_msg
+                                    data.error_msg,
                                 );
                             }
                         })
                         .catch((error) => {
                             console.error(
                                 "Error fetching product chart data:",
-                                error
+                                error,
                             );
                         });
 

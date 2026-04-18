@@ -31,7 +31,7 @@ class Product {
         productTableContainer.classList.add(
             "ims__product-table-container",
             "overflow-hidden",
-            "overflow-x-scroll"
+            "overflow-x-scroll",
         );
         const productTable = ElementFactory.createTable("ims__product-table");
         productTable.classList.add("mb-2", "overflow-hidden");
@@ -61,7 +61,7 @@ class Product {
                     ElementFactory.createTableBody(
                         "product",
                         productTable,
-                        products
+                        products,
                     );
 
                     productTableRow.appendChild(productTableCol);
@@ -78,7 +78,7 @@ class Product {
                 } else {
                     console.error(
                         "Error fetching product data: ",
-                        data.error_msg
+                        data.error_msg,
                     );
                 }
             })

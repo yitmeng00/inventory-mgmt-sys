@@ -1,6 +1,11 @@
 <?php
+header('Content-Type: application/json');
 
-require_once "mysql_conn.php";
+require_once __DIR__ . '/../lib/jwt_helper.php';
+require_once 'mysql_conn.php';
+
+JWTHelper::authenticateAPI();
+
 $conf = new DBConnection();
 $conn = $conf->connect();
 
@@ -8,413 +13,280 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 switch ($method) {
     case 'GET':
-        if (isset($_GET['transaction_id'])) {
-            retrieveTransactionById();
-        } else {
-            retrieveTransactions();
-        }
+        if (isset($_GET['transaction_id'])) retrieveTransactionById();
+        else retrieveTransactions();
         break;
-
     case 'POST':
         createTransaction();
         break;
-
     case 'PUT':
         updateTransaction();
         break;
-
     case 'DELETE':
         deleteTransaction();
         break;
-
     default:
-        // Unsupported method
-        http_response_code(405); // Method Not Allowed
-        echo json_encode(array('error_msg' => 'Unsupported HTTP method'));
+        http_response_code(405);
+        echo json_encode(['success' => false, 'error_msg' => 'Method not allowed']);
 }
 
 function retrieveTransactions()
 {
     global $conn;
-
-    try {
-        $stmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id;");
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $transactions = $result->fetch_all(MYSQLI_ASSOC);
-
-        if ($transactions) {
-            // Decode HTML special characters for specific fields
-            foreach ($transactions as &$transaction) {
-                $transaction['product_code'] = htmlspecialchars_decode($transaction['product_code']);
-                $transaction['product_name'] = htmlspecialchars_decode($transaction['product_name']);
-            }
-
-            echo json_encode(array(
-                'success' => true,
-                'transactions' => $transactions
-            ));
-        } else {
-            echo json_encode(array(
-                'success' => false,
-                'error_msg' => "Transaction does not exist"
-            ));
-        }
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage()
-        ));
+    $stmt = $conn->prepare(
+        "SELECT txn.transaction_id, txn.transaction_code, txn.product_id, p.product_code,
+                p.product_name, t.type_id, t.type_name, txn.quantity, txn.unit_price, txn.created
+         FROM `transaction` txn
+         INNER JOIN product p ON txn.product_id = p.product_id
+         INNER JOIN transaction_type t ON txn.type_id = t.type_id
+         ORDER BY txn.created DESC"
+    );
+    $stmt->execute();
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    foreach ($rows as &$r) {
+        $r['product_code'] = htmlspecialchars_decode($r['product_code']);
+        $r['product_name'] = htmlspecialchars_decode($r['product_name']);
     }
-
+    echo json_encode(['success' => true, 'transactions' => $rows]);
     $stmt->close();
-    $conn->close();
 }
 
 function retrieveTransactionById()
 {
     global $conn;
-
-    $transactionId = $_GET['transaction_id'];
-
-    try {
-        $stmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
-        $stmt->bind_param("i", $transactionId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $transactions = $result->fetch_all(MYSQLI_ASSOC);
-
-        if ($transactions) {
-            // Decode HTML special characters for specific fields
-            foreach ($transactions as &$transaction) {
-                $transaction['product_code'] = htmlspecialchars_decode($transaction['product_code']);
-                $transaction['product_name'] = htmlspecialchars_decode($transaction['product_name']);
-            }
-
-            echo json_encode(array(
-                'success' => true,
-                'transaction' => $transaction
-            ));
-        } else {
-            echo json_encode(array(
-                'success' => false,
-                'error_msg' => "Transaction does not exist"
-            ));
-        }
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage()
-        ));
+    $id   = (int)$_GET['transaction_id'];
+    $stmt = $conn->prepare(
+        "SELECT txn.transaction_id, txn.transaction_code, txn.product_id, p.product_code,
+                p.product_name, t.type_id, t.type_name, txn.quantity, txn.unit_price, txn.created
+         FROM `transaction` txn
+         INNER JOIN product p ON txn.product_id = p.product_id
+         INNER JOIN transaction_type t ON txn.type_id = t.type_id
+         WHERE txn.transaction_id = ?"
+    );
+    $stmt->bind_param('i', $id);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    if ($row) {
+        $row['product_code'] = htmlspecialchars_decode($row['product_code']);
+        $row['product_name'] = htmlspecialchars_decode($row['product_name']);
+        echo json_encode(['success' => true, 'transaction' => $row]);
+    } else {
+        http_response_code(404);
+        echo json_encode(['success' => false, 'error_msg' => 'Transaction not found']);
     }
-
     $stmt->close();
-    $conn->close();
 }
 
 function createTransaction()
 {
     global $conn;
+    $productId = (int)($_POST['product_id'] ?? 0);
+    $typeId    = (int)($_POST['type_id'] ?? 0);
+    $quantity  = (int)($_POST['quantity'] ?? 0);
 
-    $productId = $_POST['product_id'];
-    $typeId = $_POST['type_id'];
-    $quantity = $_POST['quantity'];
-
-    try {
-        $transactionCode = generateTransactionCode();
-
-        // Check if the generated transaction code already exists in the database
-        $checkCodeStmt = $conn->prepare("SELECT COUNT(*) FROM `transaction` WHERE transaction_code = ?;");
-        $checkCodeStmt->bind_param("s", $transactionCode);
-        $checkCodeStmt->execute();
-        $checkCodeResult = $checkCodeStmt->get_result();
-        $codeExists = ($checkCodeResult->fetch_row()[0] > 0);
-        $checkCodeStmt->close();
-
-        // Regenerate code if it already exists
-        while ($codeExists) {
-            $transactionCode = generateTransactionCode();
-            $checkCodeStmt->bind_param("s", $transactionCode);
-            $checkCodeStmt->execute();
-            $checkCodeResult = $checkCodeStmt->get_result();
-            $codeExists = ($checkCodeResult->fetch_row()[0] > 0);
-        }
-
-        // Fetch unit price from the product table based on product_id
-        $fetchPriceStmt = $conn->prepare("SELECT sale_price FROM product WHERE product_id = ?;");
-        $fetchPriceStmt->bind_param("i", $productId);
-        $fetchPriceStmt->execute();
-        $fetchPriceResult = $fetchPriceStmt->get_result();
-
-        // Check if the product_id is valid
-        if ($fetchPriceResult->num_rows > 0) {
-            $row = $fetchPriceResult->fetch_assoc();
-            $unitPrice = $row['sale_price'];
-
-            // Insert transaction data
-            $insertStmt = $conn->prepare("INSERT INTO `transaction` (transaction_code, product_id, type_id, quantity, unit_price) VALUES (?, ?, ?, ?, ?);");
-            $insertStmt->bind_param("siiid", $transactionCode, $productId, $typeId, $quantity, $unitPrice);
-            $insertStmt->execute();
-
-            $lastInsertedTransactionId = $conn->insert_id;
-
-            if ($insertStmt->affected_rows > 0) {
-                // Update product table based on type_id
-                if ($typeId == 1) {
-                    // If type_id is 1, subtract the quantity from the product table
-                    $updateStmt = $conn->prepare("UPDATE product SET quantity = quantity - ? WHERE product_id = ?;");
-                    $updateStmt->bind_param("ii", $quantity, $productId);
-                    $updateStmt->execute();
-                    $updateStmt->close();
-                } elseif ($typeId == 2) {
-                    // If type_id is 2, add the quantity to the product table
-                    $updateStmt = $conn->prepare("UPDATE product SET quantity = quantity + ? WHERE product_id = ?;");
-                    $updateStmt->bind_param("ii", $quantity, $productId);
-                    $updateStmt->execute();
-                    $updateStmt->close();
-                }
-
-                // Retrieve the newly added transaction data
-                $selectStmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
-                $selectStmt->bind_param("i", $lastInsertedTransactionId);
-                $selectStmt->execute();
-                $result = $selectStmt->get_result();
-                $transactionData = $result->fetch_assoc();
-
-                echo json_encode(array(
-                    'success' => true,
-                    'message' => 'Transaction created successfully',
-                    'transaction_data' => $transactionData
-                ));
-            } else {
-                echo json_encode(array(
-                    'success' => false,
-                    'error_msg' => 'Failed to insert transaction data'
-                ));
-            }
-        } else {
-            echo json_encode(array(
-                'success' => false,
-                'error_msg' => 'Invalid product_id'
-            ));
-        }
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage()
-        ));
+    if (!$productId || !$typeId || $quantity < 1) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error_msg' => 'Invalid input data']);
+        return;
     }
 
-    $fetchPriceStmt->close();
-    $insertStmt->close();
-    $selectStmt->close();
-    $conn->close();
+    // Check sufficient stock for sales
+    if ($typeId === 1) {
+        $chk = $conn->prepare("SELECT quantity FROM product WHERE product_id = ?");
+        $chk->bind_param('i', $productId);
+        $chk->execute();
+        $stock = (int)($chk->get_result()->fetch_assoc()['quantity'] ?? 0);
+        $chk->close();
+        if ($stock < $quantity) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'error_msg' => "Insufficient stock. Available: $stock"]);
+            return;
+        }
+    }
+
+    try {
+        $conn->begin_transaction();
+
+        // Fetch sale price
+        $priceStmt = $conn->prepare("SELECT sale_price FROM product WHERE product_id = ?");
+        $priceStmt->bind_param('i', $productId);
+        $priceStmt->execute();
+        $unitPrice = (float)($priceStmt->get_result()->fetch_assoc()['sale_price'] ?? 0);
+        $priceStmt->close();
+
+        $code = generateTxnCode($conn);
+
+        $insStmt = $conn->prepare("INSERT INTO `transaction` (transaction_code, product_id, type_id, quantity, unit_price) VALUES (?, ?, ?, ?, ?)");
+        $insStmt->bind_param('siiid', $code, $productId, $typeId, $quantity, $unitPrice);
+        $insStmt->execute();
+        $txnId = $conn->insert_id;
+        $insStmt->close();
+
+        // Update stock: type 1 = sale (subtract), type 2 = purchase (add)
+        $delta = $typeId === 1 ? -$quantity : $quantity;
+        $upd   = $conn->prepare("UPDATE product SET quantity = quantity + ? WHERE product_id = ?");
+        $upd->bind_param('ii', $delta, $productId);
+        $upd->execute();
+        $upd->close();
+
+        $conn->commit();
+
+        $selStmt = $conn->prepare(
+            "SELECT txn.transaction_id, txn.transaction_code, txn.product_id, p.product_code,
+                    p.product_name, t.type_id, t.type_name, txn.quantity, txn.unit_price, txn.created
+             FROM `transaction` txn
+             INNER JOIN product p ON txn.product_id = p.product_id
+             INNER JOIN transaction_type t ON txn.type_id = t.type_id
+             WHERE txn.transaction_id = ?"
+        );
+        $selStmt->bind_param('i', $txnId);
+        $selStmt->execute();
+        $txnData = $selStmt->get_result()->fetch_assoc();
+        $selStmt->close();
+
+        echo json_encode(['success' => true, 'message' => 'Transaction created', 'transaction_data' => $txnData]);
+    } catch (mysqli_sql_exception $e) {
+        $conn->rollback();
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error_msg' => $e->getMessage()]);
+    }
 }
 
 function updateTransaction()
 {
     global $conn;
+    $data  = json_decode(file_get_contents('php://input'), true);
+    $txnId = (int)($data['transaction_id'] ?? 0);
+    $typeId    = (int)($data['type_id'] ?? 0);
+    $productId = (int)($data['product_id'] ?? 0);
+    $quantity  = (int)($data['quantity'] ?? 0);
 
-    // Get data from the request body
-    $data = json_decode(file_get_contents("php://input"), true);
-
-    if (!$data) {
-        http_response_code(400); // Bad Request
-        echo json_encode(array('success' => false, 'error_msg' => 'Invalid input data'));
+    if (!$txnId || !$typeId || !$productId || $quantity < 1) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error_msg' => 'Invalid input']);
         return;
     }
 
-    $transactionId = $data['transaction_id'];
-    $typeId = $data['type_id'];
-    $productId = $data['product_id'];
-    $quantity = $data['quantity'];
-
     try {
-        // Fetch product sale_price
-        $selectSalePriceStmt = $conn->prepare("SELECT sale_price FROM `product` WHERE product_id = ?;");
-        $selectSalePriceStmt->bind_param("i", $productId);
-        $selectSalePriceStmt->execute();
-        $salePriceResult = $selectSalePriceStmt->get_result();
-        $salePriceData = $salePriceResult->fetch_assoc();
-        $selectSalePriceStmt->close();
-        $unitPrice = $salePriceData['sale_price'];
+        $conn->begin_transaction();
 
-        // Fetch old transaction data
-        $selectOldStmt = $conn->prepare("SELECT product_id, type_id, quantity FROM `transaction` WHERE transaction_id = ?;");
-        $selectOldStmt->bind_param("i", $transactionId);
-        $selectOldStmt->execute();
-        $oldResult = $selectOldStmt->get_result();
-        $oldData = $oldResult->fetch_assoc();
-        $selectOldStmt->close();
+        // Reverse old transaction's stock effect
+        $oldStmt = $conn->prepare("SELECT product_id, type_id, quantity FROM `transaction` WHERE transaction_id = ?");
+        $oldStmt->bind_param('i', $txnId);
+        $oldStmt->execute();
+        $old = $oldStmt->get_result()->fetch_assoc();
+        $oldStmt->close();
 
-        // Update the transaction
-        $updateStmt = $conn->prepare("UPDATE `transaction` SET product_id=?, type_id=?, quantity=?, unit_price=? WHERE transaction_id=?;");
-        $updateStmt->bind_param("iiidi", $productId, $typeId, $quantity, $unitPrice, $transactionId);
-        $updateStmt->execute();
-
-        if ($updateStmt->affected_rows > 0) {
-            // Update product's quantity based on old data
-            if ($oldData['type_id'] == 1) {
-                $updateOldQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
-                $updateOldQuantityStmt->bind_param("ii", $oldData['quantity'], $oldData['product_id']);
-                $updateOldQuantityStmt->execute();
-                $updateOldQuantityStmt->close();
-            } else if ($oldData['type_id'] == 2) {
-                $updateOldQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity - ? WHERE product_id = ?;");
-                $updateOldQuantityStmt->bind_param("ii", $oldData['quantity'], $oldData['product_id']);
-                $updateOldQuantityStmt->execute();
-                $updateOldQuantityStmt->close();
-            }
-
-            // Update product's quantity based on new data
-            if ($typeId == 1) {
-                $updateNewQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity - ? WHERE product_id = ?;");
-                $updateNewQuantityStmt->bind_param("ii", $quantity, $productId);
-                $updateNewQuantityStmt->execute();
-                $updateNewQuantityStmt->close();
-            } else if ($typeId == 2) {
-                $updateNewQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
-                $updateNewQuantityStmt->bind_param("ii", $quantity, $productId);
-                $updateNewQuantityStmt->execute();
-                $updateNewQuantityStmt->close();
-            }
-
-            // Fetch updated transaction data
-            $selectStmt = $conn->prepare("SELECT transaction_id, transaction_code, txn.product_id, p.product_code, p.product_name, t.type_id, t.type_name, txn.quantity, unit_price, txn.created FROM `transaction` txn INNER JOIN product p ON txn.product_id = p.product_id INNER JOIN transaction_type t ON txn.type_id = t.type_id WHERE transaction_id = ?;");
-            $selectStmt->bind_param("i", $transactionId);
-            $selectStmt->execute();
-            $result = $selectStmt->get_result();
-            $transactionData = $result->fetch_assoc();
-
-            echo json_encode(array(
-                'success' => true,
-                'message' => 'Transaction updated successfully',
-                'transaction_data' => $transactionData
-            ));
-        } else {
-            echo json_encode(array(
-                'success' => false,
-                'error_msg' => 'No rows affected. Transaction may not exist or no changes made.'
-            ));
+        if ($old) {
+            $reverseDelta = $old['type_id'] === 1 ? $old['quantity'] : -$old['quantity'];
+            $rev = $conn->prepare("UPDATE product SET quantity = quantity + ? WHERE product_id = ?");
+            $rev->bind_param('ii', $reverseDelta, $old['product_id']);
+            $rev->execute();
+            $rev->close();
         }
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage()
-        ));
+
+        // Fetch new unit price
+        $priceStmt = $conn->prepare("SELECT sale_price FROM product WHERE product_id = ?");
+        $priceStmt->bind_param('i', $productId);
+        $priceStmt->execute();
+        $unitPrice = (float)($priceStmt->get_result()->fetch_assoc()['sale_price'] ?? 0);
+        $priceStmt->close();
+
+        $updStmt = $conn->prepare("UPDATE `transaction` SET product_id=?, type_id=?, quantity=?, unit_price=? WHERE transaction_id=?");
+        $updStmt->bind_param('iiidi', $productId, $typeId, $quantity, $unitPrice, $txnId);
+        $updStmt->execute();
+        $updStmt->close();
+
+        // Apply new stock effect
+        $delta = $typeId === 1 ? -$quantity : $quantity;
+        $upd   = $conn->prepare("UPDATE product SET quantity = quantity + ? WHERE product_id = ?");
+        $upd->bind_param('ii', $delta, $productId);
+        $upd->execute();
+        $upd->close();
+
+        $conn->commit();
+
+        $selStmt = $conn->prepare(
+            "SELECT txn.transaction_id, txn.transaction_code, txn.product_id, p.product_code,
+                    p.product_name, t.type_id, t.type_name, txn.quantity, txn.unit_price, txn.created
+             FROM `transaction` txn
+             INNER JOIN product p ON txn.product_id = p.product_id
+             INNER JOIN transaction_type t ON txn.type_id = t.type_id
+             WHERE txn.transaction_id = ?"
+        );
+        $selStmt->bind_param('i', $txnId);
+        $selStmt->execute();
+        $txnData = $selStmt->get_result()->fetch_assoc();
+        $selStmt->close();
+
+        echo json_encode(['success' => true, 'message' => 'Transaction updated', 'transaction_data' => $txnData]);
+    } catch (mysqli_sql_exception $e) {
+        $conn->rollback();
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error_msg' => $e->getMessage()]);
     }
-
-    $updateStmt->close();
-    $conn->close();
-}
-
-// Function to update the product table
-function updateProductTable($productId, $typeId, $oldQuantity, $changeInQuantity)
-{
-    global $conn;
-
-    $productQuantityStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
-
-    // If it was a sale, subtract the old quantity
-    if ($typeId == 1) {
-        $productQuantityStmt->bind_param("ii", -$oldQuantity, $productId);
-        $productQuantityStmt->execute();
-    }
-
-    // Add the new quantity
-    $productQuantityStmt->bind_param("ii", $changeInQuantity, $productId);
-    $productQuantityStmt->execute();
-
-    $productQuantityStmt->close();
 }
 
 function deleteTransaction()
 {
     global $conn;
-
-    // Get data from the request body
-    $data = json_decode(file_get_contents("php://input"), true);
-
-    if (!$data || !isset($data['transaction_id']) || !isset($data['product_id'])) {
-        http_response_code(400); // Bad Request
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => 'Invalid input data'
-        ));
+    $data  = json_decode(file_get_contents('php://input'), true);
+    $txnId = (int)($data['transaction_id'] ?? 0);
+    if (!$txnId) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'error_msg' => 'Transaction ID required']);
         return;
     }
 
-    $transactionId = $data['transaction_id'];
-    $productId = $data['product_id'];
-
     try {
-        $typeId = "";
-        $quantity = "";
-        // Get type_id and quantity from the transaction before deleting it
-        $stmt = $conn->prepare("SELECT type_id, quantity FROM `transaction` WHERE transaction_id = ?;");
-        $stmt->bind_param("i", $transactionId);
+        $conn->begin_transaction();
+
+        $stmt = $conn->prepare("SELECT product_id, type_id, quantity FROM `transaction` WHERE transaction_id = ?");
+        $stmt->bind_param('i', $txnId);
         $stmt->execute();
-        $stmt->bind_result($typeId, $quantity);
+        $row = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
 
-        if ($stmt->fetch()) {
-            // Delete from transaction table
-            $stmt->close();
-
-            $stmt = $conn->prepare("DELETE FROM `transaction` WHERE transaction_id = ?;");
-            $stmt->bind_param("i", $transactionId);
-            $stmt->execute();
-
-            if ($stmt->affected_rows > 0) {
-                echo json_encode(array(
-                    'success' => true,
-                    'message' => 'Transaction deleted successfully'
-                ));
-
-                // Update product table based on type_id
-                if ($typeId == 1) {
-                    // If type_id is 1, add the quantity to the product table
-                    $updateStmt = $conn->prepare("UPDATE `product` SET quantity = quantity + ? WHERE product_id = ?;");
-                    $updateStmt->bind_param("ii", $quantity, $productId);
-                    $updateStmt->execute();
-                } elseif ($typeId == 2) {
-                    // If type_id is 2, subtract the quantity from the product table
-                    $updateStmt = $conn->prepare("UPDATE `product` SET quantity = quantity - ? WHERE product_id = ?;");
-                    $updateStmt->bind_param("ii", $quantity, $productId);
-                    $updateStmt->execute();
-                }
-
-                $updateStmt->close();
-            } else {
-                echo json_encode(array(
-                    'success' => false,
-                    'error_msg' => 'No rows affected. Transaction may not exist.'
-                ));
-            }
-        } else {
-            echo json_encode(array(
-                'success' => false,
-                'error_msg' => 'Transaction not found'
-            ));
+        if (!$row) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'error_msg' => 'Transaction not found']);
+            return;
         }
-    } catch (mysqli_sql_exception $exception) {
-        echo json_encode(array(
-            'success' => false,
-            'error_msg' => $exception->getMessage()
-        ));
-    }
 
-    $stmt->close();
-    $conn->close();
+        $del = $conn->prepare("DELETE FROM `transaction` WHERE transaction_id = ?");
+        $del->bind_param('i', $txnId);
+        $del->execute();
+        $del->close();
+
+        // Reverse stock effect
+        $delta = $row['type_id'] === 1 ? $row['quantity'] : -$row['quantity'];
+        $upd   = $conn->prepare("UPDATE product SET quantity = quantity + ? WHERE product_id = ?");
+        $upd->bind_param('ii', $delta, $row['product_id']);
+        $upd->execute();
+        $upd->close();
+
+        $conn->commit();
+        echo json_encode(['success' => true, 'message' => 'Transaction deleted']);
+    } catch (mysqli_sql_exception $e) {
+        $conn->rollback();
+        http_response_code(500);
+        echo json_encode(['success' => false, 'error_msg' => $e->getMessage()]);
+    }
 }
 
-function generateTransactionCode()
+function generateTxnCode(mysqli $conn): string
 {
-    $characters = '0123456789abcdefghijklmnopqrstuvwxyz';
-    $code = 'T';
-
-    for ($i = 0; $i < 6; $i++) {
-        $code .= $characters[rand(0, strlen($characters) - 1)];
-    }
-
+    $chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    do {
+        $code = 'T';
+        for ($i = 0; $i < 6; $i++) $code .= $chars[random_int(0, strlen($chars) - 1)];
+        $chk = $conn->prepare("SELECT 1 FROM `transaction` WHERE transaction_code = ?");
+        $chk->bind_param('s', $code);
+        $chk->execute();
+        $exists = $chk->get_result()->num_rows > 0;
+        $chk->close();
+    } while ($exists);
     return $code;
 }
+
+?>
