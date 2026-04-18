@@ -1,0 +1,12 @@
+{
+  "name": "inventory-mgmt-sys",
+  "version": "2.0.0",
+  "description": "Inventory Management System",
+  "scripts": {
+    "build": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --minify",
+    "dev": "tailwindcss -i ./assets/css/input.css -o ./assets/css/tailwind.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.0.0"
+  }
+}
