@@ -79,7 +79,7 @@ function getPurchaseChart()
         "SELECT MONTH(created) AS month_num, MONTHNAME(created) AS month,
                 SUM(quantity * unit_price) AS total
          FROM `transaction` WHERE type_id = 2 AND YEAR(created) = YEAR(CURDATE())
-         GROUP BY MONTH(created) ORDER BY month_num"
+         GROUP BY MONTH(created), MONTHNAME(created) ORDER BY month_num"
     );
     $rows = [];
     while ($row = $result->fetch_assoc()) $rows[] = ['month' => $row['month'], 'value' => (float)$row['total']];
@@ -93,7 +93,7 @@ function getSaleChart()
         "SELECT MONTH(created) AS month_num, MONTHNAME(created) AS month,
                 SUM(quantity * unit_price) AS total
          FROM `transaction` WHERE type_id = 1 AND YEAR(created) = YEAR(CURDATE())
-         GROUP BY MONTH(created) ORDER BY month_num"
+         GROUP BY MONTH(created), MONTHNAME(created) ORDER BY month_num"
     );
     $rows = [];
     while ($row = $result->fetch_assoc()) $rows[] = ['month' => $row['month'], 'value' => (float)$row['total']];
@@ -111,7 +111,7 @@ function getRevenueProfitChart()
          INNER JOIN product p ON t.product_id = p.product_id
          WHERE t.type_id = 1
            AND YEAR(t.created) = YEAR(CURRENT_DATE)
-         GROUP BY MONTH(t.created) ORDER BY month_num"
+         GROUP BY MONTH(t.created), MONTHNAME(t.created) ORDER BY month_num"
     );
     $rows = [];
     while ($row = $result->fetch_assoc()) {
