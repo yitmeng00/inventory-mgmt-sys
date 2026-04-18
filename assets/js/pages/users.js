@@ -16,6 +16,11 @@ async function loadUsers() {
     const rows = data.users || [];
     document.getElementById("user-count").textContent = rows.length;
 
+    if (usersTable) {
+        usersTable.destroy();
+        usersTable = null;
+    }
+
     const tbody = document.getElementById("users-tbody");
     tbody.innerHTML = "";
 
@@ -56,9 +61,6 @@ async function loadUsers() {
         tbody.appendChild(tr);
     });
 
-    if (usersTable) {
-        usersTable.destroy();
-    }
     usersTable = IMS.initDataTable("users-table", {
         order: [[2, "asc"]],
         columnDefs: [{ orderable: false, targets: [9] }],

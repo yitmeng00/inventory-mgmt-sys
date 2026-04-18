@@ -16,6 +16,11 @@ async function loadSuppliers() {
     const rows = data.suppliers || [];
     document.getElementById("supplier-count").textContent = rows.length;
 
+    if (suppliersTable) {
+        suppliersTable.destroy();
+        suppliersTable = null;
+    }
+
     const tbody = document.getElementById("suppliers-tbody");
     tbody.innerHTML = "";
 
@@ -45,9 +50,6 @@ async function loadSuppliers() {
         tbody.appendChild(tr);
     });
 
-    if (suppliersTable) {
-        suppliersTable.destroy();
-    }
     suppliersTable = IMS.initDataTable("suppliers-table", {
         order: [[2, "asc"]],
         columnDefs: [{ orderable: false, targets: [8] }],

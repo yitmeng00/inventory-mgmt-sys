@@ -16,6 +16,11 @@ async function loadCategories() {
     const rows = data.categories || [];
     document.getElementById("category-count").textContent = rows.length;
 
+    if (categoriesTable) {
+        categoriesTable.destroy();
+        categoriesTable = null;
+    }
+
     const tbody = document.getElementById("categories-tbody");
     tbody.innerHTML = "";
 
@@ -41,9 +46,6 @@ async function loadCategories() {
         tbody.appendChild(tr);
     });
 
-    if (categoriesTable) {
-        categoriesTable.destroy();
-    }
     categoriesTable = IMS.initDataTable("categories-table", {
         order: [[1, "asc"]],
         columnDefs: [{ orderable: false, targets: [4] }],

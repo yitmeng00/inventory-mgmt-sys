@@ -16,6 +16,11 @@ async function loadProducts() {
     const rows = data.products || [];
     document.getElementById("product-count").textContent = rows.length;
 
+    if (productsTable) {
+        productsTable.destroy();
+        productsTable = null;
+    }
+
     const tbody = document.getElementById("products-tbody");
     tbody.innerHTML = "";
 
@@ -46,9 +51,6 @@ async function loadProducts() {
         tbody.appendChild(tr);
     });
 
-    if (productsTable) {
-        productsTable.destroy();
-    }
     productsTable = IMS.initDataTable("products-table", {
         order: [[2, "asc"]],
         columnDefs: [{ orderable: false, targets: [9] }],

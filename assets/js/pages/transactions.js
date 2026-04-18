@@ -41,6 +41,11 @@ async function loadTransactions() {
     document.getElementById("txn-purchase-count").textContent =
         IMS.formatNumber(purchaseCount);
 
+    if (txnTable) {
+        txnTable.destroy();
+        txnTable = null;
+    }
+
     const tbody = document.getElementById("transactions-tbody");
     tbody.innerHTML = "";
 
@@ -75,9 +80,6 @@ async function loadTransactions() {
         tbody.appendChild(tr);
     });
 
-    if (txnTable) {
-        txnTable.destroy();
-    }
     txnTable = IMS.initDataTable("transactions-table", {
         order: [[7, "desc"]],
         columnDefs: [{ orderable: false, targets: [8] }],
