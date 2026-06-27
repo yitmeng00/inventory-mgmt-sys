@@ -53,8 +53,6 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 
 ## Screenshots
 
-> Place screenshots in `assets/images/screenshots/` and update the paths below.
-
 | Page                   | Desktop                                                                                                                                     | Mobile                                                                                                                                                          |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Login                  | ![Web Login Page](assets/images/screenshots/login-page-desktop.png)                                                                         | ![Mobile Login Page](assets/images/screenshots/login-page-mobile.png)                                                                                           |
