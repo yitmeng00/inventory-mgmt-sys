@@ -34,6 +34,8 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 - **Toast Notifications** — Contextual success/error/warning/info toasts
 - **CSV Export** — Export products and transactions to CSV
 - **Chart Export** — Export charts to image
+- **Reporting API** — JSON reports (overview, stock, sales, purchases, top products, low stock, category value, supplier spend, monthly trend)
+- **CSV Download API** — Server-side CSV downloads for products, suppliers, transactions (with optional date range), categories, and low stock
 
 ---
 
@@ -44,9 +46,11 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 | Backend         | PHP 8.1+                                     |
 | Database        | MySQL 8.0+                                   |
 | Authentication  | `firebase/php-jwt` v7, httpOnly cookie       |
+| Configuration   | `vlucas/phpdotenv` v5                        |
 | Frontend        | Tailwind v4 (`@tailwindcss/cli`), Vanilla JS |
-| Tables          | DataTables v2.3.7                            |
+| Tables          | DataTables v2.3.7 (CDN, requires jQuery 3.7) |
 | Charts          | Chart.js (CDN, dashboard only)               |
+| Icons & Fonts   | Font Awesome 6, Inter (Google Fonts)         |
 | Package Manager | Composer (PHP), npm (CSS build)              |
 
 ---
@@ -86,7 +90,7 @@ A responsive inventory management system built with **PHP**, **MySQL**, **Tailwi
 - PHP 8.1 or higher (with `mysqli`, `fileinfo`, `json` extensions enabled)
 - MySQL 8.0 or higher
 - Composer
-- Node.js 18+ and npm (for Tailwind CSS compilation)
+- Node.js 20+ and npm (for Tailwind CSS compilation)
 - A local web server: [XAMPP](https://www.apachefriends.org/), [Laragon](https://laragon.org/), or PHP's built-in server
 
 ---
@@ -113,7 +117,9 @@ npm install
 npm run build
 ```
 
-> The build script compiles `assets/css/input.css` → `assets/css/tailwind.css` using `@tailwindcss/cli`.
+> The build script compiles `assets/css/input.css` → `assets/css/tailwind.css` (minified) using `@tailwindcss/cli`.
+>
+> During development, run `npm run dev` instead to rebuild the CSS automatically whenever you edit `input.css` or the PHP/JS files.
 
 ---
 
@@ -131,13 +137,17 @@ Edit `.env`:
 
 ```env
 DB_HOST=localhost
-DB_NAME=inventory_db
 DB_USER=root
-DB_PASS=
+DB_PASSWORD=
+DB_NAME=inventory_db
 JWT_SECRET=your_random_secret_here_min_32_chars
 ```
 
-> **Important:** `JWT_SECRET` must be at least 32 characters. Use a cryptographically random string.
+> **Important:** `JWT_SECRET` must be at least 32 characters — `firebase/php-jwt` rejects shorter keys and login will fail. Generate one with:
+>
+> ```bash
+> php -r "echo bin2hex(random_bytes(32)), PHP_EOL;"
+> ```
 
 ---
 
@@ -154,6 +164,8 @@ CREATE DATABASE inventory_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```bash
 mysql -u root -p inventory_db < schema.sql
 ```
+
+This also creates the default admin account (see [Default Credentials](#default-credentials)).
 
 ### 3. (Optional) Load sample data
 
@@ -189,11 +201,21 @@ Configure a virtual host pointing to the project root, e.g. `http://ims.local`.
 
 ## Default Credentials
 
-| Role  | Username     | Password   |
-| ----- | ------------ | ---------- |
-| Admin | `admin`      | `admin123` |
-| Staff | `john.doe`   | `staff123` |
-| Staff | `jane.smith` | `staff123` |
+Created by `schema.sql`:
+
+| Role  | Username | Password   |
+| ----- | -------- | ---------- |
+| Admin | `admin`  | `password` |
+
+Additional accounts created by `seed.sql` (all share the same password):
+
+| Role  | Username     | Designation         |
+| ----- | ------------ | ------------------- |
+| Admin | `mary.chen`  | Operations Manager  |
+| Staff | `alice.tan`  | Warehouse Staff     |
+| Staff | `bob.lim`    | Inventory Clerk     |
+| Staff | `carol.ng`   | Procurement Officer |
+| Staff | `david.wong` | Sales Executive     |
 
 > **Change all default passwords immediately in a production environment.**
 
@@ -220,8 +242,12 @@ inventory-mgmt-sys/
 │   │       ├── transactions.js
 │   │       ├── users.js
 │   │       └── profile.js
-│   └── images/
+│   ├── images/
+│   └── templates/               # CSV templates for bulk import
+│       ├── products_template.csv
+│       └── suppliers_template.csv
 ├── db/                          # PHP REST API endpoints
+│   ├── mysql_conn.php           # MySQL connection (reads .env)
 │   ├── login_db.php
 │   ├── dashboard_db.php
 │   ├── product_db.php
@@ -230,15 +256,25 @@ inventory-mgmt-sys/
 │   ├── transaction_db.php
 │   ├── transaction_type_db.php
 │   ├── user_db.php
-│   └── import_db.php
+│   ├── import_db.php            # CSV bulk import (products, suppliers)
+│   ├── export_db.php            # CSV downloads
+│   └── report_db.php            # Reporting API
 ├── includes/
 │   ├── header.php               # HTML <head> — CSS/JS imports
 │   └── navbar.php               # Sidebar navigation
 ├── lib/
-│   └── jwt_helper.php           # JWT encode/decode/cookie helpers
+│   ├── jwt_helper.php           # JWT encode/decode/cookie helpers
+│   ├── CSVHelper.php            # CSV parsing and output
+│   ├── Formatter.php            # Value, date, and record formatting
+│   ├── ImageHelper.php          # Product image storage
+│   ├── PaginationHelper.php     # Pagination, search, and sorting
+│   ├── ResponseHelper.php       # JSON response helpers
+│   ├── StockHelper.php          # Stock status and adjustments
+│   └── Validator.php            # Input validation
 ├── uploads/                     # Product images (gitignored)
 ├── vendor/                      # Composer packages (gitignored)
 ├── node_modules/                # npm packages (gitignored)
+├── index.php                    # Redirects to dashboard or login
 ├── dashboard.php
 ├── products.php
 ├── categories.php
@@ -252,6 +288,7 @@ inventory-mgmt-sys/
 ├── seed.sql                     # Sample data
 ├── composer.json
 ├── package.json
+├── .env.example                 # Environment template
 └── .env                         # Environment secrets (gitignored)
 ```
 
